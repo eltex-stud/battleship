@@ -25,12 +25,12 @@ struct srv_main_data {
 
 void *srv_main_new_client(struct srv_net_client *client, void *main_data);
 void srv_main_placement_received(struct srv_net_client *client,
-		void *client_data, void *main_data);
+		placement plcmnt, void *client_data, void *main_data);
 void srv_main_del_client(struct srv_net_client *client, void *client_data,
 		void *main_data);
-void srv_main_move_received(struct srv_net_client *client, void *client_data,
-		void *main_data);
-void srv_main_nick_received(struct srv_net_client *client, void *client_data,
-		void *main_data);
+void srv_main_shot_received(struct srv_net_client *client, struct shot *shot,
+		void *client_data, void *main_data);
+void srv_main_nick_received(struct srv_net_client *client, char *nick,
+		void *client_data, void *main_data);
 
 #endif // BATTLESHIP_SRV_MAIN_H_
