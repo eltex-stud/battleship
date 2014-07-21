@@ -57,7 +57,7 @@ struct srv_net_network *srv_net_start(char *ip, short int port)
 
 int srv_net_stop(struct srv_net_client *net)
 {
-  close(*net.fd);
+  close(net->fd);
   free(net);
 }
 
@@ -76,16 +76,16 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[],
 	idx=0;
 	jdx=0;
 
-	listen(*net.fd, 5);
+	listen(net->fd, 5);
 
 	while(1) {
 		fd_set readset;
 		FD_ZERO(&readset);
-		FD_SET(*net.fd, &readset);
+		FD_SET(net->fd, &readset);
 
 		for(idx=0; idx<=32; idx++) {
-			if(client_list[idx]!=0) {
-				FD_SET(client_list, &readset);
+			if(client_list[idx].fd!=0) {
+				FD_SET(client_list[idx].fd, &readset);
 			}
 		}
 
@@ -96,20 +96,21 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[],
 			printf("Error select");
 		}
 
-		if(FD_ISSET(*net.fd, &readset)) {
-			client_list[idx] = accept(*net.fd, NULL, NULL);
-			fcntl(client_list[idx], F_SETFL, O_NONBLOCK);
+		if(FD_ISSET(net->fd, &readset)) {
+			client_list[idx].fd = accept(*net.fd, NULL, NULL);
+			fcntl(client_list[idx].fd, F_SETFL, O_NONBLOCK);
 
 			srv_main_new_client (client_list[idx], *main_data);
 			idx++;
 		}
 
 		for(jdx=0; jdx<=32; idx++) {
-			if(client_list[jdx]!=0) {
-				if(FD_ISSET(client_list[jdx], &readset)) {
-					recv(client_list[jdx], &buff, SIZE_BUFF, 0);
+			if(client_list[jdx].fd!=0) {
+				if(FD_ISSET(client_list[jdx].fd, &readset)) {
+					recv(client_list[jdx].fd, &buff, SIZE_BUFF, 0);
 					switch((enum types_msg *)tmsg) {
 						case NICK:
+
 							break;
 
 						case PLACEMENT:
