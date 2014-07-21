@@ -1,12 +1,41 @@
 /* vim: set noexpandtab tabstop=4 shiftwidth=4 smartindent: */
 #include "cl_gui.h"
 
+void gui_key_processing_battleground(struct gui *options, long ch)
+{
 
-void *cl_gui_key_processing(void *arg)
+}
+
+
+void *gui_key_processing(void *arg)
 {
 	struct gui *options;
+	long ch;
 
 	options = (struct gui*)arg;
+
+	keypad(stdscr, TRUE);
+
+	while((ch = getch()) != KEY_END) {
+	/*
+	 * options->state = 0 - enter_nickname;
+	 * options->state = 1 - work with battleground;
+	 * options->state = 2 - work with chat;
+	 */
+		switch(options->state) {
+			case 1:
+				gui_key_processing_battleground(options, ch);
+				break;
+
+			case 2:
+				gui_key_processing_chat(options, ch);
+				break;
+		}
+	}
+
+	keypad(stdscr, FALSE);
+
+	gui_stop(options);
 
 }
 
@@ -38,8 +67,15 @@ struct gui *gui_start(struct main_queue *main_queue_h)
 	options->font_color = 8;
 	options->state = 0;
 	options->main_queue_head = main_queue_h;
+	options->size_of_msg = 0;
+	options->x = 0;
+	options->y = 0;
 
-	pthread_create(&gui_pthread, NULL, cl_gui_key_processing, (void *) options);
+	for(idx = 0; idx < MAX_BUFF; idx++) {
+		options->msg[idx] = '\0';
+	}
+
+	pthread_create(&gui_pthread, NULL, gui_key_processing, (void *) options);
 
 	return options;
 }
@@ -98,7 +134,7 @@ int gui_main_window(struct gui *options, char map[10][10])
 	refresh();
 
 	options->my_map = newwin(22, 41, 3, 4);
-	wbkgd(my_map_window, COLOR_PAIR(CUR_COLOR));
+	wbkgd(options->my_map, COLOR_PAIR(CUR_COLOR));
 
 	for(idx = 2; idx < 20; idx += 2) {
 		for(jdx = 1; jdx < 41; jdx++) {
@@ -180,8 +216,8 @@ int gui_main_window(struct gui *options, char map[10][10])
 	attroff(COLOR_PAIR(2));
 	refresh();
 
-	options->chat = newwin(getmaxy(stdscr) - 27, 89, 26, 4);
-	wbkgb(options->chat, COLOR_PAIR(CUR_COLOR));
+	options->chat = newwin((getmaxy(stdscr) - 27), 89, 26, 4);
+	wbkgd(options->chat, COLOR_PAIR(CUR_COLOR));
 	box(options->chat, ACS_VLINE, ACS_HLINE);
 	wrefresh(options->chat);
 
