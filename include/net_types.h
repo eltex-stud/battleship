@@ -27,7 +27,7 @@
 
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <sys/poll.h>
+#include <sys/select.h>
 #include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>
