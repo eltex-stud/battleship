@@ -9,8 +9,6 @@
  */
 struct srv_net_client_ops {
 	/**
-	 * @name new_client
-	 *
 	 * @brief Function to handle player connections
 	 *
 	 * @param client connected client
@@ -21,8 +19,6 @@ struct srv_net_client_ops {
 	void *(*new_client)(struct srv_net_client *client, void *main_data);
 
 	/**
-	 * @name placement_received
-	 *
 	 * @brief Function to handle client placement receiving
 	 *
 	 * @param client client who sent the placement
@@ -34,8 +30,6 @@ struct srv_net_client_ops {
 			void *client_data, void *main_data);
 
 	/**
-	 * @name del_client
-	 *
 	 * @brief Function to handle client disconnect. Should free resources
 	 * allocated in new_client.
 	 *
@@ -47,8 +41,6 @@ struct srv_net_client_ops {
 			void *main_data);
 
 	/**
-	 * @name shot_received
-	 *
 	 * @brief Function to handle shots
 	 *
 	 * @param client client who sent the shot
@@ -60,8 +52,6 @@ struct srv_net_client_ops {
 			void *client_data, void *main_data);
 
 	/**
-	 * @name nick_received
-	 *
 	 * @brief Function to handle client nick receiving
 	 *
 	 * @param client client who sent the shot
