@@ -1,5 +1,6 @@
 /* vim: set noexpandtab tabstop=4 shiftwidth=4 smartindent: */
 
+
 #include "../include/srv_net.h"
 #include "srv_net.h"
 
@@ -47,4 +48,10 @@ struct srv_net_network *srv_net_start(char *ip, short int port){
 
 	network.fd = server_socket;
 	return network;
+}
+
+
+int srv_net_stop(struct srv_net_client *net) {
+  close(*net.fd);
+  free(net);
 }
