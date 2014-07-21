@@ -76,3 +76,120 @@ int gui_input_nick(struct gui *options)
         return 0;
 }
 
+int gui_main_window(struct gui *options, char map[10][10])
+{
+	int idx, jdx;
+	int poz = 4;
+	refresh();
+
+	for(idx = 0; idx < 10; idx++) {
+		move(poz, 2);
+		poz = poz + 2;
+		printw("%d\n", idx+1);
+		refresh();
+	}
+
+	poz = 5;
+	for(idx = 0; idx < 10; idx++) {
+		move(2, poz);
+		poz += 4;
+		printw("%c", 'A' + idx);
+	}
+	refresh();
+
+	options->my_map = newwin(22, 41, 3, 4);
+	wbkgd(my_map_window, COLOR_PAIR(CUR_COLOR));
+
+	for(idx = 2; idx < 20; idx += 2) {
+		for(jdx = 1; jdx < 41; jdx++) {
+			wmove(options->my_map, idx, jdx);
+			wprintw(options->my_map, "_");
+			wrefresh(options->my_map);
+		}
+	}
+
+	for(idx = 4; idx < 40; idx += 4) {
+		for(jdx = 1; jdx < 21; jdx++) {
+			wmove(options->my_map, jdx, idx);
+			wprintw(options->my_map, "|");
+			wrefresh(options->my_map);
+		}
+	}
+
+	box(options->my_map, ACS_VLINE, ACS_HLINE);
+
+	move(25, 4);
+	attrset(COLOR_PAIR(13));
+	printw("You");
+	attroff(COLOR_PAIR(13));
+	refresh();
+
+	wattron(options->my_map, COLOR_PAIR(13));
+	for(idx = 0; idx < 10; idx++) {
+		for(jdx = 0; jdx < 10; jdx++) {
+			if(map[idx][jdx] == 1) {
+				wmove(options->my_map, 1 + (idx * 2), 2 + (jdx * 4));
+				wprintw(options->my_map,"#");
+			}
+		}
+	}
+	wattroff(options->my_map, COLOR_PAIR(13));
+	wrefresh(options->my_map);
+
+
+	options->enemy_map = newwin(22, 41, 3, 52);
+	wbkgd(options->enemy_map, COLOR_PAIR(CUR_COLOR));
+
+	poz = 4;
+	for(idx = 0; idx < 10; idx++) {
+		move(poz, 50);
+		poz = poz + 2;
+		printw("%d\n", idx+1);
+		refresh();
+	}
+
+	poz = 53;
+	for(idx = 0; idx < 10; idx++) {
+		move(2, poz);
+		poz += 4;
+		printw("%c", 'A' + idx);
+	}
+
+	for(idx = 2; idx < 20; idx += 2) {
+		for(jdx = 1; jdx < 41; jdx++) {
+			wmove(options->enemy_map, idx, jdx);
+			wprintw(options->enemy_map, "_");
+			wrefresh(options->enemy_map);
+		}
+	}
+
+	for(idx = 4; idx < 40; idx += 4) {
+		for(jdx = 1; jdx < 21; jdx++) {
+			wmove(options->enemy_map, jdx, idx);
+			wprintw(options->enemy_map, "|");
+			wrefresh(options->enemy_map);
+		}
+	}
+
+	box(options->enemy_map, ACS_VLINE, ACS_HLINE);
+	wrefresh(options->enemy_map);
+
+	move(25, 53);
+	attrset(COLOR_PAIR(2));
+	printw("Enemy: hair monster");
+	attroff(COLOR_PAIR(2));
+	refresh();
+
+	options->chat = newwin(getmaxy(stdscr) - 27, 89, 26, 4);
+	wbkgb(options->chat, COLOR_PAIR(CUR_COLOR));
+	box(options->chat, ACS_VLINE, ACS_HLINE);
+	wrefresh(options->chat);
+
+	options->line_stat = newwin(1, 89, getmaxy(stdscr) - 1, 4);
+	wbkgd(options->line_stat, COLOR_PAIR(18));
+	wmove(options->line_stat, 0, 0);
+	wprintw(options->line_stat, "Status: ");
+	wrefresh(options->line_stat);
+
+	return 0;
+}
