@@ -44,3 +44,35 @@ struct gui *gui_start(struct main_queue *main_queue_h)
 	return options;
 }
 
+int gui_input_nick(struct gui *options)
+{
+        char nick[16];
+
+        refresh();
+        options->nick_window = newwin(5, 50, 10, 20);
+        wbkgd(options->nick_window, COLOR_PAIR(CUR_COLOR));
+        box(options->nick_window, ACS_VLINE, ACS_HLINE);
+
+        echo();
+
+        wmove(options->nick_window, 2, 2);
+        wprintw(options->nick_window, "Enter your nickname: ");
+        curs_set(TRUE);
+        wmove(options->nick_window, 2, 23);
+        wgetnstr(options->nick_window, nick, 16);
+        curs_set(FALSE);
+
+        noecho();
+
+        wrefresh(options->nick_window);
+        delwin(options->nick_window);
+
+        clear();
+        refresh();
+
+        cl_main_make_event(options->main_queue_head, GUI_NICK, (void*)nick, strlen(nick));
+
+        options->state = 1;
+        return 0;
+}
+
