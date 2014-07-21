@@ -63,17 +63,44 @@ struct srv_net_client_ops {
 			void *client_data, void *main_data);
 };
 
-int srv_net_start(char ip, short int port);
-int srv_net_stop(int net);
+enum srv_net_shot_result {
+	MISS,
+	HIT,
+	KILL,
+	END
+};
 
-void srv_net_wait_events(int net, int *clients[],
-		struct srv_net_client_ops client ops, *main_data);
+enum srv_net_error_msg {
+	BAD_SHOT,
+	NOT_SHOT
+};
 
-int srv_net_send_shot_result(int client, struct shot, enum result r);
-int srv_net_send_game_start(int client, int turn);
-int srv_net_send_placement(int client, char **placement);
-int srv_net_send_game_end(int client, enum result r);
-int srv_net_send_error(int client, enum error_msg er_msg);
+struct srv_net_client {
+	int fd;
+	int *next;
+};
 
-int srv_net_del_client(int client);
+struct srv_net_network {
+	int fd;
+	int *next;
+};
+
+struct srv_net_shot {
+	int x;
+	int y;
+};
+
+int srv_net_start(char *ip, short int port);
+int srv_net_stop(struct srv_net_network *net);
+int srv_net_send_shot_result(struct srv_net_client *client,
+		struct srv_net_shot *shot, enum result r);
+int srv_net_send_game_start(struct srv_net_client *client, int turn);
+int srv_net_send_placement(struct srv_net_client *client, char **placement);
+int srv_net_send_game_end(struct srv_net_client *client,
+		enum srv_net_shot_result r);
+int srv_net_send_error(struct srv_net_client *client,
+		enum srv_net_error_msg er_msg);
+int srv_net_del_client(struct srv_net_client *client);
+void srv_net_wait_events(struct srv_net_network *net, int *clients[],
+		struct srv_net_client_ops client_ops, *main_data);
 #endif // BATTLESHIP_SRV_NET_H_
