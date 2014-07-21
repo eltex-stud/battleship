@@ -2,14 +2,73 @@
 #ifndef BATTLESHIP_SRV_NET_H_
 #define BATTLESHIP_SRV_NET_H_
 
+/**
+ * @struct srv_net_client_ops
+ *
+ * @brief Set of callbacks to handle network events
+ */
 struct srv_net_client_ops {
+	/**
+	 * @name new_client
+	 *
+	 * @brief Function to handle player connections
+	 *
+	 * @param client connected client
+	 * @param main_data data passed in srv
+	 *
+	 * @return data specific to this client
+	 */
 	void *(*new_client)(struct srv_net_client *client, void *main_data);
+
+	/**
+	 * @name placement_received
+	 *
+	 * @brief Function to handle client placement receiving
+	 *
+	 * @param client client who sent the placement
+	 * @param placement placement of client's ships
+	 * @param client_data data returned from new_client
+	 * @param main_data data passed to srv_net_wait_events
+	 */
 	void (*placement_received)(struct srv_net_client *client, placement plcmnt,
 			void *client_data, void *main_data);
+
+	/**
+	 * @name del_client
+	 *
+	 * @brief Function to handle client disconnect. Should free resources
+	 * allocated in new_client.
+	 *
+	 * @param client disconnected client
+	 * @param client_data data returned from new_client
+	 * @param main_data data passed to srv_net_wait_events
+	 */
 	void (*del_client)(struct srv_net_client *client, void *client_data,
 			void *main_data);
+
+	/**
+	 * @name shot_received
+	 *
+	 * @brief Function to handle shots
+	 *
+	 * @param client client who sent the shot
+	 * @param shot the shot that player did
+	 * @param client_data data returned from new_client call
+	 * @param main_data data passed to srv_net_wait_events
+	 */
 	void (*shot_received)(struct srv_net_client *client, struct shot *shot,
 			void *client_data, void *main_data);
+
+	/**
+	 * @name nick_received
+	 *
+	 * @brief Function to handle client nick receiving
+	 *
+	 * @param client client who sent the shot
+	 * @param nick the nick
+	 * @param client_data data returned from new_client call
+	 * @param main_data data passed to srv_net_wait_events
+	 */
 	void (*nick_received)(struct srv_net_client *client, char *nick,
 			void *client_data, void *main_data);
 };
