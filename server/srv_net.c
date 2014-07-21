@@ -99,14 +99,16 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[],
 		if(FD_ISSET(*net.fd, &readset)) {
 			client_list[idx] = accept(*net.fd, NULL, NULL);
 			fcntl(client_list[idx], F_SETFL, O_NONBLOCK);
-			i++;
+
+			srv_main_new_client (client_list[idx], *main_data);
+			idx++;
 		}
 
 		for(jdx=0; jdx<=32; idx++) {
 			if(client_list[jdx]!=0) {
 				if(FD_ISSET(client_list[jdx], &readset)) {
 					recv(client_list[jdx], &buff, SIZE_BUFF, 0);
-					switch((enum types_msg)tmsg) {
+					switch((enum types_msg *)tmsg) {
 						case NICK:
 							break;
 
