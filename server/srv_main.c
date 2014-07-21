@@ -140,3 +140,48 @@ void nick_received(struct srv_net_client *client, char *nick,
 {
 	/* Do nothing for now */
 }
+
+
+void *new_client(struct srv_net_client *client, void *main_data)
+{
+	struct main_data *m_data;
+	m_data = main_data;
+	
+	struct client_list *cl_list;
+	cl_list = (struct client_list*)malloc(sizeof(cl_list));
+	
+	struct client_data *cl_data;
+	cl_data = (struct client_data*)malloc(sizeof(cl_data));
+	cl_data->client = client;
+	cl_data->map = NULL;
+	cl_data->enemy = NULL;
+	cl_list->client_data = cl_data;
+	cl_list->next = NULL;
+
+	if(m_data->clients_data == NULL)
+	{
+		m_data->clients_data = cl_list;
+	} else {
+		struct client_list *list;
+		list = m_data->clients_data;
+		while(list->next != NULL){
+			list = list->next;
+		}
+	}
+	return cl_data;
+}
+
+
+void del_client(struct srv_net_client *client, void *client_data,
+		void *main_data)
+{
+	struct client_list *temp;
+	struct main_data *m_data;
+	m_data = main_data;
+	temp = m_data->clients_data;
+
+
+
+
+
+}
