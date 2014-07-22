@@ -1,7 +1,7 @@
 /* vim: set noexpandtab tabstop=4 shiftwidth=4 smartindent: */
 #include "cl_logic.h"
 
-void cl_logic_generate_placement(placement map[10][10])
+void cl_logic_generate_placement(placement map)
 {
     int index1, index2, n, m, location;
     
@@ -188,28 +188,22 @@ void cl_logic_generate_placement(placement map[10][10])
     }
 }
 
-void cl_logic_merge_placement_map(placament server_map[10][10], placement map[10][10])
+void cl_logic_merge_placement_map(placement server_map, placement map)
 {
     int index1, index2;
-    
-    /*placement temp_map[10][10];*/
     
     for(index1 = 0; index1 < 10; index1++)
     {
 	for(index2 = 0; index2 < 10; index2++)
 	{
-	    /*temp_map[index1][index2] = server_map[index1][index2];
-	    temp_map = map[index1][index2];*/
 	    map[index1][index2] = server_map[index1][index2] + map[index1][index2];
 	}
     }
-    
-    /*return temp_map;*/
 }
 
-void cl_logic_shot(int x, int y, int result, placement map[10][10], enum player_state *state)
+void cl_logic_shot(int x, int y, int result, placement map, enum player_state *state)
 {
-    if(state == ENEMY_TURN)
+    if(*state == ENEMY_TURN)
     {
 	switch(result)
 	{
@@ -238,7 +232,7 @@ void cl_logic_shot(int x, int y, int result, placement map[10][10], enum player_
     }
     else
     {
-	if(state == WAITING_TURN)
+	if(*state == WAITING_TURN)
 	{
 	    switch(result)
 	    {
@@ -259,7 +253,7 @@ void cl_logic_shot(int x, int y, int result, placement map[10][10], enum player_
 		case 4:
 		{
 		    map[y][x] = result;
-		    state = ENEMY_TURN;
+		    *state = ENEMY_TURN;
 		    
 		    break;
 		}
@@ -268,7 +262,7 @@ void cl_logic_shot(int x, int y, int result, placement map[10][10], enum player_
     }
 }
 
-void cl_logic_kill_ship(int x, int y, int result, placement map[10][10])
+void cl_logic_kill_ship(int x, int y, int result, placement map)
 {
     int index1, index2;
     int x1 = x, y1 = y;
@@ -277,15 +271,8 @@ void cl_logic_kill_ship(int x, int y, int result, placement map[10][10])
     int horizontal = 0;
     int one = 0;
     
-    if(y == 9 && (map[y1 - 1][x1] == 2))/* || map[y1 - 1][x1] =! 2))*/
+    if(y == 9 && (map[y1 - 1][x1] == 2))
     {
-	/*if(map[y1 - 1][x1] != 2)
-	{
-	    one = 1;
-	    map[y][x] = result;
-	}
-	else
-	{*/
 	    down = y1;
 	    map[y1][x1] = result;
 	    y1--;
@@ -304,19 +291,11 @@ void cl_logic_kill_ship(int x, int y, int result, placement map[10][10])
 	    }
 	    
 	    vertical = 1;
-	/*}*/
     }
     else
     {
-	if(y1 == 0 && (map[y1 + 1][x1] == 2))/* || map[y1 + 1][x1] != 2))*/
+	if(y1 == 0 && (map[y1 + 1][x1] == 2))
 	{
-	    /*if(map[y1 + 1][x1] != 2)
-	    {
-		one = 1;
-		map[y][x] = result;
-	    }
-	    else
-	    {*/
 		up = y1;
 		map[y1][x1] = result;
 		y1++;
@@ -325,7 +304,7 @@ void cl_logic_kill_ship(int x, int y, int result, placement map[10][10])
 		{
 		    map[y1][x1] = result;
 		    
-		    if(map[y1+1][n1] != 2)
+		    if(map[y1+1][x1] != 2)
 		    {
 			down = y1;
 			break;
@@ -334,12 +313,13 @@ void cl_logic_kill_ship(int x, int y, int result, placement map[10][10])
 		    y1++;
 		}
 		
+		y1 = y;
+		
 	        vertical = 1;
-	    /*}*/
 	}
 	else
 	{
-	    if(y1 != 0 && y1 != 9 && (map[y1 - 1][x1] == 2 || map[y1 + 1][x1] == 2))/* || map[y1 - 1][x1] != 2 || map[y1 + 1][x1] != 2))*/
+	    if(y1 != 0 && y1 != 9 && (map[y1 - 1][x1] == 2 || map[y1 + 1][x1] == 2))
 	    {
 		map[y1][x1] = result;
 		
@@ -355,7 +335,6 @@ void cl_logic_kill_ship(int x, int y, int result, placement map[10][10])
 			
 			if(y1 == -1)
 			{
-			    y1 = y;
 			    break;
 			}
 		    }
@@ -365,38 +344,38 @@ void cl_logic_kill_ship(int x, int y, int result, placement map[10][10])
 		    up = y1;
 		}
 		
+		y1 = y;
+		
 		if(map[y1 + 1][x1] == 2)
 		{
-		    y++;
+		    y1++;
 		    
 		    while(map[y1][x1] == 2)
 		    {
 			map[y1][x1] = result;
-			down = y1
+			down = y1;
 			y++;
 			
 			if(y1 == 10)
 			{
-			    y1 = y;
 			    break;
 			}
 		    }
 		}
+		else
+		{
+		    down = y1;
+		}
+		
+		y1 = y;
 		
 		vertical = 1;
 	    }
 	}
     }
     
-    if(x1 == 9 && (map[y1][x1 - 1] == 2))/* || map[y1][x1 - 1] != 2))*/
+    if(x1 == 9 && (map[y1][x1 - 1] == 2))
     {
-	/*if(map[y1][x1 - 1] != 2)
-	{
-	    one = 1;
-	    map[y][x] = result;
-	}
-	else
-	{*/
 	    right = x1;
 	    map[y1][x1] = result;
 	    x1--;
@@ -408,7 +387,6 @@ void cl_logic_kill_ship(int x, int y, int result, placement map[10][10])
 		
 		if(map[y1][x1 - 1] != 2)
 		{
-		    left = x1;
 		    break;
 		}
 	        
@@ -416,19 +394,11 @@ void cl_logic_kill_ship(int x, int y, int result, placement map[10][10])
 	    }
 	    
 	    horizontal = 1;
-	/*}*/
     }
     else
     {
-	if(x1 == 0 && (map[y1][x1 + 1] == 2))/* || map[y1][x1 + 1] != 2))*/
+	if(x1 == 0 && (map[y1][x1 + 1] == 2))
 	{
-	    /*if(map[y1][x1 + 1] != 2)
-	    {
-		one = 1;
-		map[y][x] = result;
-	    }
-	    else
-	    {*/
 		left = x1;
 		map[y1][x1] = result;
 		x1++;
@@ -436,10 +406,10 @@ void cl_logic_kill_ship(int x, int y, int result, placement map[10][10])
 		while(map[y1][x1] == 2)
 		{
 		    map[y1][x1] = result;
+		    right = x1;
 		    
 		    if(map[y1][x1 + 1] != 2)
 		    {
-			right = x1;
 			break;
 		    }
 		    
@@ -447,7 +417,6 @@ void cl_logic_kill_ship(int x, int y, int result, placement map[10][10])
 	        }
 	    
 		horizontal = 1;
-	    /*}*/
 	}
 	else
 	{
@@ -467,7 +436,6 @@ void cl_logic_kill_ship(int x, int y, int result, placement map[10][10])
 			
 			if(x1 == -1)
 			{
-			    x1 = x;
 			    break;
 			}
 		    }
@@ -476,6 +444,8 @@ void cl_logic_kill_ship(int x, int y, int result, placement map[10][10])
 		{
 		    left = x1;
 		}
+		
+		x1 = x;
 		
 		if(map[y1][x1 + 1] == 2)
 		{
@@ -489,21 +459,31 @@ void cl_logic_kill_ship(int x, int y, int result, placement map[10][10])
 			
 			if(x1 == 10)
 			{
-			    x1 = x;
 			    break;
 			}
 		    }
 		}
+		else
+		{
+		    right = x1;
+		}
+		
+		x1 = x;
 		
 		horizontal = 1;
 	    }
 	}
     }
     
-    /*if()*/
+    if(horizontal != 1 && vertical != 1)
+    {
+	one = 1;
+    }
     
     if(one == 1)
     {
+	map[y][x] = result;
+	
 	for(index1 = y - 1; index1 < y+2; index1++)
 	{
 	    for(index2 = x - 1; index2 < x+2; index2++)
@@ -521,15 +501,95 @@ void cl_logic_kill_ship(int x, int y, int result, placement map[10][10])
 	    }
 	}
     }
+    else
+    {
+	if(horizontal == 1)
+	{
+	    if((left - 1) != -1)
+		left--;
+	    
+	    if((right + 1) != 10)
+		right++;
+	    
+	    if((y - 1) != -1)
+	    {
+		up = y - 1;
+	    }
+	    else
+	    {
+		up = y;
+	    }
+	    
+	    if((y + 1) != 10)
+	    {
+		down = y + 1;
+	    }
+	    else
+	    {
+		down = y;
+	    }
+	    
+	    for(index1 = up; index1 <= down; index1++)
+	    {
+		for(index2 = left; index2 <= right; index2++)
+		{
+		    if(map[index1][index2] == result)
+			continue;
+		    
+		    map[index1][index2] = 4;
+		}
+	    }
+	}
+	else
+	{
+	    if(vertical == 1)
+	    {
+		if((up - 1) != -1)
+		    up--;
+		
+		if((down + 1) != 10)
+		    down++;
+		
+		if((x - 1) != -1)
+		{
+		    left = x - 1;
+		}
+		else
+		{
+		    left = x;
+		}
+		
+		if((x + 1) != 10)
+		{
+		    right = x + 1;
+		}
+		else
+		{
+		    right = x;
+		}
+		
+		for(index1 = left; index1 <= right; index1++)
+		    {
+		    for(index2 = up; index2 <= down; index2++)
+		    {
+			if(map[index2][index1] == result)
+			    continue;
+			
+			map[index2][index1] = 4;
+		    }
+		}
+	    }
+	}
+    }
 }
 
-int cl_logic_valid_shot(int x, int y, map map[10][10], enum player_state *state)
+int cl_logic_valid_shot(int x, int y, placement map, enum player_state *state)
 {
-    if(state == MY_TURN)
+    if(*state == MY_TURN)
     {
 	if(map[y][x] == 0 || map[y][x] == 1)
 	{
-	    state = WAITING_TURN;
+	    *state = WAITING_TURN;
 	    return 1;
 	}
 	else
