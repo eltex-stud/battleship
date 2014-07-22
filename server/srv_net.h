@@ -85,7 +85,7 @@ int srv_net_stop(struct srv_net_network *net);
 int srv_net_send_shot_result(struct srv_net_client *client,
 		struct srv_net_shot *shot, enum result r);
 int srv_net_send_game_start(struct srv_net_client *client, int turn);
-int srv_net_send_placement(struct srv_net_client *client, char **placement);
+int srv_net_send_placement(struct srv_net_client *client, char *placement);
 int srv_net_send_game_end(struct srv_net_client *client,
 		enum srv_net_shot_result r);
 int srv_net_send_error(struct srv_net_client *client,

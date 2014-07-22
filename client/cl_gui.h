@@ -3,6 +3,7 @@
 #define BATTLESHIP_CLIENT_GUI_H_
 
 #include "cl_main.h"
+#include "client.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -13,6 +14,7 @@
 #define MAX_BUFF 128
 
 #define KEY_ENTER 10
+#define KEY_SPACE 32
 
 #define CUR_COLOR ((options->bg_color * 10) + options->font_color)
 
@@ -31,7 +33,11 @@ struct gui
 	unsigned short y;
 	char msg[MAX_BUFF];
 	struct main_queue *main_queue_head;
+	pthread_t gui_id;
+	pthread_mutex_t mutex;
 };
+
+void gui_distinguish_cell(struct gui *options, unsigned short color);
 
 void *gui_key_processing(void *arg);
 
@@ -39,12 +45,16 @@ void gui_key_processing_battleground(struct gui *options, long ch);
 
 void gui_key_processing_chat(struct gui *options, long ch);
 
-struct gui *gui_start(struct main_queue *main_queue_h);
+struct gui *cl_gui_start(struct main_queue *main_queue_h);
 
-int gui_input_nick(struct gui *options);
+void cl_gui_stop(struct gui *options);
 
-int gui_main_window(struct gui *options, char map[10][10]);
+void cl_gui_wait(struct gui *options);
 
-void gui_stop(struct gui *options);
+int cl_gui_input_nick(struct gui *options);
+
+int cl_gui_main_window(struct gui *options, char map[10][10]);
+
+int cl_gui_refresh_map(struct gui *options, char map[10][10], enum player pl);
 
 #endif // BATTLESHIP_CLIENT_GUI_H_

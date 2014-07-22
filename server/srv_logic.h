@@ -33,7 +33,7 @@ struct srv_logic_shot {
  *
  */
 
-struct srv_logic_map *placement_to_map(int placement[10][10]);
+struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]);
 
 /*
  *
@@ -51,7 +51,7 @@ int srv_logic_delmap(struct srv_logic_map *c_t_m);
  *
  */
 
-enum srv_logic_shot_result make_shot(struct srv_logic_map *c_t_m,
+enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 		struct srv_logic_shot *shot);
 
 
