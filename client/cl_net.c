@@ -16,8 +16,12 @@ void cl_net_processing_event(struct net *configure)
 	memcpy(buf + 1, idx->data, idx->data_len);
 	send(configure->socket, buf, idx->data_len + 1, 0);
 	net_del_queue(configure->net_queue_head);
+	if(idx->type_msg == END) {
+		pthread_mutex_unlock(configure->mutex);
+		pthread_join(configure->pthreadfd);
+		return ;
+	}
 	pthread_mutex_unlock(configure->mutex);
-
 };
 
 struct net *net_start(char address, int port, struct main_queue *m_queue)
@@ -54,6 +58,7 @@ struct net *net_start(char address, int port, struct main_queue *m_queue)
 		perror("pthred_create");
 		return NULL;
 	}
+	configure->pthredfd = net_pth;
 
 	return configure;
 }
@@ -96,6 +101,295 @@ void *net_work(void *arg)
 			cl_main_make_event(configure->m_queue, NET_ERROR, (void*)msg_error,
 			                   sizeof(msg_error));
 		}
+}
 
+
+/*
+ * NAME: net_send_placement
+ *
+ * IN:	 struct net *configure - configure which was filled by net_start and
+ * 		main
+ * 	 placement *net_placement - client ships placement
+ *
+ * OUT:	 nothing
+ *
+ * WORK: takes configure and net_placement to place it into the net queue if
+ * 	 configure->mutex is not locked, else waiting for unlock and do the
+ * 	 same things
+ */
+void net_send_placement(struct net *configure, placement *net_placement) {
+	struct net_queue *element = (struct net_queue *)malloc(
+						sizeof (struct net_queue));
+
+	pthread_mutex_lock (configure->mutex);
+
+	element->next = NULL;
+	element->type_msg = PLACEMENT;
+	element->data = (void *)net_placement;
+	element->data_len = sizeof (placement);
+	net_add_queue (configure->net_queue_head, element);
+
+	pthread_mutex_unlock (configure->mutex);
+}
+
+
+
+/*
+ * NAME: net_send_shot
+ *
+ * IN:	 struct net *configure - configure which was filled by net_start and
+ * 		main
+ * 	 char shot_x - x coordinate of shot
+ * 	 char shot_y - y coordinate of shot
+ *
+ * OUT:	 nothing
+ *
+ * WORK: takes configure and shot coordinates to place it into the net queue if
+ * 	 configure->mutex is not locked, else waiting for unlock and do the
+ * 	 same things
+ */
+void net_send_shot(struct net *configure, char shot_x, char shot_y) {
+	struct net_queue *element = (struct net_queue *)malloc(
+						sizeof (struct net_queue));
+	char buff[2]; /* a char buffer for coordinates */
+
+	pthread_mutex_lock (configure->mutex);
+
+	buff[0] = shot_x;
+	buff[1] = shot_y;
+	element->next = NULL;
+	element->type_msg = SHOT;
+	element->data = (void *)buff;
+	element->data_len = sizeof (char) * 2;
+	net_add_queue (configure->net_queue_head, element);
+
+	pthread_mutex_unlock (configure->mutex);
+}
+
+
+
+
+/*
+ * NAME: net_send_nick
+ *
+ * IN:	 struct net *configure - configure which was filled by net_start and
+ * 		main
+ * 	 char *nick - string with a client nick
+ * 	 int nick_len - nick length
+ *
+ * OUT:	 nothing
+ *
+ * WORK: takes configure and nick to place it into the net queue if
+ * 	 configure->mutex is not locked, else waiting for unlock and do the
+ * 	 same things
+ */
+void net_send_shot(struct net *configure, char *net_nick, int nick_len) {
+	struct net_queue *element = (struct net_queue *)malloc(
+						sizeof (struct net_queue));
+
+	pthread_mutex_lock (configure->mutex);
+
+	element->next = NULL;
+	element->type_msg = NICK;
+	element->data = (void *)net_nick;
+	element->data_len = nick_len;
+	net_add_queue (configure->net_queue_head, element);
+
+	pthread_mutex_unlock (configure->mutex);
+}
+
+
+
+/*
+ * NAME: net_send_start
+ *
+ * IN:	 struct net *configure - configure which was filled by net_start and
+ * 		main
+ *
+ * OUT:	 nothing
+ *
+ * WORK: takes configure to place it into the net queue if configure->mutex is
+ * 	 not locked, else waiting for unlock and do the same things
+ */
+void net_send_start(struct net *configure) {
+	struct net_queue *element = (struct net_queue *)malloc(
+						sizeof (struct net_queue));
+
+	pthread_mutex_lock (configure->mutex);
+
+	element->next = NULL;
+	element->type_msg = START;
+	element->data = NULL;
+	element->data_len = -1;
+	net_add_queue (configure->net_queue_head, element);
+
+	pthread_mutex_unlock (configure->mutex);
+}
+
+
+
+/*
+ * NAME: net_send_error
+ *
+ * IN:	 struct net *configure - configure which was filled by net_start and
+ * 		main
+ * 	 int net_error - client error number
+ *
+ * OUT:	 nothing
+ *
+ * WORK: takes configure and net_error to place it into the net queue if
+ * 	 configure->mutex is not locked, else waiting for unlock and do the
+ * 	 same things
+ */
+void net_send_error(struct net *configure, int net_error) {
+	struct net_queue *element = (struct net_queue *)malloc(
+						sizeof (struct net_queue));
+
+	pthread_mutex_lock (configure->mutex);
+
+	element->next = NULL;
+	element->type_msg = ERROR;
+	element->data = (void *)&net_error;
+	element->data_len = sizeof (int);
+	net_add_queue (configure->net_queue_head, element);
+
+	pthread_mutex_unlock (configure->mutex);
+}
+
+
+
+/*
+ * NAME: net_send_end
+ *
+ * IN:	 struct net *configure - configure which was filled by net_start and
+ * 		main
+ *
+ * OUT:	 nothing
+ *
+ * WORK: takes configure to place it into the net queue if configure->mutex is
+ * 	 not locked, else waiting for unlock and do the same things
+ */
+void net_send_end(struct net *configure) {
+	struct net_queue *element = (struct net_queue *)malloc(
+						sizeof (struct net_queue));
+
+	pthread_mutex_lock (configure->mutex);
+
+	element->next = NULL;
+	element->type_msg = END;
+	element->data = NULL;
+	element->data_len = -1;
+	net_add_queue (configure->net_queue_head, element);
+
+	pthread_mutex_unlock (configure->mutex);
+}
+
+
+
+/*
+ * NAME: net_add_queue
+ *
+ * IN:	 struct net_queue *net_queue_head - a pointer to the net queue head
+ * 	 struct net_queue *element - a pointer to the added element of net
+ * 		queue
+ *
+ * OUT:	 nothing
+ *
+ * WORK: if mutex is not locked then the element will be added to the net queue
+ */
+void net_add_queue(struct net_queue *net_queue_head, struct net_queue *element) {
+
+	struct net_queue *idp; /* a queue iterator */
+
+	if(net_queue_head == NULL) {
+	// if the queue doesn't exists
+		net_queue_head = element;
+	} else {
+		// else
+		for (idp = net_queue_head; idp->next != NULL; idp = idp->next);
+		idp->next = element;
+	}
+}
+
+
+
+/*
+ * NAME: net_del_queue
+ *
+ * IN:	 struct net_queue *net_queue_head - a pointer to the net queue head
+ *
+ * OUT:	 nothing
+ *
+ * WORK: deletes the first element of the net queue
+ */
+void net_del_queue(struct net_queue *net_queue_head) {
+	struct net_queue *idp; /* a queue iterator */
+
+	if(net_queue_head != NULL) {
+	    idp = net_queue_head;
+	    net_queue_head = net_queue_head->next;
+	    free(idp);
+	}
+}
+
+
+
+/*
+ * NAME: net_recv
+ *
+ * IN:	 struct net *configure - configure which was filled by net_start and
+ * 		main
+ *
+ * OUT:	 nothing
+ *
+ * WORK: receives information from net server module, takes configure to place
+ * 	 received information into the main queue
+ * 	 in case when recv returns an error then in main queue will be added
+ * 	 an error number from errno or -1 if the server has closed connection
+ */
+void net_recv(struct net *configure) {
+	char buff[128]; /* buffer for contain net information in recv */
+	int recv_bytes; /* receive bytes */
+	int err; /* buffer for contain error */
+	int code; /* buffer for contain code of MAIN_EVENT_TYPES */
+
+	recv_bytes = recv(configure->socket, buff, 128, 0);
+	if (recv_bytes < 0) {
+	// receive error
+		err = errno;
+		cl_main_make_event(configure->main_queue, ERROR,
+					(void *)&err, sizeof(err));
+	} else if(!recv_bytes) {
+		// server has closed a connection
+		err = 1;
+		cl_main_make_event(configure->main_queue, ERROR,
+					(void *)&err, sizeof (err));
+	} else {
+		// it's ok
+		switch(buff[0]) {
+			case START:
+				code = NET_START_GAME;
+				break;
+
+			case SHOT:
+				code = NET_SHOT_RESULT;
+				break;
+
+			case ERROR:
+				code = NET_ERROR;
+				break;
+
+			case PLACEMENT:
+				code = NET_PLACEMENT;
+				break;
+		}
+		
+		cl_main_make_event(configure->m_queue, code,	(void *)buff,
+					128);
+	}
+}
+
+int main() {
+	return 0;
 }
 

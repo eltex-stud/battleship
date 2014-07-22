@@ -15,6 +15,7 @@ struct net {
 	struct net_queue *net_queue_head;
 	struct main_queue *m_queue;
 	int socket;
+	pthread_t pthreadfd;
 	pthread_mutex_t *mutex;
 };
 
