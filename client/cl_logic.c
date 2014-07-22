@@ -598,3 +598,12 @@ int cl_logic_valid_shot(int x, int y, placement map, enum player_state *state)
     else
 	return 0;
 }
+
+char* cl_logic_convert_placement(placement fild1)
+{
+    char *fild2 = malloc(sizeof(map));
+    
+    memcpy(fild2, fild1, sizeof(map));
+    
+    return fild2;
+}
