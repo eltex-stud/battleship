@@ -32,10 +32,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#define SIZE_BUF 128
+
 enum types_msg{
 	NICK,
 	PLACEMENT,
 	START,
 	SHOT,
-	ERROR
+	ERROR,
+	END
 };
