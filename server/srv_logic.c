@@ -105,53 +105,53 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 	for (idx = 0; idx < 15; idx++) {
 		for (jdx = 0; jdx < 15; jdx++) {
 			if (placement_test[idx][jdx] == 1) {
-				if (placement_test[idx][jdx - 1] != 1 
-					 && placement_test[idx - 1][jdx] != 1
+				if (placement_test[idx][jdx - 1] == 0 
+					 && placement_test[idx - 1][jdx] == 0
 					 && placement_test[idx + 1][jdx] == 0 
 					 && placement_test[idx][jdx + 1] == 0) {
-					if (c_t_m->ship1_1[1][1] == 0) {
-						c_t_m->ship1_1[1][1] = idx - 1;
-						c_t_m->ship1_1[2][1] = jdx - 1;
-						c_t_m->ship1_1[3][1] = 1;
+					if (c_t_m->ship1_1[0][0] == 0) {
+						c_t_m->ship1_1[0][0] = idx - 1;
+						c_t_m->ship1_1[1][0] = jdx - 1;
+						c_t_m->ship1_1[2][0] = 1;
 						jdx++;
 					}
 				}
 			}
 			if (placement_test[idx][jdx] == 1) {
-				if (placement_test[idx][jdx - 1] != 1 
-					 && placement_test[idx - 1][jdx] != 1
+				if (placement_test[idx][jdx - 1] == 0 
+					 && placement_test[idx - 1][jdx] == 0
 					 && placement_test[idx + 1][jdx] == 0 
 					 && placement_test[idx][jdx + 1] == 0) {
-					if (c_t_m->ship1_2[1][1] == 0) {
-						c_t_m->ship1_2[1][1] = idx - 1;
-						c_t_m->ship1_2[2][1] = jdx - 1;
-						c_t_m->ship1_2[3][1] = 1;
+					if (c_t_m->ship1_2[0][0] == 0) {
+						c_t_m->ship1_2[0][0] = idx - 1;
+						c_t_m->ship1_2[1][0] = jdx - 1;
+						c_t_m->ship1_2[2][0] = 1;
 						jdx++;
 					}
 				}
 			}
 			if (placement_test[idx][jdx] == 1) {
-				if (placement_test[idx][jdx - 1] != 1 
-					 && placement_test[idx - 1][jdx] != 1
+				if (placement_test[idx][jdx - 1] == 0 
+					 && placement_test[idx - 1][jdx] == 0
 					 && placement_test[idx + 1][jdx] == 0 
 					 && placement_test[idx][jdx + 1] == 0) {
-					if (c_t_m->ship1_3[1][1] == 0) {
-						c_t_m->ship1_3[1][1] = idx - 1;
-						c_t_m->ship1_3[2][1] = jdx - 1;
-						c_t_m->ship1_3[3][1] = 1;
+					if (c_t_m->ship1_3[0][0] == 0) {
+						c_t_m->ship1_3[0][0] = idx - 1;
+						c_t_m->ship1_3[1][0] = jdx - 1;
+						c_t_m->ship1_3[2][0] = 1;
 						jdx++;
 					}
 				}
 			}
 			if (placement_test[idx][jdx] == 1) {
-				if (placement_test[idx][jdx - 1] != 1 
-					 && placement_test[idx - 1][jdx] != 1
+				if (placement_test[idx][jdx - 1] == 0 
+					 && placement_test[idx - 1][jdx] == 0
 					 && placement_test[idx + 1][jdx] == 0 
 					 && placement_test[idx][jdx + 1] == 0) {
-					if (c_t_m->ship1_4[1][1] == 0) {
-						c_t_m->ship1_4[1][1] = idx - 1;
-						c_t_m->ship1_4[2][1] = jdx - 1;
-						c_t_m->ship1_4[3][1] = 1;
+					if (c_t_m->ship1_4[0][0] == 0) {
+						c_t_m->ship1_4[0][0] = idx - 1;
+						c_t_m->ship1_4[1][0] = jdx - 1;
+						c_t_m->ship1_4[2][0] = 1;
 					}
 				}
 			}
@@ -165,87 +165,88 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 	for (idx = 0; idx < 15; idx++) {
 		for (jdx = 0; jdx < 15; jdx++) {
 			if (placement_test[idx][jdx] == 1) {
-				if (placement_test[idx - 1][jdx] != 1 
-					&& placement_test[idx][jdx - 1] != 1
+				if (placement_test[idx - 1][jdx] == 0 
+					&& placement_test[idx][jdx - 1] == 0
 					&& placement_test[idx][jdx + 1] == 1 
 					&& placement_test[idx][jdx + 2] == 0
 					&& placement_test[idx + 1][jdx] == 0) {
-					c_t_m->ship2_1[1][1] = idx - 1;
-					c_t_m->ship2_1[2][1] = jdx - 1;
-					c_t_m->ship2_1[1][2] = idx - 1;
-					c_t_m->ship2_1[2][2] = jdx - 1 + 1;
-					c_t_m->ship2_1[3][1] = 1;
-					c_t_m->ship2_1[3][2] = 1;
+					c_t_m->ship2_1[0][0] = idx - 1;
+					c_t_m->ship2_1[1][0] = jdx - 1;
+					c_t_m->ship2_1[0][1] = idx - 1;
+					c_t_m->ship2_1[1][1] = jdx - 1 + 1;
+					c_t_m->ship2_1[2][0] = 1;
+					c_t_m->ship2_1[2][1] = 1;
 					jdx++;
 					} else { 
-						if (placement_test[idx - 1][jdx] != 1 
-							&& placement_test[idx][jdx - 1] != 1
+						if (placement_test[idx - 1][jdx] == 0 
+							&& placement_test[idx][jdx - 1] == 0
 							&& placement_test[idx + 1][jdx] == 1 
 							&& placement_test[idx + 2][jdx] == 0
 							&& placement_test[idx][jdx + 1] == 0) {
-							c_t_m->ship2_1[1][1] = idx - 1;
-							c_t_m->ship2_1[2][1] = jdx - 1;
-							c_t_m->ship2_1[1][2] = idx - 1 + 1;
-							c_t_m->ship2_1[2][2] = jdx - 1;
-							c_t_m->ship2_1[3][1] = 1;
-							c_t_m->ship2_1[3][2] = 1;
+							c_t_m->ship2_1[0][0] = idx - 1;
+							c_t_m->ship2_1[1][0] = jdx - 1;
+							c_t_m->ship2_1[0][1] = idx - 1 + 1;
+							c_t_m->ship2_1[1][1] = jdx - 1;
+							c_t_m->ship2_1[2][0] = 1;
+							c_t_m->ship2_1[2][1] = 1;
 							jdx++;
 						}
 					}
 				}
 			if (placement_test[idx][jdx] == 1) {
-				if (placement_test[idx - 1][jdx] != 1 
-					&& placement_test[idx][jdx - 1] != 1
+				if (placement_test[idx - 1][jdx] == 0 
+					&& placement_test[idx][jdx - 1] == 0
 					&& placement_test[idx][jdx + 1] == 1 
 					&& placement_test[idx][jdx + 2] == 0
 					&& placement_test[idx + 1][jdx] == 0) {
-					c_t_m->ship2_2[1][1] = idx - 1;
-					c_t_m->ship2_2[2][1] = jdx - 1;
-					c_t_m->ship2_2[1][2] = idx - 1;
-					c_t_m->ship2_2[2][2] = jdx - 1 + 1;
-					c_t_m->ship2_2[3][1] = 1;
-					c_t_m->ship2_2[3][2] = 1;
+					c_t_m->ship2_2[0][0] = idx - 1;
+					c_t_m->ship2_2[1][0] = jdx - 1;
+					c_t_m->ship2_2[0][1] = idx - 1;
+					c_t_m->ship2_2[1][1] = jdx - 1 + 1;
+					c_t_m->ship2_2[2][0] = 1;
+					c_t_m->ship2_2[2][1] = 1;
 					jdx++;
 					} else { 
-						if (placement_test[idx - 1][jdx] != 0 
-							&& placement_test[idx][jdx - 1] != 0
+						if (placement_test[idx - 1][jdx] == 0 
+							&& placement_test[idx][jdx - 1] == 0
 							&& placement_test[idx + 1][jdx] == 1 
 							&& placement_test[idx + 2][jdx] == 0
 							&& placement_test[idx][jdx + 1] == 0) {
-							c_t_m->ship2_2[1][1] = idx - 1;
-							c_t_m->ship2_2[2][1] = jdx - 1;
-							c_t_m->ship2_2[1][2] = idx - 1 + 1;
-							c_t_m->ship2_2[2][2] = jdx - 1;
-							c_t_m->ship2_2[3][1] = 1;
-							c_t_m->ship2_2[3][2] = 1;
+							c_t_m->ship2_2[0][0] = idx - 1;
+							c_t_m->ship2_2[1][0] = jdx - 1;
+							c_t_m->ship2_2[0][1] = idx - 1 + 1;
+							c_t_m->ship2_2[1][1] = jdx - 1;
+							c_t_m->ship2_2[2][0] = 1;
+							c_t_m->ship2_2[2][1] = 1;
 							jdx++;
-						} 
+						}
 					}
 				}
 			if (placement_test[idx][jdx] == 1) {
-				if (placement_test[idx - 1][jdx] != 1
-					&& placement_test[idx][jdx - 1] != 1
+				if (placement_test[idx - 1][jdx] == 0 
+					&& placement_test[idx][jdx - 1] == 0
 					&& placement_test[idx][jdx + 1] == 1 
 					&& placement_test[idx][jdx + 2] == 0
 					&& placement_test[idx + 1][jdx] == 0) {
-					c_t_m->ship2_3[1][1] = idx - 1;
-					c_t_m->ship2_3[2][1] = jdx - 1;
-					c_t_m->ship2_3[1][2] = idx - 1;
-					c_t_m->ship2_3[2][2] = jdx - 1 + 1;
-					c_t_m->ship2_3[3][1] = 1;
-					c_t_m->ship2_3[3][2] = 1;
+					c_t_m->ship2_3[0][0] = idx - 1;
+					c_t_m->ship2_3[1][0] = jdx - 1;
+					c_t_m->ship2_3[0][1] = idx - 1;
+					c_t_m->ship2_3[1][1] = jdx - 1 + 1;
+					c_t_m->ship2_3[2][0] = 1;
+					c_t_m->ship2_3[2][1] = 1;
+					jdx++;
 					} else { 
-						if (placement_test[idx - 1][jdx] != 1
-							&& placement_test[idx][jdx - 1] != 1
+						if (placement_test[idx - 1][jdx] == 0 
+							&& placement_test[idx][jdx - 1] == 0
 							&& placement_test[idx + 1][jdx] == 1 
 							&& placement_test[idx + 2][jdx] == 0
 							&& placement_test[idx][jdx + 1] == 0) {
-							c_t_m->ship2_3[1][1] = idx - 1;
-							c_t_m->ship2_3[2][1] = jdx - 1;
-							c_t_m->ship2_3[1][2] = idx - 1 + 1;
-							c_t_m->ship2_3[2][2] = jdx - 1;
-							c_t_m->ship2_3[3][1] = 1;
-							c_t_m->ship2_3[3][2] = 1;
+							c_t_m->ship2_3[0][0] = idx - 1;
+							c_t_m->ship2_3[1][0] = jdx - 1;
+							c_t_m->ship2_3[0][1] = idx - 1 + 1;
+							c_t_m->ship2_3[1][1] = jdx - 1;
+							c_t_m->ship2_3[2][0] = 1;
+							c_t_m->ship2_3[2][1] = 1;
 						}
 					}
 				}
@@ -259,74 +260,75 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 	for (idx = 0; idx < 15; idx++) {
 		for (jdx = 0; jdx < 15; jdx++) {
 			if (placement_test[idx][jdx] == 1) {
-				if (placement_test[idx - 1][jdx] != 1
-					&& placement_test[idx][jdx - 1] != 1
+				if (placement_test[idx - 1][jdx] == 0
+					&& placement_test[idx][jdx - 1] == 0
 					&& placement_test[idx][jdx + 1] == 1
 					&& placement_test[idx][jdx + 2] == 1
 					&& placement_test[idx][jdx + 3] == 0
 					&& placement_test[idx + 1][jdx] == 0) {
-					c_t_m->ship3_1[1][1] = idx - 1;
-					c_t_m->ship3_1[2][1] = jdx - 1;
-					c_t_m->ship3_1[1][2] = idx - 1;
-					c_t_m->ship3_1[2][2] = jdx - 1 + 1;
-					c_t_m->ship3_1[1][3] = idx - 1;
-					c_t_m->ship3_1[2][3] = jdx - 1 + 2;
-					c_t_m->ship3_1[3][1] = 1;
-					c_t_m->ship3_1[3][2] = 1;
-					c_t_m->ship3_1[3][3] = 1;
+					c_t_m->ship3_1[0][0] = idx - 1;
+					c_t_m->ship3_1[1][0] = jdx - 1;
+					c_t_m->ship3_1[0][1] = idx - 1;
+					c_t_m->ship3_1[1][1] = jdx - 1 + 1;
+					c_t_m->ship3_1[0][2] = idx - 1;
+					c_t_m->ship3_1[1][2] = jdx - 1 + 2;
+					c_t_m->ship3_1[2][0] = 1;
+					c_t_m->ship3_1[2][1] = 1;
+					c_t_m->ship3_1[2][2] = 1;
 					jdx++;
 					} else {
-						if (placement_test[idx - 1][jdx] != 1
-							&& placement_test[idx][jdx - 1] != 1
+						if (placement_test[idx - 1][jdx] == 0
+							&& placement_test[idx][jdx - 1] == 0
 							&& placement_test[idx][jdx + 1] == 0
 							&& placement_test[idx + 1][jdx] == 1
 							&& placement_test[idx + 2][jdx] == 1
 							&& placement_test[idx + 3][jdx] == 0) {
-							c_t_m->ship3_1[1][1] = idx - 1;
-							c_t_m->ship3_1[2][1] = jdx - 1;
-							c_t_m->ship3_1[1][2] = idx - 1 + 1;
-							c_t_m->ship3_1[2][2] = jdx - 1;
-							c_t_m->ship3_1[1][3] = idx - 1 + 2;
-							c_t_m->ship3_1[2][3] = jdx - 1;
-							c_t_m->ship3_1[3][1] = 1;
-							c_t_m->ship3_1[3][2] = 1;
-							c_t_m->ship3_1[3][3] = 1;
+							c_t_m->ship3_1[0][0] = idx - 1;
+							c_t_m->ship3_1[1][0] = jdx - 1;
+							c_t_m->ship3_1[0][1] = idx - 1 + 1;
+							c_t_m->ship3_1[1][1] = jdx - 1;
+							c_t_m->ship3_1[0][2] = idx - 1 + 2;
+							c_t_m->ship3_1[1][2] = jdx - 1;
+							c_t_m->ship3_1[2][0] = 1;
+							c_t_m->ship3_1[2][1] = 1;
+							c_t_m->ship3_1[2][2] = 1;
 							jdx++;
 						}
 					}
 				}
 			if (placement_test[idx][jdx] == 1) {
-				if (placement_test[idx - 1][jdx] != 1
-					&& placement_test[idx][jdx - 1] != 1
+				if (placement_test[idx - 1][jdx] == 0
+					&& placement_test[idx][jdx - 1] == 0
 					&& placement_test[idx][jdx + 1] == 1
 					&& placement_test[idx][jdx + 2] == 1
 					&& placement_test[idx][jdx + 3] == 0
 					&& placement_test[idx + 1][jdx] == 0) {
-					c_t_m->ship3_2[1][1] = idx - 1;
-					c_t_m->ship3_2[2][1] = jdx - 1;
-					c_t_m->ship3_2[1][2] = idx - 1;
-					c_t_m->ship3_2[2][2] = jdx - 1 + 1;
-					c_t_m->ship3_2[1][3] = idx - 1;
-					c_t_m->ship3_2[2][3] = jdx - 1 + 2;
-					c_t_m->ship3_2[3][1] = 1;
-					c_t_m->ship3_2[3][2] = 1;
-					c_t_m->ship3_2[3][3] = 1;
+					c_t_m->ship3_2[0][0] = idx - 1;
+					c_t_m->ship3_2[1][0] = jdx - 1;
+					c_t_m->ship3_2[0][1] = idx - 1;
+					c_t_m->ship3_2[1][1] = jdx - 1 + 1;
+					c_t_m->ship3_2[0][2] = idx - 1;
+					c_t_m->ship3_2[1][2] = jdx - 1 + 2;
+					c_t_m->ship3_2[2][0] = 1;
+					c_t_m->ship3_2[2][1] = 1;
+					c_t_m->ship3_2[2][2] = 1;
+					jdx++;
 					} else {
-						if (placement_test[idx - 1][jdx] != 1
-							&& placement_test[idx][jdx - 1] != 1
+						if (placement_test[idx - 1][jdx] == 0
+							&& placement_test[idx][jdx - 1] == 0
 							&& placement_test[idx][jdx + 1] == 0
 							&& placement_test[idx + 1][jdx] == 1
 							&& placement_test[idx + 2][jdx] == 1
 							&& placement_test[idx + 3][jdx] == 0) {
-							c_t_m->ship3_2[1][1] = idx - 1;
-							c_t_m->ship3_2[2][1] = jdx - 1;
-							c_t_m->ship3_2[1][2] = idx - 1 + 1;
-							c_t_m->ship3_2[2][2] = jdx - 1;
-							c_t_m->ship3_2[1][3] = idx - 1 + 2;
-							c_t_m->ship3_2[2][3] = jdx - 1;
-							c_t_m->ship3_2[3][1] = 1;
-							c_t_m->ship3_2[3][2] = 1;
-							c_t_m->ship3_2[3][3] = 1;
+							c_t_m->ship3_2[0][0] = idx - 1;
+							c_t_m->ship3_2[1][0] = jdx - 1;
+							c_t_m->ship3_2[0][1] = idx - 1 + 1;
+							c_t_m->ship3_2[1][1] = jdx - 1;
+							c_t_m->ship3_2[0][2] = idx - 1 + 2;
+							c_t_m->ship3_2[1][2] = jdx - 1;
+							c_t_m->ship3_2[2][0] = 1;
+							c_t_m->ship3_2[2][1] = 1;
+							c_t_m->ship3_2[2][2] = 1;
 						}
 					}
 				}
@@ -340,45 +342,45 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 	for (idx = 0; idx < 15; idx++) {
 		for (jdx = 0; jdx < 15; jdx++) {
 			if (placement[idx][jdx] == 1) {
-				if (placement_test[idx - 1][jdx] != 1
-					&& placement_test[idx][jdx - 1] != 1
+				if (placement_test[idx - 1][jdx] == 0
+					&& placement_test[idx][jdx - 1] == 0
 					&& placement_test[idx + 1][jdx] == 0
 					&& placement_test[idx][jdx + 1] == 1
 					&& placement_test[idx][jdx + 2] == 1
 					&& placement_test[idx][jdx + 3] == 1
 					&& placement_test[idx][jdx + 4] == 0) {
-					c_t_m->ship4_1[1][1] = idx - 1;
-					c_t_m->ship4_1[2][1] = jdx - 1;
-					c_t_m->ship4_1[1][2] = idx - 1;
-					c_t_m->ship4_1[2][2] = jdx - 1 + 1;
-					c_t_m->ship4_1[1][3] = idx - 1;
-					c_t_m->ship4_1[2][3] = jdx - 1 + 2;
-					c_t_m->ship4_1[1][4] = idx - 1;
-					c_t_m->ship4_1[2][4] = jdx - 1 + 3;
-					c_t_m->ship4_1[3][1] = 1;
-					c_t_m->ship4_1[3][2] = 1;
-					c_t_m->ship4_1[3][3] = 1;
-					c_t_m->ship4_1[3][4] = 1;
+					c_t_m->ship4_1[0][0] = idx - 1;
+					c_t_m->ship4_1[1][0] = jdx - 1;
+					c_t_m->ship4_1[0][1] = idx - 1;
+					c_t_m->ship4_1[1][1] = jdx - 1 + 1;
+					c_t_m->ship4_1[0][2] = idx - 1;
+					c_t_m->ship4_1[1][2] = jdx - 1 + 2;
+					c_t_m->ship4_1[0][3] = idx - 1;
+					c_t_m->ship4_1[1][3] = jdx - 1 + 3;
+					c_t_m->ship4_1[2][0] = 1;
+					c_t_m->ship4_1[2][1] = 1;
+					c_t_m->ship4_1[2][2] = 1;
+					c_t_m->ship4_1[2][3] = 1;
 					} else {
-						if (placement_test[idx - 1][jdx] != 1
-							&& placement_test[idx][jdx - 1] != 1
+						if (placement_test[idx - 1][jdx] == 0
+							&& placement_test[idx][jdx - 1] == 0
 							&& placement_test[idx + 1][jdx] == 1
 							&& placement_test[idx][jdx + 1] == 0
 							&& placement_test[idx + 2][jdx] == 1
 							&& placement_test[idx + 3][jdx] == 1
 							&& placement_test[idx + 4][jdx] == 1) {
-							c_t_m->ship4_1[1][1] = idx - 1;
-							c_t_m->ship4_1[2][1] = jdx - 1;
-							c_t_m->ship4_1[1][2] = idx - 1 + 1;
-							c_t_m->ship4_1[2][2] = jdx - 1;
-							c_t_m->ship4_1[1][3] = idx - 1 + 2;
-							c_t_m->ship4_1[2][3] = jdx - 1;
-							c_t_m->ship4_1[1][4] = idx - 1 + 3;
-							c_t_m->ship4_1[2][4] = jdx - 1;
-							c_t_m->ship4_1[3][1] = 1;
-							c_t_m->ship4_1[3][2] = 1;
-							c_t_m->ship4_1[3][3] = 1;
-							c_t_m->ship4_1[3][4] = 1;
+							c_t_m->ship4_1[0][0] = idx - 1;
+							c_t_m->ship4_1[1][0] = jdx - 1;
+							c_t_m->ship4_1[0][1] = idx - 1 + 1;
+							c_t_m->ship4_1[1][1] = jdx - 1;
+							c_t_m->ship4_1[0][2] = idx - 1 + 2;
+							c_t_m->ship4_1[1][2] = jdx - 1;
+							c_t_m->ship4_1[0][3] = idx - 1 + 3;
+							c_t_m->ship4_1[1][3] = jdx - 1;
+							c_t_m->ship4_1[2][0] = 1;
+							c_t_m->ship4_1[2][1] = 1;
+							c_t_m->ship4_1[2][2] = 1;
+							c_t_m->ship4_1[2][3] = 1;
 						}
 					}
 				}
@@ -431,269 +433,268 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 	 * @begin the test sequence coordinates are recived
 	 */
 
-	if (c_t_m->ship1_1[1][1] == shot->x 
-			&& c_t_m->ship1_1[2][1] == shot->y) {
+	if (c_t_m->ship1_1[0][0] == shot->x 
+			&& c_t_m->ship1_1[1][0] == shot->y) {
 		result_shot = SRV_LOGIC_RESULT_KILL;
+		c_t_m->ship1_1[2][0] = 3;
+		c_t_m->count = c_t_m->count + 1;
+	} 
+	if (c_t_m->ship1_2[0][0] == shot->x 
+			&& c_t_m->ship1_1[1][0] == shot->y) {
+		result_shot = SRV_LOGIC_RESULT_KILL;
+		c_t_m->ship1_2[2][0] = 3;
+		c_t_m->count = c_t_m->count + 1;
+	} 
+	if (c_t_m->ship1_3[0][0] == shot->x 
+			&& c_t_m->ship1_1[1][0] == shot->y) {
+		result_shot = SRV_LOGIC_RESULT_KILL;
+		c_t_m->ship1_3[2][0] = 3;
+		c_t_m->count = c_t_m->count + 1;
+	} 
+	if (c_t_m->ship1_4[0][0] == shot->x 
+			&& c_t_m->ship1_1[1][0] == shot->y) {
+		result_shot = SRV_LOGIC_RESULT_KILL;
+		c_t_m->ship1_4[2][0] = 3;
+		c_t_m->count = c_t_m->count + 1;
+	} 
 
-		c_t_m->ship1_1[3][1] = 3;
-		c_t_m->count = c_t_m->count + 1;
-	} 
-	if (c_t_m->ship1_2[1][1] == shot->x 
-			&& c_t_m->ship1_1[2][1] == shot->y) {
-		result_shot = SRV_LOGIC_RESULT_KILL;
-		c_t_m->ship1_1[3][1] = 3;
-		c_t_m->count = c_t_m->count + 1;
-	} 
-	if (c_t_m->ship1_3[1][1] == shot->x 
-			&& c_t_m->ship1_1[2][1] == shot->y) {
-		result_shot = SRV_LOGIC_RESULT_KILL;
-		c_t_m->ship1_1[3][1] = 3;
-		c_t_m->count = c_t_m->count + 1;
-	} 
-	if (c_t_m->ship1_4[1][1] == shot->x 
-			&& c_t_m->ship1_1[2][1] == shot->y) {
-		result_shot = SRV_LOGIC_RESULT_KILL;
-		c_t_m->ship1_1[3][1] = 3;
-		c_t_m->count = c_t_m->count + 1;
-	} 
-
-	if (c_t_m->ship2_1[1][1] == shot->x
-			&& c_t_m->ship2_1[2][1] == shot->y) {
-		if (c_t_m->ship2_1[3][2] == 2) {
-			c_t_m->ship2_1[3][1] = 3;
-			c_t_m->ship2_1[3][2] = 3;
+	if (c_t_m->ship2_1[0][0] == shot->x
+			&& c_t_m->ship2_1[1][0] == shot->y) {
+		if (c_t_m->ship2_1[2][1] == 2) {
+			c_t_m->ship2_1[2][0] = 3;
+			c_t_m->ship2_1[2][1] = 3;
 			result_shot = SRV_LOGIC_RESULT_KILL;
 			c_t_m->count = c_t_m->count + 1;
 		} else {
-			c_t_m->ship2_1[3][1] = 2;
+			c_t_m->ship2_1[2][0] = 2;
 			result_shot = SRV_LOGIC_RESULT_HIT;
 			c_t_m->count = c_t_m->count + 1;
 		}
 	} 
-	if (c_t_m->ship2_1[1][2] == shot->x
-			&& c_t_m->ship2_1[2][2] == shot->y) {
-		if (c_t_m->ship2_1[3][1] == 2) {
-			c_t_m->ship2_1[3][2] = 3;
-			c_t_m->ship2_1[3][1] = 3;
+	if (c_t_m->ship2_1[0][1] == shot->x
+			&& c_t_m->ship2_1[1][1] == shot->y) {
+		if (c_t_m->ship2_1[2][0] == 2) {
+			c_t_m->ship2_1[2][1] = 3;
+			c_t_m->ship2_1[2][0] = 3;
 			result_shot = SRV_LOGIC_RESULT_KILL;
 			c_t_m->count = c_t_m->count + 1;
 		} else {
-			c_t_m->ship2_1[3][2] = 2;
+			c_t_m->ship2_1[2][1] = 2;
 			result_shot = SRV_LOGIC_RESULT_HIT;
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
-	if (c_t_m->ship2_2[1][1] == shot->x
-			&& c_t_m->ship2_2[2][1] == shot->y) {
-		if (c_t_m->ship2_2[3][2] == 2) {
-
-			c_t_m->ship2_2[3][1] = 3;
-			c_t_m->ship2_2[3][2] = 3;
+	if (c_t_m->ship2_1[0][0] == shot->x
+			&& c_t_m->ship2_2[1][0] == shot->y) {
+		if (c_t_m->ship2_2[2][1] == 2) {
+			c_t_m->ship2_2[2][0] = 3;
+			c_t_m->ship2_2[2][1] = 3;
 			result_shot = SRV_LOGIC_RESULT_KILL;
 			c_t_m->count = c_t_m->count + 1;
 		} else {
-			c_t_m->ship2_2[3][1] = 2;
+			c_t_m->ship2_2[2][0] = 2;
 			result_shot = SRV_LOGIC_RESULT_HIT;
 			c_t_m->count = c_t_m->count + 1;
 		}
 	} 
-	if (c_t_m->ship2_2[1][2] == shot->x
-			&& c_t_m->ship2_2[2][2] == shot->y) {
-		if (c_t_m->ship2_2[3][1] == 2) {
-			c_t_m->ship2_2[3][2] = 3;
-			c_t_m->ship2_2[3][1] = 3;
+	if (c_t_m->ship2_1[0][1] == shot->x
+			&& c_t_m->ship2_1[1][1] == shot->y) {
+		if (c_t_m->ship2_2[2][0] == 2) {
+			c_t_m->ship2_2[2][1] = 3;
+			c_t_m->ship2_2[2][0] = 3;
 			result_shot = SRV_LOGIC_RESULT_KILL;
 			c_t_m->count = c_t_m->count + 1;
 		} else {
-			c_t_m->ship2_2[3][2] = 2;
-			result_shot = SRV_LOGIC_RESULT_HIT;
-			c_t_m->count = c_t_m->count + 1;
-		} 
-	}
-	if (c_t_m->ship2_3[1][1] == shot->x
-			&& c_t_m->ship2_3[2][1] == shot->y) {
-		if (c_t_m->ship2_3[3][2] == 2) {
-			c_t_m->ship2_3[3][1] = 3;
-			c_t_m->ship2_3[3][2] = 3;
-			result_shot = SRV_LOGIC_RESULT_KILL;
-			c_t_m->count = c_t_m->count + 1;
-		} else {
-			c_t_m->ship2_3[3][1] = 2;
-			result_shot = SRV_LOGIC_RESULT_HIT;
-			c_t_m->count = c_t_m->count + 1;
-		} 
-	} 
-	if (c_t_m->ship2_3[1][2] == shot->x
-			&& c_t_m->ship2_3[2][2] == shot->y) {
-		if (c_t_m->ship2_3[3][1] == 2) {
-			c_t_m->ship2_3[3][2] = 3;
-			c_t_m->ship2_3[3][1] = 3;
-			result_shot = SRV_LOGIC_RESULT_KILL;
-			c_t_m->count = c_t_m->count + 1;
-		} else {
-			c_t_m->ship2_3[3][2] = 2;
-			result_shot = SRV_LOGIC_RESULT_HIT;
-			c_t_m->count = c_t_m->count + 1;
-		} 
-	}
-
-
-	if (c_t_m->ship3_1[1][1] == shot->x
-			&& c_t_m->ship3_1[2][1] == shot->y) {
-		if (c_t_m->ship3_1[3][2] == 2
-				&& c_t_m->ship3_1[3][3] == 2) {
-			c_t_m->ship3_1[3][1] = 3;
-			c_t_m->ship3_1[3][2] = 3;
-			c_t_m->ship3_1[3][3] = 3;
-			result_shot = SRV_LOGIC_RESULT_KILL;
-			c_t_m->count = c_t_m->count + 1;
-		} else {
-			c_t_m->ship3_1[3][1] = 2;
-			result_shot = SRV_LOGIC_RESULT_HIT;
-			c_t_m->count = c_t_m->count + 1;
-		}
-	} 
-	if (c_t_m->ship3_1[1][2] == shot->x
-			&& c_t_m->ship3_1[2][2] == shot->y) {
-		if (c_t_m->ship3_1[3][1] == 2
-				&& c_t_m->ship3_1[3][3] == 2) {
-			c_t_m->ship3_1[3][1] = 3;
-			c_t_m->ship3_1[3][2] = 3;
-			c_t_m->ship3_1[3][3] = 3;
-			result_shot = SRV_LOGIC_RESULT_KILL;
-			c_t_m->count = c_t_m->count + 1;
-		} else {
-			c_t_m->ship3_1[3][2] = 2;
+			c_t_m->ship2_2[2][1] = 2;
 			result_shot = SRV_LOGIC_RESULT_HIT;
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
-	if (c_t_m->ship3_1[1][3] == shot->x
-			&& c_t_m->ship3_1[2][3] == shot->y) {
-		if (c_t_m->ship3_1[3][1] == 2
+	if (c_t_m->ship2_1[0][0] == shot->x
+			&& c_t_m->ship2_3[1][0] == shot->y) {
+		if (c_t_m->ship2_3[2][1] == 2) {
+			c_t_m->ship2_3[2][0] = 3;
+			c_t_m->ship2_3[2][1] = 3;
+			result_shot = SRV_LOGIC_RESULT_KILL;
+			c_t_m->count = c_t_m->count + 1;
+		} else {
+			c_t_m->ship2_3[2][0] = 2;
+			result_shot = SRV_LOGIC_RESULT_HIT;
+			c_t_m->count = c_t_m->count + 1;
+		}
+	} 
+	if (c_t_m->ship2_1[0][1] == shot->x
+			&& c_t_m->ship2_3[1][1] == shot->y) {
+		if (c_t_m->ship2_3[2][0] == 2) {
+			c_t_m->ship2_3[2][1] = 3;
+			c_t_m->ship2_3[2][0] = 3;
+			result_shot = SRV_LOGIC_RESULT_KILL;
+			c_t_m->count = c_t_m->count + 1;
+		} else {
+			c_t_m->ship2_3[2][1] = 2;
+			result_shot = SRV_LOGIC_RESULT_HIT;
+			c_t_m->count = c_t_m->count + 1;
+		}
+	}
+
+
+	if (c_t_m->ship3_1[0][0] == shot->x
+			&& c_t_m->ship3_1[1][0] == shot->y) {
+		if (c_t_m->ship3_1[2][1] == 2
+				&& c_t_m->ship3_1[2][2] == 2) {
+			c_t_m->ship3_1[2][0] = 3;
+			c_t_m->ship3_1[2][1] = 3;
+			c_t_m->ship3_1[2][2] = 3;
+			result_shot = SRV_LOGIC_RESULT_KILL;
+			c_t_m->count = c_t_m->count + 1;
+		} else {
+			c_t_m->ship3_1[2][0] = 2;
+			result_shot = SRV_LOGIC_RESULT_HIT;
+			c_t_m->count = c_t_m->count + 1;
+		}
+	} 
+	if (c_t_m->ship3_1[0][1] == shot->x
+			&& c_t_m->ship3_1[1][1] == shot->y) {
+		if (c_t_m->ship3_1[2][0] == 2
+				&& c_t_m->ship3_1[2][2] == 2) {
+			c_t_m->ship3_1[2][0] = 3;
+			c_t_m->ship3_1[2][1] = 3;
+			c_t_m->ship3_1[2][2] = 3;
+			result_shot = SRV_LOGIC_RESULT_KILL;
+			c_t_m->count = c_t_m->count + 1;
+		} else {
+			c_t_m->ship3_1[2][1] = 2;
+			result_shot = SRV_LOGIC_RESULT_HIT;
+			c_t_m->count = c_t_m->count + 1;
+		}
+	}
+	if (c_t_m->ship3_1[0][2] == shot->x
+			&& c_t_m->ship3_1[1][2] == shot->y) {
+		if (c_t_m->ship3_1[2][0] == 2
 				&& c_t_m->ship3_1[3][2] == 2) {
-			c_t_m->ship3_1[3][1] = 3;
-			c_t_m->ship3_1[3][2] = 3;
-			c_t_m->ship3_1[3][3] = 3;
+			c_t_m->ship3_1[2][0] = 3;
+			c_t_m->ship3_1[2][1] = 3;
+			c_t_m->ship3_1[2][2] = 3;
 			result_shot = SRV_LOGIC_RESULT_KILL;
 			c_t_m->count = c_t_m->count + 1;
 		} else {
-			c_t_m->ship3_1[3][3] = 2;
+			c_t_m->ship3_1[2][2] = 2;
 			result_shot = SRV_LOGIC_RESULT_HIT;
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
 
-	if (c_t_m->ship3_2[1][1] == shot->x
-			&& c_t_m->ship3_2[2][1] == shot->y) {
-		if (c_t_m->ship3_2[3][2] == 2
-				&& c_t_m->ship3_2[3][3] == 2) {
-			c_t_m->ship3_2[3][1] = 3;
-			c_t_m->ship3_2[3][2] = 3;
-			c_t_m->ship3_2[3][3] = 3;
+	if (c_t_m->ship3_2[0][0] == shot->x
+			&& c_t_m->ship3_2[1][0] == shot->y) {
+		if (c_t_m->ship3_2[2][1] == 2
+				&& c_t_m->ship3_2[2][2] == 2) {
+			c_t_m->ship3_2[2][0] = 3;
+			c_t_m->ship3_2[2][1] = 3;
+			c_t_m->ship3_2[2][2] = 3;
 			result_shot = SRV_LOGIC_RESULT_KILL;
 			c_t_m->count = c_t_m->count + 1;
 		} else {
-			c_t_m->ship3_2[3][1] = 2;
+			c_t_m->ship3_2[2][0] = 2;
+			result_shot = SRV_LOGIC_RESULT_HIT;
+			c_t_m->count = c_t_m->count + 1;
+		}
+	} 
+	if (c_t_m->ship3_2[0][1] == shot->x
+			&& c_t_m->ship3_2[1][1] == shot->y) {
+		if (c_t_m->ship3_2[2][0] == 2
+				&& c_t_m->ship3_2[2][2] == 2) {
+			c_t_m->ship3_2[2][0] = 3;
+			c_t_m->ship3_2[2][1] = 3;
+			c_t_m->ship3_2[2][2] = 3;
+			result_shot = SRV_LOGIC_RESULT_KILL;
+			c_t_m->count = c_t_m->count + 1;
+		} else {
+			c_t_m->ship3_2[2][1] = 2;
 			result_shot = SRV_LOGIC_RESULT_HIT;
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
-	if (c_t_m->ship3_2[1][2] == shot->x
-			&& c_t_m->ship3_2[2][2] == shot->y) {
-		if (c_t_m->ship3_2[3][1] == 2
-				&& c_t_m->ship3_2[3][3] == 2) {
-			c_t_m->ship3_2[3][1] = 3;
-			c_t_m->ship3_2[3][2] = 3;
-			c_t_m->ship3_2[3][3] = 3;
+	if (c_t_m->ship3_2[0][2] == shot->x
+			&& c_t_m->ship3_2[1][2] == shot->y) {
+		if (c_t_m->ship3_2[2][0] == 2
+				&& c_t_m->ship3_2[3][2] == 2) {
+			c_t_m->ship3_2[2][0] = 3;
+			c_t_m->ship3_2[2][1] = 3;
+			c_t_m->ship3_2[2][2] = 3;
 			result_shot = SRV_LOGIC_RESULT_KILL;
 			c_t_m->count = c_t_m->count + 1;
 		} else {
-			c_t_m->ship3_2[3][2] = 2;
-			result_shot = SRV_LOGIC_RESULT_HIT;
-			c_t_m->count = c_t_m->count + 1;
-		} 
-	}
-	if (c_t_m->ship3_2[1][3] == shot->x
-			&& c_t_m->ship3_2[2][3] == shot->y) {
-		if (c_t_m->ship3_2[3][1] == 2
-				&& c_t_m->ship3_1[3][2] == 2) {
-			c_t_m->ship3_2[3][1] = 3;
-			c_t_m->ship3_2[3][2] = 3;
-			c_t_m->ship3_2[3][3] = 3;
-			result_shot = SRV_LOGIC_RESULT_KILL;
-			c_t_m->count = c_t_m->count + 1;
-		} else {
-			c_t_m->ship3_2[3][3] = 2;
+			c_t_m->ship3_2[2][2] = 2;
 			result_shot = SRV_LOGIC_RESULT_HIT;
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
 
-	if (c_t_m->ship4_1[1][1] == shot->x
-			&& c_t_m->ship4_1[2][1] == shot->y) {
-		if (c_t_m->ship4_1[3][2] == 2
-				&& c_t_m->ship4_1[3][3] == 2
-				&& c_t_m->ship4_1[3][4] == 2) {
-			c_t_m->ship4_1[3][1] = 3;
-			c_t_m->ship4_1[3][2] = 3;
-			c_t_m->ship4_1[3][3] = 3;
-			c_t_m->ship4_1[3][4] = 3;
+
+	if (c_t_m->ship4_1[0][0] == shot->x
+			&& c_t_m->ship4_1[1][0] == shot->y) {
+		if (c_t_m->ship4_1[2][1] == 2
+				&& c_t_m->ship4_1[2][2] == 2
+				&& c_t_m->ship4_1[2][3] == 2) {
+			c_t_m->ship4_1[2][0] = 3;
+			c_t_m->ship4_1[2][1] = 3;
+			c_t_m->ship4_1[2][2] = 3;
+			c_t_m->ship4_1[2][3] = 3;
 			result_shot = SRV_LOGIC_RESULT_KILL;
 			c_t_m->count = c_t_m->count + 1;
 		} else {
-			c_t_m->ship4_1[3][1] = 2;
+			c_t_m->ship4_1[2][0] = 2;
 			result_shot = SRV_LOGIC_RESULT_HIT;
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
-	if (c_t_m->ship4_1[1][2] == shot->x
-			&& c_t_m->ship4_1[2][2] == shot->y) {
-		if (c_t_m->ship4_1[3][1] == 2
-				&& c_t_m->ship4_1[3][3] == 2
-				&& c_t_m->ship4_1[3][4] == 2) {
-			c_t_m->ship4_1[3][1] = 3;
-			c_t_m->ship4_1[3][2] = 3;
-			c_t_m->ship4_1[3][3] = 3;
-			c_t_m->ship4_1[3][4] = 3;
+	if (c_t_m->ship4_1[0][1] == shot->x
+			&& c_t_m->ship4_1[1][1] == shot->y) {
+		if (c_t_m->ship4_1[2][0] == 2
+				&& c_t_m->ship4_1[2][2] == 2
+				&& c_t_m->ship4_1[2][3] == 2) {
+			c_t_m->ship4_1[2][0] = 3;
+			c_t_m->ship4_1[2][1] = 3;
+			c_t_m->ship4_1[2][2] = 3;
+			c_t_m->ship4_1[2][3] = 3;
 			result_shot = SRV_LOGIC_RESULT_KILL;
 			c_t_m->count = c_t_m->count + 1;
 		} else {
-			c_t_m->ship4_1[3][2] = 2;
+			c_t_m->ship4_1[2][1] = 2;
 			result_shot = SRV_LOGIC_RESULT_HIT;
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
-	if (c_t_m->ship4_1[1][3] == shot->x
-			&& c_t_m->ship4_1[2][3] == shot->y) {
-		if (c_t_m->ship4_1[3][1] == 2
-				&& c_t_m->ship4_1[3][2] == 2
-				&& c_t_m->ship4_1[3][4] == 2) {
-			c_t_m->ship4_1[3][1] = 3;
-			c_t_m->ship4_1[3][2] = 3;
-			c_t_m->ship4_1[3][3] = 3;
-			c_t_m->ship4_1[3][4] = 3;
+	if (c_t_m->ship4_1[0][2] == shot->x
+			&& c_t_m->ship4_1[1][2] == shot->y) {
+		if (c_t_m->ship4_1[2][0] == 2
+				&& c_t_m->ship4_1[2][1] == 2
+				&& c_t_m->ship4_1[2][3] == 2) {
+			c_t_m->ship4_1[2][0] = 3;
+			c_t_m->ship4_1[2][1] = 3;
+			c_t_m->ship4_1[2][2] = 3;
+			c_t_m->ship4_1[2][3] = 3;
 			result_shot = SRV_LOGIC_RESULT_KILL;
 			c_t_m->count = c_t_m->count + 1;
 		} else {
-			c_t_m->ship4_1[3][2] = 2;
+			c_t_m->ship4_1[2][1] = 2;
 			result_shot = SRV_LOGIC_RESULT_HIT;
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
-	if (c_t_m->ship4_1[1][4] == shot->x
-			&& c_t_m->ship4_1[2][4] == shot->y) {
-		if (c_t_m->ship4_1[3][1] == 2
-				&& c_t_m->ship4_1[3][2] == 2
-				&& c_t_m->ship4_1[3][3] == 2) {
-			c_t_m->ship4_1[3][1] = 3;
-			c_t_m->ship4_1[3][2] = 3;
-			c_t_m->ship4_1[3][3] = 3;
-			c_t_m->ship4_1[3][4] = 3;
+	if (c_t_m->ship4_1[0][3] == shot->x
+			&& c_t_m->ship4_1[1][3] == shot->y) {
+		if (c_t_m->ship4_1[2][0] == 2
+				&& c_t_m->ship4_1[2][1] == 2
+				&& c_t_m->ship4_1[2][2] == 2) {
+			c_t_m->ship4_1[2][0] = 3;
+			c_t_m->ship4_1[2][1] = 3;
+			c_t_m->ship4_1[2][2] = 3;
+			c_t_m->ship4_1[2][3] = 3;
 			result_shot = SRV_LOGIC_RESULT_KILL;
 			c_t_m->count = c_t_m->count + 1;
 		} else {
-			c_t_m->ship4_1[3][4] = 2;
+			c_t_m->ship4_1[2][3] = 2;
 			result_shot = SRV_LOGIC_RESULT_HIT;
 			c_t_m->count = c_t_m->count + 1;
 		}
