@@ -3,6 +3,7 @@
 #define BATTLESHIP_CLIENT_GUI_H_
 
 #include "cl_main.h"
+#include "client.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
