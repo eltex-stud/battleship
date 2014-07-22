@@ -16,6 +16,8 @@
 
 #define CUR_COLOR ((options->bg_color * 10) + options->font_color)
 
+int gui_refresh_map(struct gui *options, char map[10][10], enum player pl);
+
 struct gui
 {
 	WINDOW *nick_window;
