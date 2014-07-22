@@ -13,6 +13,7 @@ struct client_data {
 	struct srv_logic_map *map;
 	struct client_data *enemy;
 	enum turn turn;
+	char plcmnt[10][10];
 };
 
 struct client_list {
@@ -26,7 +27,7 @@ struct main_data {
 };
 
 void *new_client(struct srv_net_client *client, void *main_data);
-void placement_received(struct srv_net_client *client, placement plcmnt,
+void placement_received(struct srv_net_client *client, char *plcmnt,
 		void *client_data, void *main_data);
 void del_client(struct srv_net_client *client, void *client_data,
 		void *main_data);
@@ -145,29 +146,32 @@ void nick_received(struct srv_net_client *client, char *nick,
 void *new_client(struct srv_net_client *client, void *main_data)
 {
 	struct main_data *m_data;
+	struct client_list *cl_list;
+	struct client_data *cl_data;
+	struct client_list *temp;
+	
 	m_data = main_data;
 	
-	struct client_list *cl_list;
-	cl_list = (struct client_list*)malloc(sizeof(cl_list));
-	
-	struct client_data *cl_data;
-	cl_data = (struct client_data*)malloc(sizeof(cl_data));
+	cl_list = (struct client_list*)malloc(sizeof(struct client_list*));
+	cl_data = (struct client_data*)malloc(sizeof(struct client_list*));
+
 	cl_data->client = client;
 	cl_data->map = NULL;
 	cl_data->enemy = NULL;
+	
 	cl_list->client_data = cl_data;
 	cl_list->next = NULL;
 
 	if(m_data->clients_data == NULL){
 		m_data->clients_data = cl_list;
 	} else {
-		struct client_list *temp;
 		temp = m_data->clients_data;
 		while(temp->next != NULL){
 			temp = temp->next;
 		}
 		temp->next = cl_list;
 	}
+
 	temp = m_data->clients_data;
 	while(temp->next != NULL){
 		if(temp->client_data->enemy == NULL){
@@ -180,18 +184,17 @@ void *new_client(struct srv_net_client *client, void *main_data)
 	return cl_data;
 }
 
-
 void del_client(struct srv_net_client *client, void *client_data,
 		void *main_data)
 {
 	struct client_list *temp, *prev;
 	struct main_data *m_data;
+	
 	m_data = main_data;
 	temp = m_data->clients_data;
 	prev = NULL;
 
-	if(temp->client_data == (struct client_data*)client_data)
-	{
+	if(temp->client_data == (struct client_data*)client_data){
 		free(temp->client_data);
 		m_data->clients_data = temp->next;
 		if(temp->next == NULL){
@@ -211,4 +214,26 @@ void del_client(struct srv_net_client *client, void *client_data,
 		}
 		free(temp);
 	}
+}
+
+
+void placement_received(struct srv_net_client *client, char *plcmnt,
+		void *client_data, void *main_data)
+{
+	struct client_data *cl_data;
+	cl_data = client_data;
+	char map[10][10];
+	int col;
+	int row;
+	int idx;
+	idx = 0;
+
+	for(row = 0; row < 10; row++){
+		for(col = 0; col < 10; col++){
+			map[row][col] = plcmnt[idx];
+			cl_data->plcmnt[row][col] = plcmnt[idx];
+			idx++;
+		}
+	}
+	cl_data->map = placement_to_map(map);
 }
