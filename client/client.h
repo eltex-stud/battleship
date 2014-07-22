@@ -1,3 +1,6 @@
+#ifndef CLIENT
+#define CLIENT
+
 enum main_event_types { GUI_NICK, GUI_SHOT, GUI_EXIT, NET_SHOT_RESULT,
                      NET_PLACEMENT, NET_ERROR, NET_START_GAME };
 enum player_state { MY_TURN, ENEMY_TURN, WAITING_TURN };
@@ -7,3 +10,4 @@ typedef char map[10][10];
 
 void cl_main_make_event(struct main_queue *queue, enum main_event_types type,
                         void *data, int data_length);
+#endif
