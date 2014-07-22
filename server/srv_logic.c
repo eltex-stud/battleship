@@ -33,7 +33,7 @@ struct srv_logic_map {
  *
  */
 
-struct srv_logic_map *placement_to_map(int placement[10][10]) {
+struct srv_logic_map *placement_to_map(char placement[10][10]) {
 	int idx, jdx;
 
 /*
