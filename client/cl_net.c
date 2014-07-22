@@ -26,6 +26,7 @@ void cl_net_processing_event(struct net *configure)
 	struct net_queue *idx; /* iterator struct net_queue */
 	char buf[SIZE_BUF];
 	pthread_mutex_lock(&configure->mutex);
+	idx = configure->net_queue_head;
 	if(idx->type_msg == END) {
 		pthread_mutex_unlock(&configure->mutex);
 		close(configure->socket);
@@ -33,7 +34,6 @@ void cl_net_processing_event(struct net *configure)
 		free(configure);
 		return ;
 	}
-	idx = configure->net_queue_head;
 	memcpy(buf, (char*)&(idx->type_msg), 1);
 	memcpy(buf + 1, idx->data, idx->data_len);
 	send(configure->socket, buf, SIZE_BUF, 0);
@@ -102,11 +102,8 @@ struct net *cl_net_start(char address, int port, struct main_queue *m_queue)
 
 void *net_work(void *arg)
 {
-    //int loc_sock = *(int*)arg;
 	struct net *configure = (struct net*)arg;
-	int byte_read;
 	int max_sock;
-	char buf_recv[SIZE_BUF];
 	int msg_error;
 	struct timeval timeout;
 	fd_set readfd;

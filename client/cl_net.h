@@ -4,12 +4,12 @@
 #define CL_NET
 
 #include <pthread.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <error.h>
 #include "client.h"
-#include "cl_main.h"
 #include "../include/net_types.h"
 
 struct net_queue {
