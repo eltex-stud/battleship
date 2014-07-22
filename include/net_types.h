@@ -42,3 +42,20 @@ enum types_msg{
 	ERROR,
 	END
 };
+
+enum srv_net_turn {
+	SRV_NET_ENEMY_TURN,
+	SRV_NET_YOUR_TURN
+};
+
+enum srv_net_shot_result {
+	SRV_NET_MISS,
+	SRV_NET_HIT,
+	SRV_NET_KILL,
+	SRV_NET_END
+};
+
+enum srv_net_error_msg {
+	SRV_NET_BAD_SHOT,
+	SRV_NET_NOT_YOUR_TURN
+};
