@@ -725,7 +725,7 @@ enum srv_logic_shot_result make_shot(struct srv_logic_map *c_t_m,
 
 int srv_logic_delmap(struct srv_logic_map *c_t_m) {
 	free(c_t_m);
+	return 0;
 }
-
 
 
