@@ -16,8 +16,6 @@
 
 #define CUR_COLOR ((options->bg_color * 10) + options->font_color)
 
-int gui_refresh_map(struct gui *options, char map[10][10], enum player pl);
-
 struct gui
 {
 	WINDOW *nick_window;
@@ -46,6 +44,8 @@ struct gui *gui_start(struct main_queue *main_queue_h);
 int gui_input_nick(struct gui *options);
 
 int gui_main_window(struct gui *options, char map[10][10]);
+
+int gui_refresh_map(struct gui *options, char map[10][10], enum player pl);
 
 void gui_stop(struct gui *options);
 
