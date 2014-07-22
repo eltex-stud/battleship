@@ -396,8 +396,3 @@ void cl_net_recv(struct net *configure) {
 					SIZE_BUF);
 	}
 }
-
-int main() {
-	return 0;
-}
-
