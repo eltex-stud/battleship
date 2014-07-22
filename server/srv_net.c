@@ -102,7 +102,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[],
 		FD_ZERO(&readset);
 		FD_SET(net->fd, &readset);
 
-		for(idx=0; idx<=32; idx++) {
+		for(idx=0; idx<32; idx++) {
 			if(client_list[idx].fd!=0) {
 				FD_SET(client_list[idx].fd, &readset);
 			}
@@ -123,7 +123,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[],
 			idx++;
 		}
 
-		for(jdx=0; jdx<=32; idx++) {
+		for(jdx=0; jdx<32; idx++) {
 			if(client_list[jdx].fd!=0) {
 				if(FD_ISSET(client_list[jdx].fd, &readset)) {
 					size = recv(client_list[jdx].fd, &buff, SIZE_BUFF, 0);
@@ -165,4 +165,21 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[],
 			}
 		}
 	}
+}
+
+int srv_net_del_client (struct srv_net_client *client)
+{
+	int idx;
+
+	close(client->fd);
+
+	for(idx=0; idx<32; idx++) {
+		if(client->fd == client_list[idx].fd) {
+			free((client_list[idx].network)->queue);
+			free(client_list[idx].network);
+			client_list[idx].fd=0;
+			client_list[idx].network=0;
+		}
+	}
+	return 0;
 }
