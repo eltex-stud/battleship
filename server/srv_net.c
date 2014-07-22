@@ -148,8 +148,8 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[],
 
 						case SHOT:
 							cl_shot = (struct shot *)malloc(sizeof(struct srv_net_shot));
-							cl_shot->x = (int *)buff[1];
-							cl_shot->y = (int *)buff[2];
+							cl_shot->x = (int)buff[1];
+							cl_shot->y = (int)buff[2];
 							client = srv_net_find_client(client_list[jdx].fd);
 							client_ops.shot_received(client, cl_shot,
 									client_data, main_data);
