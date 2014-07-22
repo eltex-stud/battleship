@@ -9,8 +9,8 @@
  */
 int main(int argc, char *argv[])
 {
-	int srv_port; /**< Server address */
-	char srv_address[ADDRESS_LENGTH]; /**< Server port */
+	int srv_port; /**< Server port */
+	char srv_address[ADDRESS_LENGTH]; /**< Server address */
 	struct main_event cap = { NULL }, /**< Cap for easy queue processing */
 	       *head = &cap; /**< Pointer on head of queue */
 	struct main_queue queue /**< All information about queue */
@@ -104,7 +104,7 @@ int cl_main_get_options(int argc, char *argv[], int *port, char address[])
 void cl_main_make_event(struct main_queue *queue, enum main_event_types type,
                         void *data, int data_length)
 {
-	struct main_event *tmp = queue->head->next; /** Working pointer */
+	struct main_event *tmp = queue->head->next; /**< Working pointer */
 
 	pthread_mutex_lock(&(queue->mutex));
 
@@ -123,73 +123,99 @@ void cl_main_make_event(struct main_queue *queue, enum main_event_types type,
 	pthread_kill(queue->main_id, SIGUSR1);
 }
 
+/** Processing main queue
+ * \param queue - queue parametres
+ * \param my_map - curent client map
+ * \param enemy_map - enemy map :)
+ * \param network - net information
+ * \param cl_gui - gui information
+ */
+
 void cl_main_control(struct main_queue *queue, map *my_map, map *enemy_map,
                      struct net *network, struct gui *cl_gui)
 {
-	struct main_event *tmp;
-	enum player_state turn;
-	sigset_t set;
+	struct main_event *tmp; /**< tempory queue pointer*/
+	enum player_state turn; /**< whose turn it is to shot */
+	sigset_t set; /** */
 
-	/*
-	 * Evil while :)
-	 */
-
+	/* Evil while :) */
 	while(666) { 
+		/* copy main queue */
 		tmp = cl_main_copy_queue(queue);
 		sigemptyset(&set);
 		sigaddset(&set, SIGUSR1);
-
-		if(tmp == NULL)
+		/* if main queue is emty, wait signal*/
+		if(tmp == NULL) {
 			sigwait(&set, NULL);
+			tmp = cl_main_copy_queue(queue);
+		}
 
+		/* for all elements in queue */
 		for(; tmp != NULL; tmp = tmp->next) {
 			switch (tmp->event_type) {
-			case GUI_NICK:
+			case GUI_NICK: /* gui send player nick*/
 				net_send_nick(network, tmp->event_data, tmp->data_length);
 				break;
-			case GUI_SHOT:
+			case GUI_SHOT: /* gui send player's shot*/
 				cl_main_check_shot(tmp->event_data, my_map, network, cl_gui, &turn);
 				break;
-			case GUI_EXIT:
+			case GUI_EXIT: /* gui send player's whant exit*/
 				net_stop();
 				goto out;
 				break;
-			case NET_SHOT_RESULT:
+			case NET_SHOT_RESULT: /* server send shot result*/
 				cl_main_check_net_shot(tmp->event_data,
 				                       &turn,
 				                       my_map,
 				                       enemy_map,
 				                       cl_gui);
 				break;
-			case NET_PLACEMENT:
+			case NET_PLACEMENT: /* server send enemy placement*/
 				cl_main_send_placement(tmp->event_data, enemy_map, cl_gui);
 				break;
-			case NET_ERROR:
+			case NET_ERROR: /* server send some error*/
 				gui_error(cl_gui);//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 				break;
-			case NET_START_GAME:
+			case NET_START_GAME: /* server send that the game start*/
 				cl_main_start_game(tmp->event_data, my_map, &turn, cl_gui);
 				break;
 			}
 		}
 		cl_main_clear_queue(tmp);
 	}
-out:
+out: /* end of evil while*/
 	cl_main_clear_queue(tmp);
 	return;
 }
 
+/** Check player shot
+ * \param event_data - shot coordinates
+ * \param my_map - curent client map
+ * \param network - net information
+ * \param cl_gui - gui information
+ * \param turn - whose turn to shot
+ */
+
 void cl_main_check_shot(void * event_data, map *my_map, struct net *network,
                         struct gui *cl_gui, enum player_state *turn)
 {
-	char *x = (char *)(event_data);
-	char *y = (char *)(event_data + sizeof(char));
+	char *x = (char *)(event_data); /**< x coordinate*/
+	char *y = (char *)(event_data + sizeof(char)) /**< y coordinate*/;
 
+	/* if shot not valid */
 	if(logic_valid_shot(*x, *y, my_map, turn) == 0)
-		gui_error(cl_gui); //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		gui_error(cl_gui);
 	else
 		net_send_shot(network, *x, *y);
 }
+
+/** Check shot result from server
+ * \param event_data - shot coordinates and result
+ * \param turn - whose turn to shot
+ * /param my_map - player map
+ * \param enemy_map - enemy map :)
+ * \param cl_gui - gui information
+ */
 
 void cl_main_check_net_shot(void * event_data,
                             enum player_state *turn,
@@ -197,10 +223,10 @@ void cl_main_check_net_shot(void * event_data,
                             map *enemy_map,
                             struct gui *cl_gui)
 {
-	char *x = (char *)(event_data + sizeof(char));
-	char *y = (char *)(event_data + sizeof(char) * 2);
-	char *result = (char *)(event_data + sizeof(char) * 3);
-
+	char *x = (char *)(event_data + sizeof(char)); /**< x coordinate*/
+	char *y = (char *)(event_data + sizeof(char) * 2); /**< y coordinate*/
+	char *result = (char *)(event_data + sizeof(char) * 3); /**< shot result*/
+	/* if playershoting and whating answer from server*/
 	if(turn == WAITING_TURN) {
 		enemy_map = logic_shot(x, y, result, enemy_map, turn);
 		gui_refresh_map(cl_gui, enemy_map, ENEMY);
@@ -210,13 +236,26 @@ void cl_main_check_net_shot(void * event_data,
 	}
 }
 
+/** Take enemy placement when game end
+ * \param event_data - enemy placement
+ * \param enemy_map - enemy map :)
+ * \param cl_gui - gui information
+ */
+
 void cl_main_send_placement(void *event_data, placement *enemy_map,
                             struct gui *cl_gui)
 {
 	placement *place = (placement *)event_data;
 	enemy_map = logic_merge_placement_map(place);
-	gui_refresh_map(cl_gui, enemy_map, ENEMY); // send enemy_map to gui. 0 is enemy
+	gui_refresh_map(cl_gui, enemy_map, ENEMY);
 }
+
+/** Start game
+ * \param event_data - whose turn to shot
+ * \param my_map - curent client map
+ * \param turn - whose turn to shot
+ * \param cl_gui - gui information
+ */
 
 void cl_main_start_game(void * event_data, map *my_map, enum player_state *turn,
                         struct gui *cl_gui)
@@ -225,23 +264,41 @@ void cl_main_start_game(void * event_data, map *my_map, enum player_state *turn,
 	gui_main_window(cl_gui, my_map);
 }
 
+/** Copy main queue
+ * \param queue - queue parametres
+ * \return a pointer to the queue head
+ */
+
 struct main_event *cl_main_copy_queue(struct main_queue *queue)
 {
 	struct main_event *tmp_head;
+
+	/* lock queue for nothing to lose*/
 	pthread_mutex_lock(&(queue->mutex));
 	tmp_head = queue->head->next;
 	queue->head->next = NULL;
+
+	/* unlock queue*/
 	pthread_mutex_unlock(&(queue->mutex));
 	return tmp_head;
 }
 
+/** Clear memory after work with queue
+ * \param head - start of queue
+ */
+
 void cl_main_clear_queue(struct main_event *head)
 {
-	struct main_event *prev = head, *tmp = head;
+	struct main_event *prev = head; /**< pointer to prev element*/
+	struct main_event *tmp = head; /**< pointer to curent element*/
 	while(tmp != NULL) {
+		/* release the memory data*/
 		free(tmp->event_data);
+		/* go to next element*/
 		tmp = tmp->next;
+		/* release the memory of one item in thr queue*/
 		free(prev);
+		/* go to curent element*/
 		prev = tmp;
 	}
 }
