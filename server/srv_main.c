@@ -158,15 +158,15 @@ void *new_client(struct srv_net_client *client, void *main_data)
 	cl_list->client_data = cl_data;
 	cl_list->next = NULL;
 
-	if(m_data->clients_data == NULL)
-	{
+	if(m_data->clients_data == NULL){
 		m_data->clients_data = cl_list;
 	} else {
-		struct client_list *list;
-		list = m_data->clients_data;
-		while(list->next != NULL){
-			list = list->next;
+		struct client_list *temp;
+		temp = m_data->clients_data;
+		while(temp->next != NULL){
+			temp = temp->next;
 		}
+		temp->next = cl_list;
 	}
 	return cl_data;
 }
@@ -175,13 +175,31 @@ void *new_client(struct srv_net_client *client, void *main_data)
 void del_client(struct srv_net_client *client, void *client_data,
 		void *main_data)
 {
-	struct client_list *temp;
+	struct client_list *temp, *prev;
 	struct main_data *m_data;
 	m_data = main_data;
 	temp = m_data->clients_data;
+	prev = NULL;
 
-
-
-
-
+	if(temp->client_data == (struct client_data*)client_data)
+	{
+		free(temp->client_data);
+		m_data->clients_data = temp->next;
+		if(temp->next == NULL){
+			m_data->clients_data = NULL;
+		}
+		free(temp);
+	} else {
+		while(temp->client_data != (struct client_data*)client_data){
+			prev = temp;
+			temp = temp->next;
+		}
+		free(temp->client_data);
+		if(temp->next != NULL){
+			prev->next = temp->next;
+		} else {
+			prev->next = NULL;
+		}
+		free(temp);
+	}
 }
