@@ -168,6 +168,15 @@ void *new_client(struct srv_net_client *client, void *main_data)
 		}
 		temp->next = cl_list;
 	}
+	temp = m_data->clients_data;
+	while(temp->next != NULL){
+		if(temp->client_data->enemy == NULL){
+			temp->client_data->enemy = cl_data;
+			cl_data->enemy = temp->client_data;
+			break;
+		}
+		temp = temp->next;
+	}
 	return cl_data;
 }
 
