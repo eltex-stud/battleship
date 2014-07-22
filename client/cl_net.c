@@ -57,7 +57,7 @@ void cl_net_processing_event(struct net *configure)
  *       else waiting for unlock and do the same things
  */
 
-struct net *cl_net_start(char address, int port, struct main_queue *m_queue)
+struct net *cl_net_start(char *address, int port, struct main_queue *m_queue)
 {
 	struct net *configure;
 	struct sockaddr_in addr;
