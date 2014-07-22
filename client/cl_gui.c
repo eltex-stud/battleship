@@ -116,11 +116,11 @@ void *gui_key_processing(void *arg)
 
 	keypad(stdscr, FALSE);
 
-	gui_stop(options);
+	cl_gui_stop(options);
 
 }
 
-struct gui *gui_start(struct main_queue *main_queue_h)
+struct gui *cl_gui_start(struct main_queue *main_queue_h)
 {
 	struct gui *options;
 	int idx;
@@ -163,12 +163,12 @@ struct gui *gui_start(struct main_queue *main_queue_h)
 	return options;
 }
 
-void gui_wait(struct gui *options)
+void cl_gui_wait(struct gui *options)
 {
 	pthread_join(options->gui_id, NULL);
 }
 
-void gui_stop(struct gui *options)
+void cl_gui_stop(struct gui *options)
 {
 	delwin(options->my_map);
 	delwin(options->enemy_map);
@@ -183,7 +183,7 @@ void gui_stop(struct gui *options)
 }
 
 
-int gui_input_nick(struct gui *options)
+int cl_gui_input_nick(struct gui *options)
 {
 	char nick[16];
 
@@ -219,7 +219,7 @@ int gui_input_nick(struct gui *options)
 	return 0;
 }
 
-int gui_main_window(struct gui *options, char map[10][10])
+int cl_gui_main_window(struct gui *options, char map[10][10])
 {
 	int idx, jdx;
 	int poz = 4;
@@ -341,7 +341,7 @@ int gui_main_window(struct gui *options, char map[10][10])
 	return 0;
 }
 
-int gui_refresh_map(struct gui *options, char map[10][10], enum player pl)
+int cl_gui_refresh_map(struct gui *options, char map[10][10], enum player pl)
 {
 	int idx;
 	int jdx;

@@ -45,14 +45,16 @@ void gui_key_processing_battleground(struct gui *options, long ch);
 
 void gui_key_processing_chat(struct gui *options, long ch);
 
-struct gui *gui_start(struct main_queue *main_queue_h);
+struct gui *cl_gui_start(struct main_queue *main_queue_h);
 
-int gui_input_nick(struct gui *options);
+void cl_gui_stop(struct gui *options);
 
-int gui_main_window(struct gui *options, char map[10][10]);
+void cl_gui_wait(struct gui *options);
 
-int gui_refresh_map(struct gui *options, char map[10][10], enum player pl);
+int cl_gui_input_nick(struct gui *options);
 
-void gui_stop(struct gui *options);
+int cl_gui_main_window(struct gui *options, char map[10][10]);
+
+int cl_gui_refresh_map(struct gui *options, char map[10][10], enum player pl);
 
 #endif // BATTLESHIP_CLIENT_GUI_H_
