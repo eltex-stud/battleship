@@ -54,12 +54,5 @@ int srv_logic_delmap(struct srv_logic_map *c_t_m);
 enum srv_logic_shot_result make_shot(struct srv_logic_map *c_t_m,
 		struct srv_logic_shot *shot);
 
-/*
- *
- * @function srv_logic_delmap clears the memory pointer to srv_logic_map
- *
- */
-
-int srv_logic_delmap(struct srv_logic_map *c_t_m);
 
 #endif // BATTLE_SERVER_LOGIC_H_

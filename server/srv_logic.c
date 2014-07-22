@@ -109,7 +109,7 @@ struct srv_logic_map *placement_to_map(int placement[10][10]) {
 					 && placement_test[idx - 1][jdx] != 1
 					 && placement_test[idx + 1][jdx] == 0 
 					 && placement_test[idx][jdx + 1] == 0) {
-					if (c_t_m->ship1_1[1][1] = 0) {
+					if (c_t_m->ship1_1[1][1] == 0) {
 						c_t_m->ship1_1[1][1] = idx - 1;
 						c_t_m->ship1_1[2][1] = jdx - 1;
 						c_t_m->ship1_1[3][1] = 1;
@@ -122,7 +122,7 @@ struct srv_logic_map *placement_to_map(int placement[10][10]) {
 					 && placement_test[idx - 1][jdx] != 1
 					 && placement_test[idx + 1][jdx] == 0 
 					 && placement_test[idx][jdx + 1] == 0) {
-					if (c_t_m->ship1_2[1][1] = 0) {
+					if (c_t_m->ship1_2[1][1] == 0) {
 						c_t_m->ship1_2[1][1] = idx - 1;
 						c_t_m->ship1_2[2][1] = jdx - 1;
 						c_t_m->ship1_2[3][1] = 1;
@@ -135,7 +135,7 @@ struct srv_logic_map *placement_to_map(int placement[10][10]) {
 					 && placement_test[idx - 1][jdx] != 1
 					 && placement_test[idx + 1][jdx] == 0 
 					 && placement_test[idx][jdx + 1] == 0) {
-					if (c_t_m->ship1_3[1][1] = 0) {
+					if (c_t_m->ship1_3[1][1] == 0) {
 						c_t_m->ship1_3[1][1] = idx - 1;
 						c_t_m->ship1_3[2][1] = jdx - 1;
 						c_t_m->ship1_3[3][1] = 1;
@@ -148,7 +148,7 @@ struct srv_logic_map *placement_to_map(int placement[10][10]) {
 					 && placement_test[idx - 1][jdx] != 1
 					 && placement_test[idx + 1][jdx] == 0 
 					 && placement_test[idx][jdx + 1] == 0) {
-					if (c_t_m->ship1_4[1][1] = 0) {
+					if (c_t_m->ship1_4[1][1] == 0) {
 						c_t_m->ship1_4[1][1] = idx - 1;
 						c_t_m->ship1_4[2][1] = jdx - 1;
 						c_t_m->ship1_4[3][1] = 1;
@@ -164,7 +164,7 @@ struct srv_logic_map *placement_to_map(int placement[10][10]) {
 
 	for (idx = 0; idx < 15; idx++) {
 		for (jdx = 0; jdx < 15; jdx++) {
-			if (placement_test[idx][jdx] = 1) {
+			if (placement_test[idx][jdx] == 1) {
 				if (placement_test[idx - 1][jdx] != 1 
 					&& placement_test[idx][jdx - 1] != 1
 					&& placement_test[idx][jdx + 1] == 1 
