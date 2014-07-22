@@ -3,9 +3,10 @@
 
 void gui_distinguish_cell(struct gui *options, unsigned short bgcolor)
 {
-	chtype symb;
+/*	chtype symb;
 	int idx;
 	int jdx;
+*/
 
 	wclear(options->line_stat);
 	wmove(options->line_stat, 0, 0);
@@ -127,6 +128,7 @@ void *gui_key_processing(void *arg)
 
 	cl_gui_stop(options);
 
+	return NULL;
 }
 
 struct gui *cl_gui_start(struct main_queue *main_queue_h)
