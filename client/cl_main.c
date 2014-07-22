@@ -2,26 +2,35 @@
 
 #include "cl_main.h"
 
-
-
+/** Starting point of client
+ * \param argc - number of incoming options
+ * \param argv - command line options
+ * \return ending code
+ */
 int main(int argc, char *argv[])
 {
-	int srv_port; /* Server address */
-	char srv_address[ADDRESS_LENGTH]; /* Server port */
-	struct main_event cap = { NULL }, *head = &cap;
-	struct main_queue queue = { pthread_self(), PTHREAD_MUTEX_INITIALIZER, 
+	int srv_port; /**< Server address */
+	char srv_address[ADDRESS_LENGTH]; /**< Server port */
+	struct main_event cap = { NULL }, /**< Cap for easy queue processing */
+	       *head = &cap; /**< Pointer on head of queue */
+	struct main_queue queue /**< All information about queue */
+	                        = { pthread_self(), PTHREAD_MUTEX_INITIALIZER, 
 	                            head };
-	struct net *cl_net = NULL;
-	struct gui *cl_gui = NULL;
-	map cl_map, cl_enemy_map;
-	placement cl_placement;
+	struct net *cl_net = NULL; /**< Net information */
+	struct gui *cl_gui = NULL; /**< GUI information */
+	map cl_map, /**< Player's map */
+	    cl_enemy_map; /**< Enemy's map */
+	placement cl_placement; /**< Player's placement to server */
 
+
+	/* Process all command line options */
 	if (cl_main_get_options(argc, argv, &srv_port, srv_address)) {
 		printf("Illegal command line options.\n");
 		printf("Use \"-a\" for address and \"-p\" for port.\n");
 		exit(EXIT_FAILURE);
 	}
 
+	/* Start modules */
 	if ((cl_net = cl_net_start(srv_address, srv_port, &queue)) == NULL) {
 		printf("Server is unreachable.\n");
 		exit(EXIT_FAILURE);
@@ -36,18 +45,32 @@ int main(int argc, char *argv[])
 	cl_map = cl_logic_convert_placement(cl_placement);
 	cl_gui_input_nick(cl_gui);
 	net_send_placement(cl_net, cl_placement);
+
+	/* Start to process all events */
 	cl_main_control(&queue, &cl_map, &cl_enemy_map, cl_net, cl_gui);
+
+	/* After main work wait for all threads to end */
 	gui_wait(cl_gui);
 	net_wait(cl_net);
 	return 0;
 }
 
+/** Command line options processor
+ * \param argc - number of incoming options
+ * \param argv - command line options
+ * \param port - server's port
+ * \param address - server's ip address
+ * \return 0 if options are correct
+ */
+
 int cl_main_get_options(int argc, char *argv[], int *port, char address[])
 {
-	char opt, is_address_set = 0, is_port_set = 0;
+	char opt, /**< letter of option */
+	     is_address_set = 0, /**< flag for address */
+	     is_port_set = 0; /**< flag for port */
 	while ((opt = getopt(argc, argv, "a:p:")) != -1) {
 		switch (opt) {
-		case 'a':
+		case 'a': /* Address */
 			if (!is_address_set) {
 				address = optarg;
 				is_address_set = 1;
@@ -55,7 +78,7 @@ int cl_main_get_options(int argc, char *argv[], int *port, char address[])
 				return 1;
 			}
 			break;
-		case 'p':
+		case 'p': /* Port */
 			if (!is_port_set) {
 				*port = atoi(optarg);
 				is_port_set = 1;
@@ -71,13 +94,21 @@ int cl_main_get_options(int argc, char *argv[], int *port, char address[])
 	return 0;
 }
 
+/** Create event for main queue
+ * \param queue - queue parametres
+ * \param type - event type
+ * \param data - pointer to datafield
+ * \param data_length - number of bytes in data
+ */
+
 void cl_main_make_event(struct main_queue *queue, enum main_event_types type,
                         void *data, int data_length)
 {
-	struct main_event *tmp = queue->head->next;
+	struct main_event *tmp = queue->head->next; /** Working pointer */
 
 	pthread_mutex_lock(&(queue->mutex));
 
+	/* Going in the end of list */
 	for(; tmp->next != NULL; tmp = tmp->next);
 
 	tmp->next = malloc(sizeof(struct main_event));
@@ -87,9 +118,9 @@ void cl_main_make_event(struct main_queue *queue, enum main_event_types type,
 	tmp->event_type = type;
 	tmp->event_data = malloc(data_length);
 	memcpy(tmp->event_data, data, data_length);
+
 	pthread_mutex_unlock(&(queue->mutex));
 	pthread_kill(queue->main_id, SIGUSR1);
-	return;
 }
 
 void cl_main_control(struct main_queue *queue, map *my_map, map *enemy_map,
