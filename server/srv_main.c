@@ -176,7 +176,9 @@ void *new_client(struct srv_net_client *client, void *main_data)
 	while(temp->next != NULL){
 		if(temp->client_data->enemy == NULL){
 			temp->client_data->enemy = cl_data;
+			temp->client_data->turn = ENEMY;
 			cl_data->enemy = temp->client_data;
+			cl_data->enemy->turn = MY;
 			break;
 		}
 		temp = temp->next;
@@ -235,5 +237,10 @@ void placement_received(struct srv_net_client *client, char *plcmnt,
 			idx++;
 		}
 	}
-	cl_data->map = placement_to_map(map);
+	cl_data->map = srv_logic_placement_to_map(map);
+	if(cl_data->turn == MY){
+		srv_net_send_game_start(client, SRV_NET_YOUR_TURN);
+	} else {
+		srv_net_send_game_start(client, SRV_NET_ENEMY_TURN);
+	}
 }
