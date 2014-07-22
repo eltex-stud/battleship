@@ -39,5 +39,6 @@ enum types_msg{
 	PLACEMENT,
 	START,
 	SHOT,
-	ERROR
+	ERROR,
+	END
 };
