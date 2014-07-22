@@ -341,7 +341,7 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 
 	for (idx = 0; idx < 15; idx++) {
 		for (jdx = 0; jdx < 15; jdx++) {
-			if (placement[idx][jdx] == 1) {
+			if (placement_test[idx][jdx] == 1) {
 				if (placement_test[idx - 1][jdx] == 0
 					&& placement_test[idx][jdx - 1] == 0
 					&& placement_test[idx + 1][jdx] == 0
