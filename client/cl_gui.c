@@ -15,16 +15,7 @@ void gui_distinguish_cell(struct gui *options, unsigned short bgcolor)
 	for (idx = 0; idx < 2; idx++) {
 		for(jdx = 0; jdx < 3; jdx++) {
 			wmove(options->enemy_map, 1 + idx + (options->y * 2), 1 + jdx + (options->x * 4));
-			symb = winch(options->enemy_map);
-			switch(symb & A_CHARTEXT) {
-				case '*':
-					wattron(COLOR_PAIR(8 + (bgcolor * 10)));
-					wprintw(options->enemy_map, "%c", symb);
-					wattroff(COLOR_PAIR(8 + (bgcolor * 10)));
-					break;
-
-				case 'X':
-					
+			if (i != 0 &&
 */
 	wmove(options->enemy_map, 1 + (options->y * 2), 2 + (options->x * 4));
 	wrefresh(options->enemy_map);
@@ -365,7 +356,7 @@ int cl_gui_refresh_map(struct gui *options, char map[10][10], enum player pl)
 	int jdx;
 	pthread_mutex_lock(&(options->mutex));
 	switch(pl) {
-		case MY:
+		case ME:
 			for(idx = 0; idx < 10; idx++) {
 				for(jdx = 0; jdx < 10; jdx++) {
 					if(map[idx][jdx] == 1) {
