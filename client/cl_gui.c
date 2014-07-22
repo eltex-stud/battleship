@@ -1,9 +1,85 @@
 /* vim: set noexpandtab tabstop=4 shiftwidth=4 smartindent: */
 #include "cl_gui.h"
 
+void gui_distinguish_cell(struct gui *options, unsigned short color)
+{
+	wclear(options->line_stat);
+	wmove(options->line_stat, 0, 0);
+	wprintw(options->line_stat, "%c%d", 'A' + options->x, 1 + options->y);
+	wrefresh(options->line_stat);
+
+	wmove(options->enemy_map, 1 + (options->y * 2), 2 + (options->x * 4));
+	wrefresh(options->enemy_map);
+}
+
+void gui_key_processing_chat(struct gui *options, long ch)
+{
+	switch(ch) {
+		case KEY_ENTER:
+			options->state = 1;
+//			curs_set(FALSE);
+			break;
+
+		default:
+			break;
+	}
+}
+
 void gui_key_processing_battleground(struct gui *options, long ch)
 {
+	char data[2];
 
+	switch(ch) {
+		case KEY_ENTER:
+			options->state = 2;
+			wmove(options->chat, getmaxy(options->chat) - 1, 1);
+//			curs_set(TRUE);
+			wrefresh(options->chat);
+			break;
+		
+		case KEY_UP:
+
+			if(options->y == 0) {
+				options->y = 9;
+			} else {
+				options->y--;
+			}
+			gui_distinguish_cell(options, 18);
+			break;
+
+		case KEY_DOWN:
+			if(options->y == 9) {
+				options->y = 0;
+			} else {
+				options->y++;
+			}
+			gui_distinguish_cell(options, 18);
+			break;
+
+		case KEY_LEFT:
+			if(options->x == 0) {
+				options->x = 9;
+			} else {
+				options->x--;
+			}
+			gui_distinguish_cell(options, 18);
+			break;
+
+		case KEY_RIGHT:
+			if(options->x == 9) {
+				options->x = 0;
+			} else {
+				options->x++;
+			}
+			gui_distinguish_cell(options, 18);
+			break;
+
+		case KEY_SPACE:
+			data[0] = options->x;
+			data[1] = options->y;
+			cl_main_make_event(options->main_queue_head, GUI_SHOT, (void *)data, 2);
+			break;
+	}
 }
 
 
@@ -42,8 +118,8 @@ void *gui_key_processing(void *arg)
 struct gui *gui_start(struct main_queue *main_queue_h)
 {
 	struct gui *options;
-	pthread_t gui_pthread;
-	int idx, jdx;
+	int idx;
+	int jdx;
 
 	initscr();
 
@@ -71,14 +147,36 @@ struct gui *gui_start(struct main_queue *main_queue_h)
 	options->x = 0;
 	options->y = 0;
 
+	pthread_mutex_init (&options->mutex, NULL);
+
 	for(idx = 0; idx < MAX_BUFF; idx++) {
 		options->msg[idx] = '\0';
 	}
 
-	pthread_create(&gui_pthread, NULL, gui_key_processing, (void *) options);
+	pthread_create(&options->gui_id, NULL, gui_key_processing, (void *) options);
 
 	return options;
 }
+
+void gui_wait(struct gui *options)
+{
+	pthread_join(options->gui_id, NULL);
+}
+
+void gui_stop(struct gui *options)
+{
+	delwin(options->my_map);
+	delwin(options->enemy_map);
+	delwin(options->chat);
+	delwin(options->line_stat);
+
+	endwin();
+
+	pthread_mutex_destroy (&options->mutex);
+
+	free(options);
+}
+
 
 int gui_input_nick(struct gui *options)
 {

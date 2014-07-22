@@ -13,6 +13,7 @@
 #define MAX_BUFF 128
 
 #define KEY_ENTER 10
+#define KEY_SPACE 32
 
 #define CUR_COLOR ((options->bg_color * 10) + options->font_color)
 
@@ -31,7 +32,11 @@ struct gui
 	unsigned short y;
 	char msg[MAX_BUFF];
 	struct main_queue *main_queue_head;
+	pthread_t gui_id;
+	pthread_mutex_t mutex;
 };
+
+void gui_distinguish_cell(struct gui *options, unsigned short color);
 
 void *gui_key_processing(void *arg);
 
