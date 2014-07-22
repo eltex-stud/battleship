@@ -216,7 +216,7 @@ int gui_main_window(struct gui *options, char map[10][10])
 	attroff(COLOR_PAIR(2));
 	refresh();
 
-	options->chat = newwin((getmaxy(stdscr) - 27), 89, 26, 4);
+	options->chat = newwin(getmaxy(stdscr) - 27, 89, 26, 4);
 	wbkgd(options->chat, COLOR_PAIR(CUR_COLOR));
 	box(options->chat, ACS_VLINE, ACS_HLINE);
 	wrefresh(options->chat);
@@ -229,3 +229,82 @@ int gui_main_window(struct gui *options, char map[10][10])
 
 	return 0;
 }
+
+int gui_refresh_map(struct gui *options, char map[10][10], enum player pl)
+{
+	int idx;
+	int jdx;
+	switch(pl) {
+		case MY:
+			for(idx = 0; idx < 10; idx++) {
+				for(jdx = 0; jdx < 10; jdx++) {
+					if(map[idx][jdx] == 1) {
+						wmove(options->my_map, 1 + (idx * 2), 2 + (jdx * 4));
+						wattron(options->my_map, COLOR_PAIR(13));
+						wprintw(options->my_map, "#");
+						wattroff(options->my_map, COLOR_PAIR(13));
+					}
+					if(map[idx][jdx] == 2) {
+						wmove(options->my_map, 1 + (idx * 2), 2 + (jdx * 4));
+						wattron(options->my_map, A_BOLD);
+						wattron(options->my_map, COLOR_PAIR(14));
+						wprintw(options->my_map, "X");
+						wattroff(options->my_map, COLOR_PAIR(14));
+						wattroff(options->my_map, A_BOLD);
+					}
+					if(map[idx][jdx] == 3) {
+						wmove(options->my_map, 1 + (idx * 2), 2 + (jdx * 4));
+						wattron(options->my_map, A_BOLD);
+						wattron(options->my_map, COLOR_PAIR(12));
+						wprintw(options->my_map, "X");
+						wattroff(options->my_map, COLOR_PAIR(12));
+						wattroff(options->my_map, A_BOLD);
+					}
+					if(map[idx][jdx] == 4) {
+						wmove(options->my_map, 1 + (idx * 2), 2 + (jdx * 4));
+						wattron(options->my_map, COLOR_PAIR(CUR_COLOR));
+						wattron(options->my_map, A_BOLD);
+						wprintw(options->my_map, "*");
+						wattroff(options->my_map, COLOR_PAIR(CUR_COLOR));
+						wattroff(options->my_map, A_BOLD);
+					}
+				}
+			}
+			wrefresh(options->my_map);
+			break;
+		case ENEMY:
+			for(idx = 0; idx < 10; idx++) {
+				for(jdx = 0; jdx < 10; jdx++) {
+					if(map[idx][jdx] == 2) {
+						wmove(options->enemy_map, 1 + (idx * 2), 2 + (jdx * 4));
+						wattron(options->enemy_map, A_BOLD);
+						wattron(options->enemy_map, COLOR_PAIR(14));
+						wprintw(options->enemy_map, "X");
+						wattroff(options->enemy_map, COLOR_PAIR(14));
+						wattroff(options->enemy_map, A_BOLD);
+					}
+					if(map[idx][jdx] == 3) {
+						wmove(options->enemy_map, 1 + (idx * 2), 2 + (jdx * 4));
+						wattron(options->enemy_map, A_BOLD);
+						wattron(options->enemy_map, COLOR_PAIR(12));
+						wprintw(options->enemy_map, "X");
+						wattroff(options->enemy_map, COLOR_PAIR(12));
+						wattroff(options->enemy_map, A_BOLD);
+					}
+					if(map[idx][jdx] == 4) {
+						wmove(options->enemy_map, 1 + (idx * 2), 2 + (jdx * 4));
+						wattron(options->enemy_map, COLOR_PAIR(CUR_COLOR));
+						wattron(options->enemy_map, A_BOLD);
+						wprintw(options->enemy_map, "*");
+						wattroff(options->enemy_map, COLOR_PAIR(CUR_COLOR));
+						wattroff(options->enemy_map, A_BOLD);
+					}
+				}
+			}
+			wrefresh(options->enemy_map);
+			break;
+	}
+
+	return 0;
+}
+
