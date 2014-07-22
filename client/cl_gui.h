@@ -2,7 +2,6 @@
 #ifndef BATTLESHIP_CLIENT_GUI_H_
 #define BATTLESHIP_CLIENT_GUI_H_
 
-#include "cl_main.h"
 #include "client.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,7 +12,7 @@
 
 #define MAX_BUFF 128
 
-#define KEY_ENTER 10
+#define ENTER 10
 #define KEY_SPACE 32
 
 #define CUR_COLOR ((options->bg_color * 10) + options->font_color)

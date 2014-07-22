@@ -1,13 +1,31 @@
 /* vim: set noexpandtab tabstop=4 shiftwidth=4 smartindent: */
 #include "cl_gui.h"
 
-void gui_distinguish_cell(struct gui *options, unsigned short color)
+void gui_distinguish_cell(struct gui *options, unsigned short bgcolor)
 {
+	chtype symb;
+	int idx;
+	int jdx;
+
 	wclear(options->line_stat);
 	wmove(options->line_stat, 0, 0);
 	wprintw(options->line_stat, "%c%d", 'A' + options->x, 1 + options->y);
 	wrefresh(options->line_stat);
+/*
+	for (idx = 0; idx < 2; idx++) {
+		for(jdx = 0; jdx < 3; jdx++) {
+			wmove(options->enemy_map, 1 + idx + (options->y * 2), 1 + jdx + (options->x * 4));
+			symb = winch(options->enemy_map);
+			switch(symb & A_CHARTEXT) {
+				case '*':
+					wattron(COLOR_PAIR(8 + (bgcolor * 10)));
+					wprintw(options->enemy_map, "%c", symb);
+					wattroff(COLOR_PAIR(8 + (bgcolor * 10)));
+					break;
 
+				case 'X':
+					
+*/
 	wmove(options->enemy_map, 1 + (options->y * 2), 2 + (options->x * 4));
 	wrefresh(options->enemy_map);
 }
@@ -16,7 +34,7 @@ void gui_key_processing_chat(struct gui *options, long ch)
 {
 	pthread_mutex_lock(&(options->mutex));
 	switch(ch) {
-		case KEY_ENTER:
+		case ENTER:
 			options->state = 1;
 //			curs_set(FALSE);
 			break;
@@ -33,7 +51,7 @@ void gui_key_processing_battleground(struct gui *options, long ch)
 
 	pthread_mutex_lock(&(options->mutex));
 	switch(ch) {
-		case KEY_ENTER:
+		case ENTER:
 			options->state = 2;
 			wmove(options->chat, getmaxy(options->chat) - 1, 1);
 //			curs_set(TRUE);
