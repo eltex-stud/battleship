@@ -1,15 +1,16 @@
 CC=gcc
 CFLAGS=-g -c -Wall -Werror
-CPPFLAGS=-I. -I..
+CPPFLAGS=-I. -I.. -I../include
 LDFLAGS=-lncurses -lmenu -lpanel
-SOURCES=*.c
-OBJECTS=*.o
+SOURCES=$(wildcard *.c)
+MAIN=srv_main.c
+OBJECTS=$(patsubst %.c,%.o,$(filter-out $(MAIN),$(SOURCES)))
 BINARY=server
 
 all: $(BINARY)
 
-$(BINARY): $(OBJECTS) 
-	$(CC) $(CPPFLAGS) $(OBJECTS) -o $(BINARY) $(LDFLAGS)
+$(BINARY): $(MAIN) $(OBJECTS)
+	$(CC) $(CPPFLAGS) $^ -o $(BINARY) $(LDFLAGS)
 
 $(OBJECTS): $(SOURCES)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(SOURCES)

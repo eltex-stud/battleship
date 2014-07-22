@@ -2,7 +2,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
+#include <net_types.h>
 #include <server/srv_net.h>
 #include <server/srv_logic.h>
 
@@ -31,10 +33,11 @@ void placement_received(struct srv_net_client *client, char *plcmnt,
 		void *client_data, void *main_data);
 void del_client(struct srv_net_client *client, void *client_data,
 		void *main_data);
-void shot_received(struct srv_net_client *client, struct shot *shot,
+void shot_received(struct srv_net_client *client, struct srv_net_shot *shot,
 		void *client_data, void *main_data);
 void nick_received(struct srv_net_client *client, char *nick,
 		void *client_data, void *main_data);
+enum srv_net_shot_result logic_to_net_shot_result(enum srv_logic_shot_result);
 
 
 /**
@@ -47,7 +50,7 @@ void nick_received(struct srv_net_client *client, char *nick,
  */
 int main(int argc, char *argv[])
 {
-	struct srv_net *net;
+	struct srv_net_network *net;
 	struct main_data main_data;
 	struct srv_net_client_ops client_ops;
 	char *ip;
@@ -74,52 +77,76 @@ int main(int argc, char *argv[])
 	client_ops.nick_received = nick_received;
 
 	/* Run main loop */
-	net = srv_net_init(ip, port);
+	net = srv_net_start(ip, port);
+	if (net == NULL) {
+		printf("Net start error\n");
+		return 1;
+	}
 	srv_net_wait_events(net, NULL, client_ops, &main_data);
-	srv_net_del(net);
+	srv_net_stop(net);
 
 	return 0;
 }
 
-
-void shot_received(struct srv_net_client *client, struct shot *shot,
-		void *client_data_void, void *main_data_void)
+enum srv_net_shot_result logic_to_net_shot_result(enum srv_logic_shot_result r)
 {
-	enum shot_result result;
+	switch (r) {
+		case SRV_LOGIC_RESULT_HIT:
+			return SRV_NET_HIT;
+		case SRV_LOGIC_RESULT_KILL:
+			return SRV_NET_KILL;
+		case SRV_LOGIC_RESULT_MISS:
+			return SRV_LOGIC_RESULT_MISS;
+		case SRV_LOGIC_RESULT_END_GAME:
+			return SRV_NET_END;
+		default:
+			assert(0 && "Programming error: bad srv_logic_shot_result");
+	}
+}
+
+void shot_received(struct srv_net_client *client, struct srv_net_shot *shot,
+		void *client_data_void, void *main_data_void __attribute__((unused)))
+{
+	enum srv_logic_shot_result shot_result;
+	enum srv_net_shot_result net_shot_result;
 	struct client_data *client_data;
 	struct client_data *enemy_data;
-	placement my_placement;
-	placement enemy_placement;
+	char *my_placement;
+	char *enemy_placement;
+	struct srv_logic_shot logic_shot;
 
 	client_data = client_data_void;
 	enemy_data = client_data->enemy;
 
 	/* Send error if not his turn */
 	if(client_data->turn != MY) {
-		srv_net_send_error(client, SRV_NET_ERR_NOT_YOUR_TURN);
+		srv_net_send_error(client, SRV_NET_NOT_YOUR_TURN);
 		return;
 	}
 
 	/* Send error if malformed shot */
-	shot_result = srv_logic_make_shot(enemy_data->map, shot);
-	if(shot_result == SRV_LOGIC_BAD_SHOT) {
-		srv_net_send_error(client, SRV_NET_ERR_BAD_SHOT);
+	if (shot->x < 0 || shot->x >= 10 || shot->y < 0 || shot->y >= 10) {
+		srv_net_send_error(client, SRV_NET_BAD_SHOT);
 		return;
 	}
+	logic_shot.x = shot->x;
+	logic_shot.y = shot->y;
+	shot_result = srv_logic_make_shot(enemy_data->map, &logic_shot);
 
 	/* Send shot result to each client */
-	srv_net_send_shot_result(client, shot, shot_result);
-	srv_net_send_shot_result(enemy_data->client, shot, shot_result);
+	net_shot_result = logic_to_net_shot_result(shot_result);
+	srv_net_send_shot_result(client, shot, net_shot_result);
+	srv_net_send_shot_result(enemy_data->client, shot, net_shot_result);
 
 	/* Switch turn */
 	client_data->turn = ENEMY;
 	enemy_data->turn = MY;
 
 	/* If game finished */
-	if(shot_result == SRV_SHOT_RESULT_END) {
+	if(shot_result == SRV_LOGIC_RESULT_END_GAME) {
 		/* TODO: rethink. probably should store placement in main module */
-		my_placement = srv_logic_map_to_placement(client_data->map);
-		enemy_placement = srv_logic_map_to_placement(enemy_data->map);
+		my_placement = (char *)client_data->plcmnt;
+		enemy_placement = (char *)enemy_data->plcmnt;
 
 		/* Unbind clients from each other (for correctness of del_client */
 		enemy_data->enemy = NULL;
@@ -136,8 +163,10 @@ void shot_received(struct srv_net_client *client, struct shot *shot,
 }
 
 
-void nick_received(struct srv_net_client *client, char *nick,
-		void *client_data, void *main_data)
+void nick_received(struct srv_net_client *client __attribute__((unused)),
+		char *nick __attribute__((unused)),
+		void *client_data __attribute__((unused)),
+		void *main_data __attribute__((unused)))
 {
 	/* Do nothing for now */
 }
@@ -186,8 +215,8 @@ void *new_client(struct srv_net_client *client, void *main_data)
 	return cl_data;
 }
 
-void del_client(struct srv_net_client *client, void *client_data,
-		void *main_data)
+void del_client(struct srv_net_client *client __attribute__((unused)),
+		void *client_data __attribute__((unused)), void *main_data)
 {
 	struct client_list *temp, *prev;
 	struct main_data *m_data;
@@ -220,7 +249,7 @@ void del_client(struct srv_net_client *client, void *client_data,
 
 
 void placement_received(struct srv_net_client *client, char *plcmnt,
-		void *client_data, void *main_data)
+		void *client_data, void *main_data __attribute__((unused)))
 {
 	struct client_data *cl_data;
 	cl_data = client_data;

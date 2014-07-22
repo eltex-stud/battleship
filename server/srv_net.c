@@ -1,8 +1,17 @@
 /* vim: set noexpandtab tabstop=4 shiftwidth=4 smartindent: */
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+#include <arpa/inet.h>
+#include <sys/socket.h>
 
 #include <net_types.h>
 #include "srv_net.h"
+
+#define SIZE_BUFF 1024
+
 
 struct srv_net_queue {
 	int fd;
@@ -15,13 +24,13 @@ struct srv_net_queue {
 
 struct srv_net_network {
 	int fd;
-	int main_data;
+	void *main_data;
 	struct srv_net_queue *queue;
 };
 
 struct srv_net_client {
 	int fd;
-	int client_data;
+	void *client_data;
 	struct srv_net_network *network;
 };
 
@@ -37,12 +46,11 @@ struct srv_net_client *srv_net_find_client(int fd)
 			return &(client_list[i]);
 		}
 	}
+	return NULL;
 }
 
 struct srv_net_queue *head = NULL;
 struct srv_net_queue *tail = NULL;
-
-fd_set writeset;
 
 struct srv_net_network *srv_net_start(char *ip, short int port)
 {
@@ -64,13 +72,14 @@ struct srv_net_network *srv_net_start(char *ip, short int port)
 		return 0;
 	}
 
+	memset(&server_addr, 0, sizeof(struct sockaddr_in));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = inet_addr(ip);
-	server_addr.sin_addr.s_addr = htons(port);
+	server_addr.sin_port = htons(port);
 
 	if((bind(server_sock,(struct sockaddr *)&server_addr,
 			sizeof(server_addr))) < 0) {
-		printf("Error bind");
+		perror("Error bind");
 		return 0;
 	}
 
@@ -82,9 +91,10 @@ int srv_net_stop(struct srv_net_network *net)
 {
   close(net->fd);
   free(net);
+  return 0;
 }
 
-void srv_net_wait_events(struct srv_net_network *net, int *clients[],
+void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute__((unused)),
 		struct srv_net_client_ops client_ops, void *main_data)
 {
 	int idx;
@@ -103,7 +113,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[],
 	char buff[128];
 	char nick[127];
 
-	unsigned char *tmsg = buff;
+	unsigned char *tmsg = (unsigned char *)buff;
 	struct srv_net_shot *cl_shot;
 	struct timeval timeout;
 	struct srv_net_client *client;
@@ -144,7 +154,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[],
 		timeout.tv_sec=1;
 		timeout.tv_usec=0;
 
-		if(select(33, &readset, NULL, NULL, &timeout) <= 0) {
+		if(select(33, &readset, &writeset, NULL, &timeout) <= 0) {
 			printf("Error select");
 		}
 
@@ -181,7 +191,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[],
 							break;
 
 						case SHOT:
-							cl_shot = (struct shot *)malloc(sizeof(struct srv_net_shot));
+							cl_shot = (struct srv_net_shot *)malloc(sizeof(struct srv_net_shot));
 							cl_shot->x = (int)buff[1];
 							cl_shot->y = (int)buff[2];
 							client = srv_net_find_client(client_list[jdx].fd);
@@ -194,6 +204,10 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[],
 							main_client_ops.del_client(client,
 									client_list[idx].client_data, net->main_data);
 							break;
+						case ERROR:
+						case START:
+						default:
+							printf("Client sent something wrong\n");
 					}
 				}
 			}
@@ -223,7 +237,7 @@ int srv_net_del_client(struct srv_net_client *client)
 
 	close(client->fd);
 
-	main_client_ops.srv_net_main_del_client(client, client->client_data,
+	main_client_ops.del_client(client, client->client_data,
 			client->network->main_data);
 
 	for(idx=0; idx<32; idx++) {

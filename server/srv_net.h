@@ -2,6 +2,15 @@
 #ifndef BATTLESHIP_SRV_NET_H_
 #define BATTLESHIP_SRV_NET_H_
 
+#include <net_types.h>
+
+struct srv_net_client;
+
+struct srv_net_shot {
+	int x;
+	int y;
+};
+
 /**
  * @struct srv_net_client_ops
  *
@@ -26,7 +35,7 @@ struct srv_net_client_ops {
 	 * @param client_data data returned from new_client
 	 * @param main_data data passed to srv_net_wait_events
 	 */
-	void (*placement_received)(struct srv_net_client *client, placement plcmnt,
+	void (*placement_received)(struct srv_net_client *client, char *plcmnt,
 			void *client_data, void *main_data);
 
 	/**
@@ -48,8 +57,8 @@ struct srv_net_client_ops {
 	 * @param client_data data returned from new_client call
 	 * @param main_data data passed to srv_net_wait_events
 	 */
-	void (*shot_received)(struct srv_net_client *client, struct shot *shot,
-			void *client_data, void *main_data);
+	void (*shot_received)(struct srv_net_client *client,
+			struct srv_net_shot *shot, void *client_data, void *main_data);
 
 	/**
 	 * @brief Function to handle client nick receiving
@@ -63,32 +72,10 @@ struct srv_net_client_ops {
 			void *client_data, void *main_data);
 };
 
-enum srv_net_shot_result {
-	SRV_NET_MISS,
-	SRV_NET_HIT,
-	SRV_NET_KILL,
-	SRV_NET_END
-};
-
-enum srv_net_error_msg {
-	SRV_NET_BAD_SHOT,
-	SRV_NET_NOT_YOUR_TURN
-};
-
-enum srv_net_turn {
-	SRV_NET_ENEMY_TURN,
-	SRV_NET_YOUR_TURN
-};
-
-struct srv_net_shot {
-	int x;
-	int y;
-};
-
 struct srv_net_network *srv_net_start(char *ip, short int port);
 int srv_net_stop(struct srv_net_network *net);
 int srv_net_send_shot_result(struct srv_net_client *client,
-		struct srv_net_shot *shot, enum result r);
+		struct srv_net_shot *shot, enum srv_net_shot_result r);
 int srv_net_send_game_start(struct srv_net_client *client, enum srv_net_turn r);
 int srv_net_send_placement(struct srv_net_client *client, char *placement);
 int srv_net_send_game_end(struct srv_net_client *client,
