@@ -1,4 +1,6 @@
 /* vim: set noexpandtab tabstop=4 shiftwidth=4 smartindent: */
+#ifndef BATTLESHIP_NET_TYPES_H_
+#define BATTLESHIP_NET_TYPES_H_
 /*
  * ip - loopback
  * port -  1234
@@ -59,3 +61,4 @@ enum srv_net_error_msg {
 	SRV_NET_BAD_SHOT,
 	SRV_NET_NOT_YOUR_TURN
 };
+#endif // BATTLESHIP_NET_TYPES_H_
