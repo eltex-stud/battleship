@@ -29,7 +29,6 @@ void gui_key_processing_input_nick(struct gui *options, long ch)
 	int idx;
 
 	pthread_mutex_lock(&(options->mutex));
-	noecho();
 	switch(ch) {
 		case ENTER:
 			cl_main_make_event(options->main_queue_head, GUI_NICK, (void*)options->msg, options->size_of_msg);
@@ -68,13 +67,12 @@ void gui_key_processing_input_nick(struct gui *options, long ch)
 			}
 			break;
 	}
-	echo();
 	pthread_mutex_unlock(&(options->mutex));
 }
+
 void gui_key_processing_chat(struct gui *options, long ch)
 {
 	pthread_mutex_lock(&(options->mutex));
-	noecho();
 	switch(ch) {
 		case ENTER:
 			options->state = 1;
@@ -84,7 +82,6 @@ void gui_key_processing_chat(struct gui *options, long ch)
 		default:
 			break;
 	}
-	echo();
 	pthread_mutex_unlock(&(options->mutex));
 }
 
@@ -93,7 +90,6 @@ void gui_key_processing_battleground(struct gui *options, long ch)
 	char data[2];
 
 	pthread_mutex_lock(&(options->mutex));
-	noecho();
 	switch(ch) {
 		case ENTER:
 			options->state = 2;
@@ -145,7 +141,6 @@ void gui_key_processing_battleground(struct gui *options, long ch)
 			cl_main_make_event(options->main_queue_head, GUI_SHOT, (void *)data, 2);
 			break;
 	}
-	echo();
 	pthread_mutex_unlock(&(options->mutex));
 
 }
@@ -159,8 +154,6 @@ void *gui_key_processing(void *arg)
 	options = (struct gui*)arg;
 
 	keypad(stdscr, TRUE);
-
-	noecho();
 
 	while((ch = getch()) != KEY_END) {
 	/*
@@ -267,8 +260,6 @@ int cl_gui_input_nick(struct gui *options)
 	options->nick_window = newwin(5, 50, 10, 20);
 	wbkgd(options->nick_window, COLOR_PAIR(CUR_COLOR));
 	box(options->nick_window, ACS_VLINE, ACS_HLINE);
-
-	echo();
 
 	wmove(options->nick_window, 2, 2);
 	wprintw(options->nick_window, "Enter your nickname: ");
