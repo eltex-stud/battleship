@@ -22,8 +22,14 @@ int main(int argc, char *argv[])
 	map cl_map, /**< Player's map */
 	    cl_enemy_map; /**< Enemy's map */
 	placement cl_placement; /**< Player's placement to server */
+	struct sigaction sigact;
+	sigact.sa_handler = usr1_handler;
 
-
+	if (sigaction(SIGUSR1, &sigact, NULL)) {
+		perror("sigaction");
+		exit(EXIT_FAILURE);
+	}
+	
 	/* Process all command line options */
 	if (cl_main_get_options(argc, argv, &srv_port, srv_address)) {
 		printf("Illegal command line options.\n");
@@ -306,4 +312,8 @@ void cl_main_clear_queue(struct main_event *head)
 		/* go to curent element*/
 		prev = tmp;
 	}
+}
+
+void usr1_handler(int a)
+{
 }
