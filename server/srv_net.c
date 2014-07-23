@@ -125,6 +125,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 	struct srv_net_shot *cl_shot;
 	struct timeval timeout;
 	struct srv_net_client *client;
+	int max_fd;
 
 	kdx=0;
 	idx=0;
@@ -146,10 +147,13 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 
 		FD_SET(net->fd, &readset);
 
-
+		max_fd = net->fd;
 		for(idx=0; idx<32; idx++) {
 			if(client_list[idx].fd!=0) {
 				FD_SET(client_list[idx].fd, &readset);
+				if (client_list[idx].fd > max_fd) {
+					max_fd = client_list[idx].fd;
+				}
 			}
 		}
 
@@ -162,8 +166,8 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 		timeout.tv_sec=1;
 		timeout.tv_usec=0;
 
-		if(select(33, &readset, &writeset, NULL, &timeout) <= 0) {
-			printf("Error select");
+		if(select(max_fd+1, &readset, &writeset, NULL, &timeout) < 0) {
+			perror("Error select");
 		}
 
 		if(FD_ISSET(net->fd, &readset)) {
@@ -171,11 +175,11 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 			fcntl(client_list[idx].fd, F_SETFL, O_NONBLOCK);
 
 			client_list[idx].client_data = main_client_ops.new_client(&(client_list[idx]), net->main_data);
-			
+
 			idx++;
 		}
 
-		for(jdx=0; jdx<32; idx++) {
+		for(jdx=0; jdx<32; jdx++) {
 			if(client_list[jdx].fd!=0) {
 				if(FD_ISSET(client_list[jdx].fd, &readset)) {
 					size = recv(client_list[jdx].fd, &buff, SIZE_BUFF, 0);
@@ -220,6 +224,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 				}
 			}
 		}
+
 		if(head != NULL) {
 			for(temp = head->next; temp->next!=NULL; temp=temp->next) {
 				if(FD_ISSET (temp->fd, &writeset)) {

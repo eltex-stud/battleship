@@ -182,9 +182,9 @@ static void *new_client(struct srv_net_client *client, void *main_data)
 	struct client_list *cl_list;
 	struct client_data *cl_data;
 	struct client_list *temp;
-	
+
 	m_data = main_data;
-	
+
 	cl_list = (struct client_list*)malloc(sizeof(struct client_list*));
 	cl_data = (struct client_data*)malloc(sizeof(struct client_list*));
 
@@ -216,6 +216,7 @@ static void *new_client(struct srv_net_client *client, void *main_data)
 		}
 		temp = temp->next;
 	}
+
 	return cl_data;
 }
 
