@@ -73,7 +73,8 @@ int cl_main_get_options(int argc, char *argv[], int *port, char address[])
 		switch (opt) {
 		case 'a': /* Address */
 			if (!is_address_set) {
-				address = optarg;
+				memcpy(address, optarg, strlen(optarg));
+				address[strlen(optarg)] = '\0';
 				is_address_set = 1;
 			} else {
 				return 1;
