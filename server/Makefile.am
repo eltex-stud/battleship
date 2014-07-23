@@ -1,7 +1,7 @@
 AUTOMAKE_OPTIONS = foreign
 
 #AM_LDFLAGS = -ldl
-AM_CFLAGS = -std=c99
+AM_CFLAGS = -Wno-error
 AM_LDFLAGS = -lpthread
 AM_CPPFLAGS = -I. -I.. -I../include
 
