@@ -81,7 +81,7 @@ struct net *cl_net_start(char *address, int port, struct main_queue *m_queue)
 	bzero(&addr, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(port);
-	addr.sin_addr.s_addr = htonl(address);
+	addr.sin_addr.s_addr = inet_addr(address);
 
 	if(connect(cl_sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
 		perror("connect");

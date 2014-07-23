@@ -188,7 +188,7 @@ void cl_logic_generate_placement(placement map)
     }
 }
 
-void cl_logic_merge_placement_map(placement server_map, placement map)
+void cl_logic_merge_placement_map(placement server_map, map cl_map)
 {
     int index1, index2;
     
@@ -196,12 +196,12 @@ void cl_logic_merge_placement_map(placement server_map, placement map)
     {
 	for(index2 = 0; index2 < 10; index2++)
 	{
-	    map[index1][index2] = server_map[index1][index2] + map[index1][index2];
+	    cl_map[index1][index2] = server_map[index1][index2] + cl_map[index1][index2];
 	}
     }
 }
 
-void cl_logic_shot(int x, int y, int result, placement map, enum player_state *state)
+void cl_logic_shot(int x, int y, char result, placement map, enum player_state *state)
 {
     if(*state == ENEMY_TURN)
     {
@@ -262,7 +262,7 @@ void cl_logic_shot(int x, int y, int result, placement map, enum player_state *s
     }
 }
 
-void cl_logic_kill_ship(int x, int y, int result, placement map)
+void cl_logic_kill_ship(int x, int y, char result, placement map)
 {
     int index1, index2;
     int x1 = x, y1 = y;

@@ -8,6 +8,8 @@ enum player { ME, ENEMY };
 typedef char placement[10][10];
 typedef char map[10][10];
 
+struct main_queue;
+
 void cl_main_make_event(struct main_queue *queue, enum main_event_types type,
                         void *data, int data_length);
 #endif
