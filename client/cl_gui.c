@@ -24,6 +24,52 @@ void gui_distinguish_cell(struct gui *options, unsigned short bgcolor)
 	wrefresh(options->enemy_map);
 }
 
+void gui_key_processing_input_nick(struct gui *options, long ch)
+{
+	int idx;
+
+	pthread_mutex_lock(&(options->mutex));
+	switch(ch) {
+		case ENTER:
+			cl_main_make_event(options->main_queue_head, GUI_NICK, (void*)options->msg, options->size_of_msg);
+
+			for(idx = 0; idx < MAX_BUFF; idx++) {
+				options->msg[idx] = '\0';
+			}
+			options->size_of_msg = 0;
+
+			wclear(options->nick_window);
+			delwin(options->nick_window);
+			clear();
+			refresh();
+
+			options->state = 1;
+			break;
+
+		case KEY_BACKSPACE:
+			if(options->size_of_msg > 0) {
+				options->size_of_msg--;
+				wmove(options->nick_window, 2, 23 + options->size_of_msg);
+				wprintw(options->nick_window, " ");
+				wmove(options->nick_window, 2, 23 + options->size_of_msg);
+				options->msg[options->size_of_msg] = '\0';
+				wrefresh(options->nick_window);
+			}
+			break;
+
+		default:
+			if (options->size_of_msg < MAX_BUFF - 1) {
+				options->msg[options->size_of_msg] = ch;
+				wmove(options->nick_window, 2, 23 + options->size_of_msg);
+				wprintw(options->nick_window, "%c", ch);
+				options->size_of_msg++;
+				options->nick_window;
+			}
+			break;
+	}
+
+	pthread_mutex_unlock(&(options->mutex));
+}
 void gui_key_processing_chat(struct gui *options, long ch)
 {
 	pthread_mutex_lock(&(options->mutex));
@@ -116,6 +162,10 @@ void *gui_key_processing(void *arg)
 	 * options->state = 2 - work with chat;
 	 */
 		switch(options->state) {
+			case 0:
+				gui_key_processing_input_nick(options, ch);
+				break;
+
 			case 1:
 				gui_key_processing_battleground(options, ch);
 				break;
@@ -213,20 +263,7 @@ int cl_gui_input_nick(struct gui *options)
 	wprintw(options->nick_window, "Enter your nickname: ");
 	curs_set(TRUE);
 	wmove(options->nick_window, 2, 23);
-	wgetnstr(options->nick_window, nick, 16);
-	curs_set(FALSE);
 
-	noecho();
-
-	wrefresh(options->nick_window);
-	delwin(options->nick_window);
-
-	clear();
-	refresh();
-
-	cl_main_make_event(options->main_queue_head, GUI_NICK, (void*)nick, strlen(nick));
-
-	options->state = 1;
 	pthread_mutex_unlock(&(options->mutex));
 
 	return 0;

@@ -10,7 +10,7 @@
 #include <curses.h>
 #include <pthread.h>
 
-#define MAX_BUFF 128
+#define MAX_BUFF 100
 
 #define ENTER 10
 #define KEY_SPACE 32
@@ -43,6 +43,8 @@ void *gui_key_processing(void *arg);
 void gui_key_processing_battleground(struct gui *options, long ch);
 
 void gui_key_processing_chat(struct gui *options, long ch);
+
+void gui_key_processing_input_nick(struct gui *options, long ch);
 
 struct gui *cl_gui_start(struct main_queue *main_queue_h);
 
