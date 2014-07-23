@@ -10,8 +10,6 @@
 #include <net_types.h>
 #include "srv_net.h"
 
-#define SIZE_BUFF 1024
-
 
 struct srv_net_queue {
 	int fd;
@@ -118,7 +116,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 	struct srv_net_queue *temp2;
 
 	char placement[100];
-	char buff[128];
+	char buff[SIZE_BUF];
 	char nick[127];
 
 	unsigned char *tmsg = (unsigned char *)buff;
@@ -182,7 +180,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 		for(jdx=0; jdx<32; jdx++) {
 			if(client_list[jdx].fd!=0) {
 				if(FD_ISSET(client_list[jdx].fd, &readset)) {
-					size = recv(client_list[jdx].fd, &buff, SIZE_BUFF, 0);
+					size = recv(client_list[jdx].fd, buff, SIZE_BUF, 0);
 					switch((enum types_msg)tmsg[0]) {
 						case NICK:
 							for(kdx = 1; kdx <= size; kdx++) {
