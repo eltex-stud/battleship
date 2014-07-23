@@ -3,7 +3,7 @@ CFLAGS=-g -c -Wall -Werror
 LDFLAGS=-lncurses -lmenu -lpanel
 SOURCES=*.c
 OBJECTS=*.o
-BINARY=CLIENT
+BINARY=client
 
 all: $(BINARY)
 
