@@ -3,6 +3,8 @@
 #include "cl_main.h"
 #include "cl_net.h"
 
+extern char *optarg;
+
 /** Starting point of client
  * \param argc - number of incoming options
  * \param argv - command line options
