@@ -107,7 +107,7 @@ int cl_main_get_options(int argc, char *argv[], int *port, char address[])
 void cl_main_make_event(struct main_queue *queue, enum main_event_types type,
                         void *data, int data_length)
 {
-	struct main_event *tmp = queue->head->next; /**< Working pointer */
+	struct main_event *tmp = queue->head; /**< Working pointer */
 
 	pthread_mutex_lock(&(queue->mutex));
 

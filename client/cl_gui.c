@@ -63,7 +63,7 @@ void gui_key_processing_input_nick(struct gui *options, long ch)
 				wmove(options->nick_window, 2, 23 + options->size_of_msg);
 				wprintw(options->nick_window, "%c", ch);
 				options->size_of_msg++;
-				options->nick_window;
+				wrefresh(options->nick_window);
 			}
 			break;
 	}
@@ -248,8 +248,6 @@ void cl_gui_stop(struct gui *options)
 
 int cl_gui_input_nick(struct gui *options)
 {
-	char nick[16];
-
 	pthread_mutex_lock(&(options->mutex));
 
 	refresh();
