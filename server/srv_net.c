@@ -164,7 +164,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 		}
 
 		if(head != NULL && head->next != NULL) {
-			for(temp = head->next; temp->next!=NULL; temp=temp->next) {
+			for(temp = head->next; temp!=NULL; temp=temp->next) {
 				FD_SET (temp->fd, &writeset);
 			}
 		}
@@ -238,7 +238,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 		}
 
 		if(head != NULL && head->next != NULL) {
-			for(temp = head->next; temp->next!=NULL; temp=temp->next) {
+			for(temp = head->next; temp!=NULL; temp=temp->next) {
 				if(FD_ISSET (temp->fd, &writeset)) {
 					size_send = send(temp->fd, (temp->data)+(temp->index), temp->size, 0);
 					printf("send %d of %d (index %d)\n", size_send, temp->size, temp->index);
@@ -285,7 +285,7 @@ int srv_net_send_game_start (struct srv_net_client *client, enum srv_net_turn r)
 	buff[1] = r;
 
 	memcpy(queue->data, buff, 2);
-	queue->size = sizeof(buff);
+	queue->size = 2;
 	queue->fd = client->fd;
 	queue->index = 0;
 	queue->next = NULL;

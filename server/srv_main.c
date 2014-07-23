@@ -276,10 +276,18 @@ static void placement_received(struct srv_net_client *client, char *plcmnt,
 		}
 	}
 	cl_data->map = srv_logic_placement_to_map(map);
+
+	if(cl_data->enemy == NULL) {
+		printf("placement_received\n");
+		return;
+	}
+
 	if(cl_data->turn == MY){
 		srv_net_send_game_start(client, SRV_NET_YOUR_TURN);
+		srv_net_send_game_start(cl_data->enemy->client, SRV_NET_ENEMY_TURN);
 	} else {
 		srv_net_send_game_start(client, SRV_NET_ENEMY_TURN);
+		srv_net_send_game_start(cl_data->enemy->client, SRV_NET_YOUR_TURN);
 	}
 	printf("placement_received\n");
 }
