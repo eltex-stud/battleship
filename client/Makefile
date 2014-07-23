@@ -1,17 +1,19 @@
 CC=gcc
 CFLAGS=-g -c -Wall -Werror
+CPPFLAGS=-I. -I.. -I../include
 LDFLAGS=-lncurses -lmenu -lpanel -lpthread
-SOURCES=*.c
-OBJECTS=*.o
+SOURCES=$(wildcard *.c)
+MAIN=cl_main.c
+OBJECTS=$(patsubst %.c,%.o,$(filter-out $(MAIN),$(SOURCES)))
 BINARY=client
 
 all: $(BINARY)
 
-$(BINARY): $(OBJECTS) 
-	$(CC) $(OBJECTS) -o $(BINARY) $(LDFLAGS)
+$(BINARY): $(MAIN) $(OBJECTS)
+	$(CC) $(CPPFLAGS) $^ -o $(BINARY) $(LDFLAGS)
 
 $(OBJECTS): $(SOURCES)
-	$(CC) $(CFLAGS) $(SOURCES)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(SOURCES)
 
 clean: 
 	rm $(OBJECTS) $(BINARY)

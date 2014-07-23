@@ -118,6 +118,7 @@ static void shot_received(struct srv_net_client *client,
 	char *my_placement;
 	char *enemy_placement;
 	struct srv_logic_shot logic_shot;
+	printf("shot received %d %d\n", shot->x, shot->y);
 
 	client_data = client_data_void;
 	enemy_data = client_data->enemy;
@@ -148,7 +149,6 @@ static void shot_received(struct srv_net_client *client,
 
 	/* If game finished */
 	if(shot_result == SRV_LOGIC_RESULT_END_GAME) {
-		/* TODO: rethink. probably should store placement in main module */
 		my_placement = (char *)client_data->plcmnt;
 		enemy_placement = (char *)enemy_data->plcmnt;
 
@@ -163,7 +163,9 @@ static void shot_received(struct srv_net_client *client,
 		/* Disconnect clients */
 		srv_net_del_client(client);
 		srv_net_del_client(enemy_data->client);
+		printf("shot received end game end\n");
 	}
+	printf("shot received end\n");
 }
 
 
@@ -172,6 +174,7 @@ static void nick_received(struct srv_net_client *client __attribute__((unused)),
 		void *client_data __attribute__((unused)),
 		void *main_data __attribute__((unused)))
 {
+	printf("nick received %s\n", nick);
 	/* Do nothing for now */
 }
 
@@ -185,8 +188,8 @@ static void *new_client(struct srv_net_client *client, void *main_data)
 
 	m_data = main_data;
 
-	cl_list = (struct client_list*)malloc(sizeof(struct client_list*));
-	cl_data = (struct client_data*)malloc(sizeof(struct client_list*));
+	cl_list = (struct client_list*)malloc(sizeof(struct client_list));
+	cl_data = (struct client_data*)malloc(sizeof(struct client_data));
 
 	cl_data->client = client;
 	cl_data->map = NULL;
@@ -256,6 +259,7 @@ static void del_client(struct srv_net_client *client __attribute__((unused)),
 static void placement_received(struct srv_net_client *client, char *plcmnt,
 		void *client_data, void *main_data __attribute__((unused)))
 {
+	printf("start placement_received\n");
 	struct client_data *cl_data;
 	cl_data = client_data;
 	char map[10][10];
@@ -277,4 +281,5 @@ static void placement_received(struct srv_net_client *client, char *plcmnt,
 	} else {
 		srv_net_send_game_start(client, SRV_NET_ENEMY_TURN);
 	}
+	printf("placement_received\n");
 }

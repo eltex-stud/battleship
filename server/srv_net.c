@@ -53,6 +53,8 @@ struct srv_net_queue *tail = NULL;
 struct srv_net_network *srv_net_start(char *ip, short int port)
 {
 	int server_sock;
+	int *sock_opt_reuseaddr = malloc(sizeof(int)); /* TODO: fix memory leak */
+	*sock_opt_reuseaddr = 1;
 
 	struct sockaddr_in server_addr;
 	struct srv_net_network *network;
@@ -82,6 +84,8 @@ struct srv_net_network *srv_net_start(char *ip, short int port)
 	}
 	server_addr.sin_port = htons(port);
 
+
+	setsockopt(server_sock, SOL_SOCKET, SO_REUSEADDR, &sock_opt_reuseaddr, sizeof(int));
 	if((bind(server_sock,(struct sockaddr *)&server_addr,
 			sizeof(server_addr))) < 0) {
 		perror("bind");
@@ -90,6 +94,7 @@ struct srv_net_network *srv_net_start(char *ip, short int port)
 	}
 
 	network->fd = server_sock;
+	network->queue = NULL;
 	return network;
 }
 
@@ -124,6 +129,9 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 	struct timeval timeout;
 	struct srv_net_client *client;
 	int max_fd;
+	size_t client_cnt;
+
+	client_cnt = 0;
 
 	kdx=0;
 	idx=0;
@@ -155,7 +163,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 			}
 		}
 
-		if(head != NULL) {
+		if(head != NULL && head->next != NULL) {
 			for(temp = head->next; temp->next!=NULL; temp=temp->next) {
 				FD_SET (temp->fd, &writeset);
 			}
@@ -163,24 +171,30 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 
 		timeout.tv_sec=1;
 		timeout.tv_usec=0;
-
 		if(select(max_fd+1, &readset, &writeset, NULL, &timeout) < 0) {
 			perror("Error select");
 		}
 
 		if(FD_ISSET(net->fd, &readset)) {
-			client_list[idx].fd = accept(net->fd, NULL, NULL);
-			fcntl(client_list[idx].fd, F_SETFL, O_NONBLOCK);
+			client_list[client_cnt].fd = accept(net->fd, NULL, NULL);
+			fcntl(client_list[client_cnt].fd, F_SETFL, O_NONBLOCK);
 
-			client_list[idx].client_data = main_client_ops.new_client(&(client_list[idx]), net->main_data);
+			client_list[client_cnt].client_data = main_client_ops.new_client(&(client_list[client_cnt]), net->main_data);
+			client_list[client_cnt].network = net;
 
-			idx++;
+			client_cnt++;
 		}
 
 		for(jdx=0; jdx<32; jdx++) {
 			if(client_list[jdx].fd!=0) {
 				if(FD_ISSET(client_list[jdx].fd, &readset)) {
 					size = recv(client_list[jdx].fd, buff, SIZE_BUF, 0);
+					if (size == 0) {
+						client = &client_list[jdx];
+						srv_net_del_client(client);
+						continue;
+					}
+
 					switch((enum types_msg)tmsg[0]) {
 						case NICK:
 							for(kdx = 1; kdx <= size; kdx++) {
@@ -188,7 +202,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 							}
 							client = srv_net_find_client(client_list[jdx].fd);
 							main_client_ops.nick_received(client, nick,
-									client_list[idx].client_data, net->main_data);
+									client_list[jdx].client_data, net->main_data);
 							break;
 
 						case PLACEMENT:
@@ -197,7 +211,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 							}
 							client = srv_net_find_client(client_list[jdx].fd);
 							main_client_ops.placement_received(client, placement,
-									client_list[idx].client_data, net->main_data);
+									client_list[jdx].client_data, net->main_data);
 							break;
 
 						case SHOT:
@@ -206,13 +220,13 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 							cl_shot->y = (int)buff[2];
 							client = srv_net_find_client(client_list[jdx].fd);
 							main_client_ops.shot_received(client, cl_shot,
-									client_list[idx].client_data, net->main_data);
+									client_list[jdx].client_data, net->main_data);
 							break;
 
 						case END:
 							client = srv_net_find_client(client_list[jdx].fd);
 							main_client_ops.del_client(client,
-									client_list[idx].client_data, net->main_data);
+									client_list[jdx].client_data, net->main_data);
 							break;
 						case ERROR:
 						case START:
@@ -223,17 +237,23 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 			}
 		}
 
-		if(head != NULL) {
+		if(head != NULL && head->next != NULL) {
 			for(temp = head->next; temp->next!=NULL; temp=temp->next) {
 				if(FD_ISSET (temp->fd, &writeset)) {
-					size_send = send (temp->fd, temp->data, temp->size, 0); //WARNING!!! ADD SEND FROM INDEX!!!
-					if((size_send+temp->index) < temp->size) {
+					size_send = send(temp->fd, (temp->data)+(temp->index), temp->size, 0);
+					printf("send %d of %d (index %d)\n", size_send, temp->size, temp->index);
+					if((size_send+(temp->index)) < temp->size) {
 						temp->index+=size_send;
+						break;
 					}
-					if((size_send+temp->index) == temp->size) {
-						for(temp2 = head->next; temp2->next!=temp; temp2=temp2->next);
+					if((size_send+(temp->index)) == temp->size) {
+						for(temp2 = head; temp2->next!=temp; temp2=temp2->next);
 						temp2->next = temp->next;
+						if(temp == tail) {
+							tail = temp2;
+						}
 						free(temp);
+						temp = temp2;
 					}
 				}
 			}
@@ -244,21 +264,13 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 
 int srv_net_del_client(struct srv_net_client *client)
 {
-	int idx;
-
 	close(client->fd);
 
 	main_client_ops.del_client(client, client->client_data,
 			client->network->main_data);
 
-	for(idx=0; idx<32; idx++) {
-		if(client->fd == client_list[idx].fd) {
-			free((client_list[idx].network)->queue);
-			free(client_list[idx].network);
-			client_list[idx].fd=0;
-			client_list[idx].network=0;
-		}
-	}
+	client->fd=0;
+	client->network=0;
 	return 0;
 }
 
@@ -372,7 +384,7 @@ int srv_net_send_placement(struct srv_net_client *client, char *placement)
 	memcpy(buff+1, placement, 100);
 
 	memcpy(queue->data, buff, 101);
-	queue->size = sizeof(buff);
+	queue->size = 101;
 	queue->fd = client->fd;
 	queue->index = 0;
 	queue->next = NULL;
