@@ -5,7 +5,10 @@
  */
 
 #include "cl_net.h"
-
+#include <signal.h>
+#include <pthread.h>
+#include <strings.h>
+#include <arpa/inet.h>
 
 
 /*
@@ -41,7 +44,7 @@ void cl_net_processing_event(struct net *configure)
 		cl_net_del_queue(configure);
 	}
 	pthread_mutex_unlock(&configure->mutex);
-};
+}
 
 
 

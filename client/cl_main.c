@@ -1,6 +1,7 @@
 /* vim: set noexpandtab tabstop=4 shiftwidth=4 smartindent: */
 
 #include "cl_main.h"
+#include "cl_net.h"
 
 /** Starting point of client
  * \param argc - number of incoming options

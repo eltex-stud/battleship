@@ -38,5 +38,8 @@ void cl_net_send_error(struct net *configure, int net_error);
 void cl_net_add_queue(struct net *configure, struct net_queue *element);
 void cl_net_del_queue(struct net *configure);
 void cl_net_recv(struct net *configure);
+void cl_net_wait(struct net *configure);
+void cl_net_stop(struct net *configure);
+void cl_net_send_shot(struct net *configure, char shot_x, char shot_y);
 
 #endif
