@@ -29,6 +29,7 @@ void gui_key_processing_input_nick(struct gui *options, long ch)
 	int idx;
 
 	pthread_mutex_lock(&(options->mutex));
+	noecho();
 	switch(ch) {
 		case ENTER:
 			cl_main_make_event(options->main_queue_head, GUI_NICK, (void*)options->msg, options->size_of_msg);
@@ -58,7 +59,7 @@ void gui_key_processing_input_nick(struct gui *options, long ch)
 			break;
 
 		default:
-			if (options->size_of_msg < MAX_BUFF - 1) {
+			if (options->size_of_msg < 26 - 1) {
 				options->msg[options->size_of_msg] = ch;
 				wmove(options->nick_window, 2, 23 + options->size_of_msg);
 				wprintw(options->nick_window, "%c", ch);
@@ -67,12 +68,13 @@ void gui_key_processing_input_nick(struct gui *options, long ch)
 			}
 			break;
 	}
-
+	echo();
 	pthread_mutex_unlock(&(options->mutex));
 }
 void gui_key_processing_chat(struct gui *options, long ch)
 {
 	pthread_mutex_lock(&(options->mutex));
+	noecho();
 	switch(ch) {
 		case ENTER:
 			options->state = 1;
@@ -82,6 +84,7 @@ void gui_key_processing_chat(struct gui *options, long ch)
 		default:
 			break;
 	}
+	echo();
 	pthread_mutex_unlock(&(options->mutex));
 }
 
@@ -90,6 +93,7 @@ void gui_key_processing_battleground(struct gui *options, long ch)
 	char data[2];
 
 	pthread_mutex_lock(&(options->mutex));
+	noecho();
 	switch(ch) {
 		case ENTER:
 			options->state = 2;
@@ -141,6 +145,7 @@ void gui_key_processing_battleground(struct gui *options, long ch)
 			cl_main_make_event(options->main_queue_head, GUI_SHOT, (void *)data, 2);
 			break;
 	}
+	echo();
 	pthread_mutex_unlock(&(options->mutex));
 
 }
@@ -154,6 +159,8 @@ void *gui_key_processing(void *arg)
 	options = (struct gui*)arg;
 
 	keypad(stdscr, TRUE);
+
+	noecho();
 
 	while((ch = getch()) != KEY_END) {
 	/*
@@ -190,6 +197,8 @@ struct gui *cl_gui_start(struct main_queue *main_queue_h)
 	int jdx;
 
 	initscr();
+	cbreak();
+	noecho();
 
 	if(getmaxx(stdscr) < 94 || getmaxy(stdscr) < 39) {
 		endwin();
@@ -201,7 +210,7 @@ struct gui *cl_gui_start(struct main_queue *main_queue_h)
 
 	for(idx = 1; idx < 9; idx++) {
 		for(jdx = 1; jdx < 9; jdx++) {
-			init_pair( ((jdx * 10) + idx), jdx, idx);
+			init_pair( ((idx * 10) + jdx), jdx - 1, idx - 1);
 		}
 	}
 
@@ -214,6 +223,10 @@ struct gui *cl_gui_start(struct main_queue *main_queue_h)
 	options->size_of_msg = 0;
 	options->x = 0;
 	options->y = 0;
+
+	bkgdset(COLOR_PAIR(CUR_COLOR));
+	clear();
+	refresh();
 
 	pthread_mutex_init (&(options->mutex), NULL);
 
@@ -261,6 +274,7 @@ int cl_gui_input_nick(struct gui *options)
 	wprintw(options->nick_window, "Enter your nickname: ");
 	curs_set(TRUE);
 	wmove(options->nick_window, 2, 23);
+	wrefresh(options->nick_window);
 
 	pthread_mutex_unlock(&(options->mutex));
 
