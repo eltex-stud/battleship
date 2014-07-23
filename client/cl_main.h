@@ -42,4 +42,6 @@ void cl_main_start_game(void *event_data, map my_map, enum player_state *turn,
                         struct gui *cl_gui);
 struct main_event *cl_main_copy_queue(struct main_queue *queue);
 void cl_main_clear_queue(struct main_event *head);
+void usr1_handler(int a);
+
 #endif
