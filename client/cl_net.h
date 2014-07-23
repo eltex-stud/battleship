@@ -9,10 +9,6 @@
 #include <string.h>
 #include <errno.h>
 #include <error.h>
-#include <signal.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
 #include "client.h"
 #include "../include/net_types.h"
 
@@ -35,14 +31,12 @@ struct net *cl_net_start(char *address, int port, struct main_queue *m_queue);
 void *net_work(void *arg);
 void cl_net_processing_event(struct net *configure);
 void cl_net_send_placement(struct net *configure, placement net_placement);
-void cl_net_send_shot(struct net *configure, char shot_x, char shot_y);
+void cl_net_send_short(struct net *configure, char shot_x, char shot_y);
 void cl_net_send_nick(struct net *configure, char *net_nick, int nick_len);
 void cl_net_send_start(struct net *configure);
 void cl_net_send_error(struct net *configure, int net_error);
 void cl_net_add_queue(struct net *configure, struct net_queue *element);
-void cl_net_del_queue(struct net_queue *net_queue_head);
+void cl_net_del_queue(struct net *configure);
 void cl_net_recv(struct net *configure);
-void cl_net_stop(struct net *configure);
-void cl_net_wait(struct net *configure);
 
 #endif

@@ -38,7 +38,7 @@ void cl_net_processing_event(struct net *configure)
 		memcpy(buf, (char*)&(idx->type_msg), 1);
 		memcpy(buf + 1, idx->data, idx->data_len);
 		send(configure->socket, buf, SIZE_BUF, 0);
-		cl_net_del_queue(configure->net_queue_head);
+		cl_net_del_queue(configure);
 	}
 	pthread_mutex_unlock(&configure->mutex);
 };
@@ -339,12 +339,12 @@ void cl_net_add_queue(struct net *configure, struct net_queue *element) {
  *
  * WORK: deletes the first element of the net queue
  */
-void cl_net_del_queue(struct net_queue *net_queue_head) {
+void cl_net_del_queue(struct net *configure) {
 	struct net_queue *idp; /* a queue iterator */
 
-	if(net_queue_head != NULL) {
-	    idp = net_queue_head;
-	    net_queue_head = net_queue_head->net_next;
+	if(configure->net_queue_head != NULL) {
+	    idp = configure->net_queue_head;
+	    configure->net_queue_head = configure->net_queue_head->net_next;
 	    free(idp);
 	}
 }
