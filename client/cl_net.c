@@ -30,7 +30,7 @@ void cl_net_processing_event(struct net *configure)
 	if(idx->type_msg == END) {
 		pthread_mutex_unlock(&configure->mutex);
 		close(configure->socket);
-		pthread_join(configure->pthreadfd, NULL);
+		pthread_kill(configure->pthreadfd, SIGKILL);
 		free(configure);
 		return ;
 	}
@@ -133,13 +133,20 @@ void *net_work(void *arg)
 			cl_net_processing_event(configure);
 		if(FD_ISSET(configure->socket, &errorfd)) {
 			msg_error = errno;
-			cl_main_make_event(configure->m_queue, NET_ERROR, (void *)&msg_error,
-			                   sizeof(msg_error));
+			cl_main_make_event(configure->m_queue, NET_ERROR,
+			                   (void *)&msg_error, sizeof(msg_error));
+
 		}
 	}
 	return NULL;
 }
 
+
+
+void cl_net_wait(struct net *configure)
+{
+	pthread_join(configure->pthreadfd, NULL);
+}
 
 /*
  * NAME: cl_net_send_placement
@@ -152,7 +159,7 @@ void *net_work(void *arg)
  *
  * WORK: takes configure and net_placement to place it into the net queue
  */
-void cl_net_send_placement(struct net *configure, placement *net_placement) {
+void cl_net_send_placement(struct net *configure, placement net_placement) {
 	struct net_queue *element = (struct net_queue *)malloc(
 						sizeof (struct net_queue));
 
@@ -276,7 +283,7 @@ void cl_net_send_error(struct net *configure, int net_error) {
  *
  * WORK: takes configure to place END into the net queue
  */
-void cl_net_send_end(struct net *configure) {
+void cl_net_stop(struct net *configure) {
 	struct net_queue *element = (struct net_queue *)malloc(
 						sizeof (struct net_queue));
 
