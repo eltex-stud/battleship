@@ -109,7 +109,7 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 					 && placement_test[idx - 1][jdx] == 0
 					 && placement_test[idx + 1][jdx] == 0 
 					 && placement_test[idx][jdx + 1] == 0) {
-					if (c_t_m->ship1_1[0][0] == 0) {
+					if (c_t_m->ship1_1[0][2] == 0) {
 						c_t_m->ship1_1[0][0] = idx - 1;
 						c_t_m->ship1_1[1][0] = jdx - 1;
 						c_t_m->ship1_1[2][0] = 1;
@@ -122,7 +122,7 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 					 && placement_test[idx - 1][jdx] == 0
 					 && placement_test[idx + 1][jdx] == 0 
 					 && placement_test[idx][jdx + 1] == 0) {
-					if (c_t_m->ship1_2[0][0] == 0) {
+					if (c_t_m->ship1_2[0][2] == 0) {
 						c_t_m->ship1_2[0][0] = idx - 1;
 						c_t_m->ship1_2[1][0] = jdx - 1;
 						c_t_m->ship1_2[2][0] = 1;
@@ -135,7 +135,7 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 					 && placement_test[idx - 1][jdx] == 0
 					 && placement_test[idx + 1][jdx] == 0 
 					 && placement_test[idx][jdx + 1] == 0) {
-					if (c_t_m->ship1_3[0][0] == 0) {
+					if (c_t_m->ship1_3[0][2] == 0) {
 						c_t_m->ship1_3[0][0] = idx - 1;
 						c_t_m->ship1_3[1][0] = jdx - 1;
 						c_t_m->ship1_3[2][0] = 1;
@@ -148,7 +148,7 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 					 && placement_test[idx - 1][jdx] == 0
 					 && placement_test[idx + 1][jdx] == 0 
 					 && placement_test[idx][jdx + 1] == 0) {
-					if (c_t_m->ship1_4[0][0] == 0) {
+					if (c_t_m->ship1_4[0][2] == 0) {
 						c_t_m->ship1_4[0][0] = idx - 1;
 						c_t_m->ship1_4[1][0] = jdx - 1;
 						c_t_m->ship1_4[2][0] = 1;
@@ -157,6 +157,7 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 			}
 		}
 	}
+
 
 /*
  * @search ships longest in two decks
@@ -170,6 +171,7 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 					&& placement_test[idx][jdx + 1] == 1 
 					&& placement_test[idx][jdx + 2] == 0
 					&& placement_test[idx + 1][jdx] == 0) {
+					if (c_t_m->ship2_1[0][2] == 0) {
 					c_t_m->ship2_1[0][0] = idx - 1;
 					c_t_m->ship2_1[1][0] = jdx - 1;
 					c_t_m->ship2_1[0][1] = idx - 1;
@@ -177,12 +179,14 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 					c_t_m->ship2_1[2][0] = 1;
 					c_t_m->ship2_1[2][1] = 1;
 					jdx++;
+					}
 					} else { 
 						if (placement_test[idx - 1][jdx] == 0 
 							&& placement_test[idx][jdx - 1] == 0
 							&& placement_test[idx + 1][jdx] == 1 
 							&& placement_test[idx + 2][jdx] == 0
 							&& placement_test[idx][jdx + 1] == 0) {
+							if (c_t_m->ship2_1[0][2] == 0) {
 							c_t_m->ship2_1[0][0] = idx - 1;
 							c_t_m->ship2_1[1][0] = jdx - 1;
 							c_t_m->ship2_1[0][1] = idx - 1 + 1;
@@ -193,12 +197,14 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 						}
 					}
 				}
+			}
 			if (placement_test[idx][jdx] == 1) {
 				if (placement_test[idx - 1][jdx] == 0 
 					&& placement_test[idx][jdx - 1] == 0
 					&& placement_test[idx][jdx + 1] == 1 
 					&& placement_test[idx][jdx + 2] == 0
 					&& placement_test[idx + 1][jdx] == 0) {
+					if (c_t_m->ship2_2[0][2] == 0) {
 					c_t_m->ship2_2[0][0] = idx - 1;
 					c_t_m->ship2_2[1][0] = jdx - 1;
 					c_t_m->ship2_2[0][1] = idx - 1;
@@ -206,12 +212,14 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 					c_t_m->ship2_2[2][0] = 1;
 					c_t_m->ship2_2[2][1] = 1;
 					jdx++;
+					}
 					} else { 
 						if (placement_test[idx - 1][jdx] == 0 
 							&& placement_test[idx][jdx - 1] == 0
 							&& placement_test[idx + 1][jdx] == 1 
 							&& placement_test[idx + 2][jdx] == 0
 							&& placement_test[idx][jdx + 1] == 0) {
+							if (c_t_m->ship2_2[0][2] == 0) {
 							c_t_m->ship2_2[0][0] = idx - 1;
 							c_t_m->ship2_2[1][0] = jdx - 1;
 							c_t_m->ship2_2[0][1] = idx - 1 + 1;
@@ -222,12 +230,14 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 						}
 					}
 				}
+			}
 			if (placement_test[idx][jdx] == 1) {
 				if (placement_test[idx - 1][jdx] == 0 
 					&& placement_test[idx][jdx - 1] == 0
 					&& placement_test[idx][jdx + 1] == 1 
 					&& placement_test[idx][jdx + 2] == 0
 					&& placement_test[idx + 1][jdx] == 0) {
+					if (c_t_m->ship2_3[0][2] == 0) {
 					c_t_m->ship2_3[0][0] = idx - 1;
 					c_t_m->ship2_3[1][0] = jdx - 1;
 					c_t_m->ship2_3[0][1] = idx - 1;
@@ -235,23 +245,28 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 					c_t_m->ship2_3[2][0] = 1;
 					c_t_m->ship2_3[2][1] = 1;
 					jdx++;
+					}
 					} else { 
 						if (placement_test[idx - 1][jdx] == 0 
 							&& placement_test[idx][jdx - 1] == 0
 							&& placement_test[idx + 1][jdx] == 1 
 							&& placement_test[idx + 2][jdx] == 0
 							&& placement_test[idx][jdx + 1] == 0) {
+							if (c_t_m->ship2_3[0][2] == 0) {
 							c_t_m->ship2_3[0][0] = idx - 1;
 							c_t_m->ship2_3[1][0] = jdx - 1;
 							c_t_m->ship2_3[0][1] = idx - 1 + 1;
 							c_t_m->ship2_3[1][1] = jdx - 1;
 							c_t_m->ship2_3[2][0] = 1;
 							c_t_m->ship2_3[2][1] = 1;
+							jdx++;
 						}
 					}
 				}
 			}
 		}
+	}
+
 
 /*
  * @search in three long ships deck
@@ -266,6 +281,7 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 					&& placement_test[idx][jdx + 2] == 1
 					&& placement_test[idx][jdx + 3] == 0
 					&& placement_test[idx + 1][jdx] == 0) {
+					if (c_t_m->ship3_1[0][2] == 0) {
 					c_t_m->ship3_1[0][0] = idx - 1;
 					c_t_m->ship3_1[1][0] = jdx - 1;
 					c_t_m->ship3_1[0][1] = idx - 1;
@@ -276,6 +292,7 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 					c_t_m->ship3_1[2][1] = 1;
 					c_t_m->ship3_1[2][2] = 1;
 					jdx++;
+					}
 					} else {
 						if (placement_test[idx - 1][jdx] == 0
 							&& placement_test[idx][jdx - 1] == 0
@@ -283,6 +300,7 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 							&& placement_test[idx + 1][jdx] == 1
 							&& placement_test[idx + 2][jdx] == 1
 							&& placement_test[idx + 3][jdx] == 0) {
+							if (c_t_m->ship3_1[0][2] == 0) {
 							c_t_m->ship3_1[0][0] = idx - 1;
 							c_t_m->ship3_1[1][0] = jdx - 1;
 							c_t_m->ship3_1[0][1] = idx - 1 + 1;
@@ -296,6 +314,7 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 						}
 					}
 				}
+			}
 			if (placement_test[idx][jdx] == 1) {
 				if (placement_test[idx - 1][jdx] == 0
 					&& placement_test[idx][jdx - 1] == 0
@@ -303,6 +322,7 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 					&& placement_test[idx][jdx + 2] == 1
 					&& placement_test[idx][jdx + 3] == 0
 					&& placement_test[idx + 1][jdx] == 0) {
+					if (c_t_m->ship3_2[0][2] == 0) {
 					c_t_m->ship3_2[0][0] = idx - 1;
 					c_t_m->ship3_2[1][0] = jdx - 1;
 					c_t_m->ship3_2[0][1] = idx - 1;
@@ -313,6 +333,7 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 					c_t_m->ship3_2[2][1] = 1;
 					c_t_m->ship3_2[2][2] = 1;
 					jdx++;
+					}
 					} else {
 						if (placement_test[idx - 1][jdx] == 0
 							&& placement_test[idx][jdx - 1] == 0
@@ -320,6 +341,7 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 							&& placement_test[idx + 1][jdx] == 1
 							&& placement_test[idx + 2][jdx] == 1
 							&& placement_test[idx + 3][jdx] == 0) {
+							if (c_t_m->ship3_2[0][2] == 0) {
 							c_t_m->ship3_2[0][0] = idx - 1;
 							c_t_m->ship3_2[1][0] = jdx - 1;
 							c_t_m->ship3_2[0][1] = idx - 1 + 1;
@@ -329,11 +351,15 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 							c_t_m->ship3_2[2][0] = 1;
 							c_t_m->ship3_2[2][1] = 1;
 							c_t_m->ship3_2[2][2] = 1;
+							jdx++;
 						}
 					}
 				}
 			}
 		}
+	}
+
+
 
 /*
  * @searc long ship four decks
