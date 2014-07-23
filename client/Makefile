@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-g -c -Wall -Werror
-LDFLAGS=-lncurses -lmenu -lpanel
+LDFLAGS=-lncurses -lmenu -lpanel -lpthread
 SOURCES=*.c
 OBJECTS=*.o
 BINARY=client

@@ -5,7 +5,10 @@
  */
 
 #include "cl_net.h"
-
+#include <signal.h>
+#include <pthread.h>
+#include <strings.h>
+#include <arpa/inet.h>
 
 
 /*
@@ -26,20 +29,22 @@ void cl_net_processing_event(struct net *configure)
 	struct net_queue *idx; /* iterator struct net_queue */
 	char buf[SIZE_BUF];
 	pthread_mutex_lock(&configure->mutex);
-	idx = configure->net_queue_head;
-	if(idx->type_msg == END) {
-		pthread_mutex_unlock(&configure->mutex);
-		close(configure->socket);
-		pthread_join(configure->pthreadfd, NULL);
-		free(configure);
-		return ;
+	if(configure->net_queue_head != NULL) {
+		idx = configure->net_queue_head;
+		if(idx->type_msg == END) {
+			pthread_mutex_unlock(&configure->mutex);
+			close(configure->socket);
+			pthread_kill(configure->pthreadfd, SIGKILL);
+			free(configure);
+			return ;
+		}
+		memcpy(buf, (char*)&(idx->type_msg), 1);
+		memcpy(buf + 1, idx->data, idx->data_len);
+		send(configure->socket, buf, SIZE_BUF, 0);
+		cl_net_del_queue(configure);
 	}
-	memcpy(buf, (char*)&(idx->type_msg), 1);
-	memcpy(buf + 1, idx->data, idx->data_len);
-	send(configure->socket, buf, SIZE_BUF, 0);
-	cl_net_del_queue(configure->net_queue_head);
-		pthread_mutex_unlock(&configure->mutex);
-};
+	pthread_mutex_unlock(&configure->mutex);
+}
 
 
 
@@ -81,7 +86,7 @@ struct net *cl_net_start(char *address, int port, struct main_queue *m_queue)
 	bzero(&addr, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(port);
-	addr.sin_addr.s_addr = htonl(address);
+	addr.sin_addr.s_addr = inet_addr(address);
 
 	if(connect(cl_sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
 		perror("connect");
@@ -133,13 +138,20 @@ void *net_work(void *arg)
 			cl_net_processing_event(configure);
 		if(FD_ISSET(configure->socket, &errorfd)) {
 			msg_error = errno;
-			cl_main_make_event(configure->m_queue, NET_ERROR, (void *)&msg_error,
-			                   sizeof(msg_error));
+			cl_main_make_event(configure->m_queue, NET_ERROR,
+			                   (void *)&msg_error, sizeof(msg_error));
+
 		}
 	}
 	return NULL;
 }
 
+
+
+void cl_net_wait(struct net *configure)
+{
+	pthread_join(configure->pthreadfd, NULL);
+}
 
 /*
  * NAME: cl_net_send_placement
@@ -152,7 +164,7 @@ void *net_work(void *arg)
  *
  * WORK: takes configure and net_placement to place it into the net queue
  */
-void cl_net_send_placement(struct net *configure, placement *net_placement) {
+void cl_net_send_placement(struct net *configure, placement net_placement) {
 	struct net_queue *element = (struct net_queue *)malloc(
 						sizeof (struct net_queue));
 
@@ -276,7 +288,7 @@ void cl_net_send_error(struct net *configure, int net_error) {
  *
  * WORK: takes configure to place END into the net queue
  */
-void cl_net_send_end(struct net *configure) {
+void cl_net_stop(struct net *configure) {
 	struct net_queue *element = (struct net_queue *)malloc(
 						sizeof (struct net_queue));
 
@@ -330,12 +342,12 @@ void cl_net_add_queue(struct net *configure, struct net_queue *element) {
  *
  * WORK: deletes the first element of the net queue
  */
-void cl_net_del_queue(struct net_queue *net_queue_head) {
+void cl_net_del_queue(struct net *configure) {
 	struct net_queue *idp; /* a queue iterator */
 
-	if(net_queue_head != NULL) {
-	    idp = net_queue_head;
-	    net_queue_head = net_queue_head->net_next;
+	if(configure->net_queue_head != NULL) {
+	    idp = configure->net_queue_head;
+	    configure->net_queue_head = configure->net_queue_head->net_next;
 	    free(idp);
 	}
 }

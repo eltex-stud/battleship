@@ -28,16 +28,15 @@ struct main_data {
 	struct client_list *clients_data;
 };
 
-void *new_client(struct srv_net_client *client, void *main_data);
-void placement_received(struct srv_net_client *client, char *plcmnt,
+static void *new_client(struct srv_net_client *client, void *main_data);
+static void placement_received(struct srv_net_client *client, char *plcmnt,
 		void *client_data, void *main_data);
-void del_client(struct srv_net_client *client, void *client_data,
+static void del_client(struct srv_net_client *client, void *client_data,
 		void *main_data);
-void shot_received(struct srv_net_client *client, struct srv_net_shot *shot,
+static void shot_received(struct srv_net_client *client,
+		struct srv_net_shot *shot, void *client_data, void *main_data);
+static void nick_received(struct srv_net_client *client, char *nick,
 		void *client_data, void *main_data);
-void nick_received(struct srv_net_client *client, char *nick,
-		void *client_data, void *main_data);
-enum srv_net_shot_result logic_to_net_shot_result(enum srv_logic_shot_result);
 
 
 /**
@@ -64,7 +63,11 @@ int main(int argc, char *argv[])
 
 	/* Retrieve ip and port from command line arguments */
 	ip = argv[1];
-	port = atoi(argv[2]);
+	port = strtol(argv[2], NULL, 10);
+	if(!(port > 0 && port < 65535)) {
+		fprintf(stderr, "Invalid port number");
+		return 1;
+	}
 
 	/* Init main_data */
 	main_data.clients_data = NULL;
@@ -78,8 +81,8 @@ int main(int argc, char *argv[])
 
 	/* Run main loop */
 	net = srv_net_start(ip, port);
-	if (net == NULL) {
-		printf("Net start error\n");
+	if(net == NULL) {
+		fprintf(stderr, "Network start error\n");
 		return 1;
 	}
 	srv_net_wait_events(net, NULL, client_ops, &main_data);
@@ -88,7 +91,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-enum srv_net_shot_result logic_to_net_shot_result(enum srv_logic_shot_result r)
+static enum srv_net_shot_result logic_to_net_shot_result(enum srv_logic_shot_result r)
 {
 	switch (r) {
 		case SRV_LOGIC_RESULT_HIT:
@@ -104,8 +107,9 @@ enum srv_net_shot_result logic_to_net_shot_result(enum srv_logic_shot_result r)
 	}
 }
 
-void shot_received(struct srv_net_client *client, struct srv_net_shot *shot,
-		void *client_data_void, void *main_data_void __attribute__((unused)))
+static void shot_received(struct srv_net_client *client,
+		struct srv_net_shot *shot, void *client_data_void,
+		void *main_data_void __attribute__((unused)))
 {
 	enum srv_logic_shot_result shot_result;
 	enum srv_net_shot_result net_shot_result;
@@ -163,7 +167,7 @@ void shot_received(struct srv_net_client *client, struct srv_net_shot *shot,
 }
 
 
-void nick_received(struct srv_net_client *client __attribute__((unused)),
+static void nick_received(struct srv_net_client *client __attribute__((unused)),
 		char *nick __attribute__((unused)),
 		void *client_data __attribute__((unused)),
 		void *main_data __attribute__((unused)))
@@ -172,15 +176,15 @@ void nick_received(struct srv_net_client *client __attribute__((unused)),
 }
 
 
-void *new_client(struct srv_net_client *client, void *main_data)
+static void *new_client(struct srv_net_client *client, void *main_data)
 {
 	struct main_data *m_data;
 	struct client_list *cl_list;
 	struct client_data *cl_data;
 	struct client_list *temp;
-	
+
 	m_data = main_data;
-	
+
 	cl_list = (struct client_list*)malloc(sizeof(struct client_list*));
 	cl_data = (struct client_data*)malloc(sizeof(struct client_list*));
 
@@ -212,10 +216,11 @@ void *new_client(struct srv_net_client *client, void *main_data)
 		}
 		temp = temp->next;
 	}
+
 	return cl_data;
 }
 
-void del_client(struct srv_net_client *client __attribute__((unused)),
+static void del_client(struct srv_net_client *client __attribute__((unused)),
 		void *client_data __attribute__((unused)), void *main_data)
 {
 	struct client_list *temp, *prev;
@@ -248,7 +253,7 @@ void del_client(struct srv_net_client *client __attribute__((unused)),
 }
 
 
-void placement_received(struct srv_net_client *client, char *plcmnt,
+static void placement_received(struct srv_net_client *client, char *plcmnt,
 		void *client_data, void *main_data __attribute__((unused)))
 {
 	struct client_data *cl_data;

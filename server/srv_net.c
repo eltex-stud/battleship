@@ -37,7 +37,7 @@ struct srv_net_client {
 struct srv_net_client client_list[32];
 struct srv_net_client_ops main_client_ops;
 
-struct srv_net_client *srv_net_find_client(int fd)
+static struct srv_net_client *srv_net_find_client(int fd)
 {
 	int i;
 
@@ -63,24 +63,32 @@ struct srv_net_network *srv_net_start(char *ip, short int port)
 
 	server_sock = socket(AF_INET, SOCK_STREAM, 0);
 	if(server_sock < 0) {
-		printf("Error create socket");
-		return 0;
+		perror("socket");
+		free(network);
+		return NULL;
 	}
 
 	if(fcntl(server_sock, F_SETFL, O_NONBLOCK) < 0) {
-		printf ("Error set nonblock socket");
-		return 0;
+		perror("fcntl");
+		free(network);
+		return NULL;
 	}
 
 	memset(&server_addr, 0, sizeof(struct sockaddr_in));
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_addr.s_addr = inet_addr(ip);
+	if(server_addr.sin_addr.s_addr == INADDR_NONE) {
+		fprintf(stderr, "Invalid address %s\n", ip);
+		free(network);
+		return NULL;
+	}
 	server_addr.sin_port = htons(port);
 
 	if((bind(server_sock,(struct sockaddr *)&server_addr,
 			sizeof(server_addr))) < 0) {
-		perror("Error bind");
-		return 0;
+		perror("bind");
+		free(network);
+		return NULL;
 	}
 
 	network->fd = server_sock;
@@ -117,6 +125,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 	struct srv_net_shot *cl_shot;
 	struct timeval timeout;
 	struct srv_net_client *client;
+	int max_fd;
 
 	kdx=0;
 	idx=0;
@@ -138,10 +147,13 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 
 		FD_SET(net->fd, &readset);
 
-
+		max_fd = net->fd;
 		for(idx=0; idx<32; idx++) {
 			if(client_list[idx].fd!=0) {
 				FD_SET(client_list[idx].fd, &readset);
+				if (client_list[idx].fd > max_fd) {
+					max_fd = client_list[idx].fd;
+				}
 			}
 		}
 
@@ -154,8 +166,8 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 		timeout.tv_sec=1;
 		timeout.tv_usec=0;
 
-		if(select(33, &readset, &writeset, NULL, &timeout) <= 0) {
-			printf("Error select");
+		if(select(max_fd+1, &readset, &writeset, NULL, &timeout) < 0) {
+			perror("Error select");
 		}
 
 		if(FD_ISSET(net->fd, &readset)) {
@@ -163,11 +175,11 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 			fcntl(client_list[idx].fd, F_SETFL, O_NONBLOCK);
 
 			client_list[idx].client_data = main_client_ops.new_client(&(client_list[idx]), net->main_data);
-			
+
 			idx++;
 		}
 
-		for(jdx=0; jdx<32; idx++) {
+		for(jdx=0; jdx<32; jdx++) {
 			if(client_list[jdx].fd!=0) {
 				if(FD_ISSET(client_list[jdx].fd, &readset)) {
 					size = recv(client_list[jdx].fd, &buff, SIZE_BUFF, 0);
@@ -212,6 +224,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 				}
 			}
 		}
+
 		if(head != NULL) {
 			for(temp = head->next; temp->next!=NULL; temp=temp->next) {
 				if(FD_ISSET (temp->fd, &writeset)) {

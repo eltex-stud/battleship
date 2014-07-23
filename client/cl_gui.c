@@ -16,12 +16,60 @@ void gui_distinguish_cell(struct gui *options, unsigned short bgcolor)
 	for (idx = 0; idx < 2; idx++) {
 		for(jdx = 0; jdx < 3; jdx++) {
 			wmove(options->enemy_map, 1 + idx + (options->y * 2), 1 + jdx + (options->x * 4));
-			if (i != 0 &&
+			if (idx != 0 && jdx != 1) {
+
+			}
 */
 	wmove(options->enemy_map, 1 + (options->y * 2), 2 + (options->x * 4));
 	wrefresh(options->enemy_map);
 }
 
+void gui_key_processing_input_nick(struct gui *options, long ch)
+{
+	int idx;
+
+	pthread_mutex_lock(&(options->mutex));
+	switch(ch) {
+		case ENTER:
+			cl_main_make_event(options->main_queue_head, GUI_NICK, (void*)options->msg, options->size_of_msg);
+
+			for(idx = 0; idx < MAX_BUFF; idx++) {
+				options->msg[idx] = '\0';
+			}
+			options->size_of_msg = 0;
+
+			wclear(options->nick_window);
+			delwin(options->nick_window);
+			clear();
+			refresh();
+
+			options->state = 1;
+			break;
+
+		case KEY_BACKSPACE:
+			if(options->size_of_msg > 0) {
+				options->size_of_msg--;
+				wmove(options->nick_window, 2, 23 + options->size_of_msg);
+				wprintw(options->nick_window, " ");
+				wmove(options->nick_window, 2, 23 + options->size_of_msg);
+				options->msg[options->size_of_msg] = '\0';
+				wrefresh(options->nick_window);
+			}
+			break;
+
+		default:
+			if (options->size_of_msg < MAX_BUFF - 1) {
+				options->msg[options->size_of_msg] = ch;
+				wmove(options->nick_window, 2, 23 + options->size_of_msg);
+				wprintw(options->nick_window, "%c", ch);
+				options->size_of_msg++;
+				options->nick_window;
+			}
+			break;
+	}
+
+	pthread_mutex_unlock(&(options->mutex));
+}
 void gui_key_processing_chat(struct gui *options, long ch)
 {
 	pthread_mutex_lock(&(options->mutex));
@@ -114,6 +162,10 @@ void *gui_key_processing(void *arg)
 	 * options->state = 2 - work with chat;
 	 */
 		switch(options->state) {
+			case 0:
+				gui_key_processing_input_nick(options, ch);
+				break;
+
 			case 1:
 				gui_key_processing_battleground(options, ch);
 				break;
@@ -211,26 +263,13 @@ int cl_gui_input_nick(struct gui *options)
 	wprintw(options->nick_window, "Enter your nickname: ");
 	curs_set(TRUE);
 	wmove(options->nick_window, 2, 23);
-	wgetnstr(options->nick_window, nick, 16);
-	curs_set(FALSE);
 
-	noecho();
-
-	wrefresh(options->nick_window);
-	delwin(options->nick_window);
-
-	clear();
-	refresh();
-
-	cl_main_make_event(options->main_queue_head, GUI_NICK, (void*)nick, strlen(nick));
-
-	options->state = 1;
 	pthread_mutex_unlock(&(options->mutex));
 
 	return 0;
 }
 
-int cl_gui_main_window(struct gui *options, char map[10][10])
+int cl_gui_main_window(struct gui *options, map cl_map)
 {
 	int idx, jdx;
 	int poz = 4;
@@ -283,7 +322,7 @@ int cl_gui_main_window(struct gui *options, char map[10][10])
 	wattron(options->my_map, COLOR_PAIR(13));
 	for(idx = 0; idx < 10; idx++) {
 		for(jdx = 0; jdx < 10; jdx++) {
-			if(map[idx][jdx] == 1) {
+			if(cl_map[idx][jdx] == 1) {
 				wmove(options->my_map, 1 + (idx * 2), 2 + (jdx * 4));
 				wprintw(options->my_map,"#");
 			}
@@ -352,7 +391,7 @@ int cl_gui_main_window(struct gui *options, char map[10][10])
 	return 0;
 }
 
-int cl_gui_refresh_map(struct gui *options, char map[10][10], enum player pl)
+int cl_gui_refresh_map(struct gui *options, map came_map, enum player pl)
 {
 	int idx;
 	int jdx;
@@ -361,13 +400,13 @@ int cl_gui_refresh_map(struct gui *options, char map[10][10], enum player pl)
 		case ME:
 			for(idx = 0; idx < 10; idx++) {
 				for(jdx = 0; jdx < 10; jdx++) {
-					if(map[idx][jdx] == 1) {
+					if(came_map[idx][jdx] == 1) {
 						wmove(options->my_map, 1 + (idx * 2), 2 + (jdx * 4));
 						wattron(options->my_map, COLOR_PAIR(13));
 						wprintw(options->my_map, "#");
 						wattroff(options->my_map, COLOR_PAIR(13));
 					}
-					if(map[idx][jdx] == 2) {
+					if(came_map[idx][jdx] == 2) {
 						wmove(options->my_map, 1 + (idx * 2), 2 + (jdx * 4));
 						wattron(options->my_map, A_BOLD);
 						wattron(options->my_map, COLOR_PAIR(14));
@@ -375,7 +414,7 @@ int cl_gui_refresh_map(struct gui *options, char map[10][10], enum player pl)
 						wattroff(options->my_map, COLOR_PAIR(14));
 						wattroff(options->my_map, A_BOLD);
 					}
-					if(map[idx][jdx] == 3) {
+					if(came_map[idx][jdx] == 3) {
 						wmove(options->my_map, 1 + (idx * 2), 2 + (jdx * 4));
 						wattron(options->my_map, A_BOLD);
 						wattron(options->my_map, COLOR_PAIR(12));
@@ -383,7 +422,7 @@ int cl_gui_refresh_map(struct gui *options, char map[10][10], enum player pl)
 						wattroff(options->my_map, COLOR_PAIR(12));
 						wattroff(options->my_map, A_BOLD);
 					}
-					if(map[idx][jdx] == 4) {
+					if(came_map[idx][jdx] == 4) {
 						wmove(options->my_map, 1 + (idx * 2), 2 + (jdx * 4));
 						wattron(options->my_map, COLOR_PAIR(CUR_COLOR));
 						wattron(options->my_map, A_BOLD);
@@ -398,7 +437,7 @@ int cl_gui_refresh_map(struct gui *options, char map[10][10], enum player pl)
 		case ENEMY:
 			for(idx = 0; idx < 10; idx++) {
 				for(jdx = 0; jdx < 10; jdx++) {
-					if(map[idx][jdx] == 2) {
+					if(came_map[idx][jdx] == 2) {
 						wmove(options->enemy_map, 1 + (idx * 2), 2 + (jdx * 4));
 						wattron(options->enemy_map, A_BOLD);
 						wattron(options->enemy_map, COLOR_PAIR(14));
@@ -406,7 +445,7 @@ int cl_gui_refresh_map(struct gui *options, char map[10][10], enum player pl)
 						wattroff(options->enemy_map, COLOR_PAIR(14));
 						wattroff(options->enemy_map, A_BOLD);
 					}
-					if(map[idx][jdx] == 3) {
+					if(came_map[idx][jdx] == 3) {
 						wmove(options->enemy_map, 1 + (idx * 2), 2 + (jdx * 4));
 						wattron(options->enemy_map, A_BOLD);
 						wattron(options->enemy_map, COLOR_PAIR(12));
@@ -414,7 +453,7 @@ int cl_gui_refresh_map(struct gui *options, char map[10][10], enum player pl)
 						wattroff(options->enemy_map, COLOR_PAIR(12));
 						wattroff(options->enemy_map, A_BOLD);
 					}
-					if(map[idx][jdx] == 4) {
+					if(came_map[idx][jdx] == 4) {
 						wmove(options->enemy_map, 1 + (idx * 2), 2 + (jdx * 4));
 						wattron(options->enemy_map, COLOR_PAIR(CUR_COLOR));
 						wattron(options->enemy_map, A_BOLD);

@@ -1,4 +1,6 @@
 *.swp
 *.o
 *.swo
-
+make.txt
+client
+server
