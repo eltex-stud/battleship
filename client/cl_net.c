@@ -26,19 +26,21 @@ void cl_net_processing_event(struct net *configure)
 	struct net_queue *idx; /* iterator struct net_queue */
 	char buf[SIZE_BUF];
 	pthread_mutex_lock(&configure->mutex);
-	idx = configure->net_queue_head;
-	if(idx->type_msg == END) {
-		pthread_mutex_unlock(&configure->mutex);
-		close(configure->socket);
-		pthread_kill(configure->pthreadfd, SIGKILL);
-		free(configure);
-		return ;
+	if(configure->net_queue_head != NULL) {
+		idx = configure->net_queue_head;
+		if(idx->type_msg == END) {
+			pthread_mutex_unlock(&configure->mutex);
+			close(configure->socket);
+			pthread_kill(configure->pthreadfd, SIGKILL);
+			free(configure);
+			return ;
+		}
+		memcpy(buf, (char*)&(idx->type_msg), 1);
+		memcpy(buf + 1, idx->data, idx->data_len);
+		send(configure->socket, buf, SIZE_BUF, 0);
+		cl_net_del_queue(configure->net_queue_head);
 	}
-	memcpy(buf, (char*)&(idx->type_msg), 1);
-	memcpy(buf + 1, idx->data, idx->data_len);
-	send(configure->socket, buf, SIZE_BUF, 0);
-	cl_net_del_queue(configure->net_queue_head);
-		pthread_mutex_unlock(&configure->mutex);
+	pthread_mutex_unlock(&configure->mutex);
 };
 
 
