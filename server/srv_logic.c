@@ -597,7 +597,7 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 	if (c_t_m->ship3_1[0][2] == shot->x
 			&& c_t_m->ship3_1[1][2] == shot->y) {
 		if (c_t_m->ship3_1[2][0] == 2
-				&& c_t_m->ship3_1[3][2] == 2) {
+				&& c_t_m->ship3_1[2][1] == 2) {
 			c_t_m->ship3_1[2][0] = 3;
 			c_t_m->ship3_1[2][1] = 3;
 			c_t_m->ship3_1[2][2] = 3;
@@ -643,7 +643,7 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 	if (c_t_m->ship3_2[0][2] == shot->x
 			&& c_t_m->ship3_2[1][2] == shot->y) {
 		if (c_t_m->ship3_2[2][0] == 2
-				&& c_t_m->ship3_2[3][2] == 2) {
+				&& c_t_m->ship3_2[2][1] == 2) {
 			c_t_m->ship3_2[2][0] = 3;
 			c_t_m->ship3_2[2][1] = 3;
 			c_t_m->ship3_2[2][2] = 3;
@@ -703,7 +703,7 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 			result_shot = SRV_LOGIC_RESULT_KILL;
 			c_t_m->count = c_t_m->count + 1;
 		} else {
-			c_t_m->ship4_1[2][1] = 2;
+			c_t_m->ship4_1[2][2] = 2;
 			result_shot = SRV_LOGIC_RESULT_HIT;
 			c_t_m->count = c_t_m->count + 1;
 		}
