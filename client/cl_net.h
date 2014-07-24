@@ -27,6 +27,7 @@ struct net {
 	pthread_mutex_t mutex;
 };
 
+void net_usr1_handler(int a);
 struct net *cl_net_start(char *address, int port, struct main_queue *m_queue);
 void *net_work(void *arg);
 void cl_net_processing_event(struct net *configure);

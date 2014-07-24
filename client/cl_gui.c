@@ -151,6 +151,13 @@ void *gui_key_processing(void *arg)
 {
 	struct gui *options;
 	long ch;
+	struct sigaction sigact;
+	sigact.sa_handler = gui_usr1_handler;
+
+	if (sigaction(SIGUSR1, &sigact, NULL)) {
+		perror("sigaction");
+		exit(EXIT_FAILURE);
+	}
 
 	options = (struct gui*)arg;
 
@@ -172,6 +179,9 @@ void *gui_key_processing(void *arg)
 
 			case STATE_CHAT:
 				gui_key_processing_chat(options, ch);
+				break;
+
+			case STATE_WAIT:
 				break;
 		}
 	}
@@ -507,3 +517,6 @@ int cl_gui_refresh_map(struct gui *options, map came_map, enum player pl)
 	return 0;
 }
 
+void gui_usr1_handler(int a)
+{
+}
