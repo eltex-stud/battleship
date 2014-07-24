@@ -317,21 +317,21 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 	box(options->my_map, ACS_VLINE, ACS_HLINE);
 
 	move(25, 4);
-	attrset(COLOR_PAIR(13));
+	attrset(COLOR_PAIR(CLR_BLK_GRN));
 	printw("You");
-	attroff(COLOR_PAIR(13));
+	attroff(COLOR_PAIR(CLR_BLK_GRN));
 	refresh();
 
-	wattron(options->my_map, COLOR_PAIR(13));
+	wattron(options->my_map, COLOR_PAIR(CLR_BLK_GRN));
 	for(idx = 0; idx < 10; idx++) {
 		for(jdx = 0; jdx < 10; jdx++) {
-			if(cl_map[idx][jdx] == 1) {
+			if(cl_map[idx][jdx] == MAP_SHIP) {
 				wmove(options->my_map, 1 + (idx * 2), 2 + (jdx * 4));
 				wprintw(options->my_map,"#");
 			}
 		}
 	}
-	wattroff(options->my_map, COLOR_PAIR(13));
+	wattroff(options->my_map, COLOR_PAIR(CLR_BLK_GRN));
 	wrefresh(options->my_map);
 
 
@@ -384,7 +384,7 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 	wrefresh(options->chat);
 
 	options->line_stat = newwin(1, 89, getmaxy(stdscr) - 1, 4);
-	wbkgd(options->line_stat, COLOR_PAIR(18));
+	wbkgd(options->line_stat, COLOR_PAIR(CUR_COLOR));
 	wmove(options->line_stat, 0, 0);
 	wprintw(options->line_stat, "Status: ");
 	wrefresh(options->line_stat);
@@ -404,29 +404,29 @@ int cl_gui_refresh_map(struct gui *options, map came_map, enum player pl)
 		case ME:
 			for(idx = 0; idx < 10; idx++) {
 				for(jdx = 0; jdx < 10; jdx++) {
-					if(came_map[idx][jdx] == 1) {
+					if(came_map[idx][jdx] == MAP_SHIP) {
 						wmove(options->my_map, 1 + (idx * 2), 2 + (jdx * 4));
-						wattron(options->my_map, COLOR_PAIR(13));
+						wattron(options->my_map, COLOR_PAIR(CLR_BLK_GRN));
 						wprintw(options->my_map, "#");
-						wattroff(options->my_map, COLOR_PAIR(13));
+						wattroff(options->my_map, COLOR_PAIR(CLR_BLK_GRN));
 					}
-					if(came_map[idx][jdx] == 2) {
+					if(came_map[idx][jdx] == MAP_WOUNDED) {
 						wmove(options->my_map, 1 + (idx * 2), 2 + (jdx * 4));
 						wattron(options->my_map, A_BOLD);
-						wattron(options->my_map, COLOR_PAIR(14));
+						wattron(options->my_map, COLOR_PAIR(CLR_BLK_YLLW));
 						wprintw(options->my_map, "X");
-						wattroff(options->my_map, COLOR_PAIR(14));
+						wattroff(options->my_map, COLOR_PAIR(CLR_BLK_YLLW));
 						wattroff(options->my_map, A_BOLD);
 					}
-					if(came_map[idx][jdx] == 3) {
+					if(came_map[idx][jdx] == MAP_KILLED) {
 						wmove(options->my_map, 1 + (idx * 2), 2 + (jdx * 4));
 						wattron(options->my_map, A_BOLD);
-						wattron(options->my_map, COLOR_PAIR(12));
+						wattron(options->my_map, COLOR_PAIR(CLR_BLK_RED));
 						wprintw(options->my_map, "X");
-						wattroff(options->my_map, COLOR_PAIR(12));
+						wattroff(options->my_map, COLOR_PAIR(CLR_BLK_RED));
 						wattroff(options->my_map, A_BOLD);
 					}
-					if(came_map[idx][jdx] == 4) {
+					if(came_map[idx][jdx] == MAP_MISS) {
 						wmove(options->my_map, 1 + (idx * 2), 2 + (jdx * 4));
 						wattron(options->my_map, COLOR_PAIR(CUR_COLOR));
 						wattron(options->my_map, A_BOLD);
@@ -441,23 +441,23 @@ int cl_gui_refresh_map(struct gui *options, map came_map, enum player pl)
 		case ENEMY:
 			for(idx = 0; idx < 10; idx++) {
 				for(jdx = 0; jdx < 10; jdx++) {
-					if(came_map[idx][jdx] == 2) {
+					if(came_map[idx][jdx] == MAP_WOUNDED) {
 						wmove(options->enemy_map, 1 + (idx * 2), 2 + (jdx * 4));
 						wattron(options->enemy_map, A_BOLD);
-						wattron(options->enemy_map, COLOR_PAIR(14));
+						wattron(options->enemy_map, COLOR_PAIR(CLR_BLK_YLLW));
 						wprintw(options->enemy_map, "X");
-						wattroff(options->enemy_map, COLOR_PAIR(14));
+						wattroff(options->enemy_map, COLOR_PAIR(CLR_BLK_YLLW));
 						wattroff(options->enemy_map, A_BOLD);
 					}
-					if(came_map[idx][jdx] == 3) {
+					if(came_map[idx][jdx] == MAP_KILLED) {
 						wmove(options->enemy_map, 1 + (idx * 2), 2 + (jdx * 4));
 						wattron(options->enemy_map, A_BOLD);
-						wattron(options->enemy_map, COLOR_PAIR(12));
+						wattron(options->enemy_map, COLOR_PAIR(CLR_BLK_RED));
 						wprintw(options->enemy_map, "X");
-						wattroff(options->enemy_map, COLOR_PAIR(12));
+						wattroff(options->enemy_map, COLOR_PAIR(CLR_BLK_RED));
 						wattroff(options->enemy_map, A_BOLD);
 					}
-					if(came_map[idx][jdx] == 4) {
+					if(came_map[idx][jdx] == MAP_MISS) {
 						wmove(options->enemy_map, 1 + (idx * 2), 2 + (jdx * 4));
 						wattron(options->enemy_map, COLOR_PAIR(CUR_COLOR));
 						wattron(options->enemy_map, A_BOLD);
