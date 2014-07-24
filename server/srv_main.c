@@ -123,7 +123,7 @@ static enum srv_net_shot_result logic_to_net_shot_result(enum srv_logic_shot_res
 		case SRV_LOGIC_RESULT_KILL:
 			return SRV_NET_KILL;
 		case SRV_LOGIC_RESULT_MISS:
-			return SRV_LOGIC_RESULT_MISS;
+			return SRV_NET_MISS;
 		case SRV_LOGIC_RESULT_END_GAME:
 			return SRV_NET_END;
 		default:
@@ -149,21 +149,25 @@ static void shot_received(struct srv_net_client *client,
 
 	/* Send error if not his turn */
 	if(client_data->turn != MY) {
+		printf("not your turn\n");
 		srv_net_send_error(client, SRV_NET_NOT_YOUR_TURN);
 		return;
 	}
 
 	/* Send error if malformed shot */
 	if (shot->x < 0 || shot->x >= 10 || shot->y < 0 || shot->y >= 10) {
+		printf("bad shot\n");
 		srv_net_send_error(client, SRV_NET_BAD_SHOT);
 		return;
 	}
 	logic_shot.x = shot->x;
 	logic_shot.y = shot->y;
 	shot_result = srv_logic_make_shot(enemy_data->map, &logic_shot);
+	printf("shot result: logic: %d; net: %d\n", shot_result, logic_to_net_shot_result(shot_result));
 
 	/* Send shot result to each client */
 	net_shot_result = logic_to_net_shot_result(shot_result);
+	printf("send shot result %d\n", net_shot_result);
 	srv_net_send_shot_result(client, shot, net_shot_result);
 	srv_net_send_shot_result(enemy_data->client, shot, net_shot_result);
 
