@@ -3,23 +3,6 @@
 
 void gui_distinguish_cell(struct gui *options, unsigned short bgcolor)
 {
-/*	chtype symb;
-	int idx;
-	int jdx;
-*/
-
-/*	wclear(options->line_stat);
-	wmove(options->line_stat, 0, 0);
-	wprintw(options->line_stat, "%c%d", 'A' + options->x, 1 + options->y);
-	wrefresh(options->line_stat);
-
-	for (idx = 0; idx < 2; idx++) {
-		for(jdx = 0; jdx < 3; jdx++) {
-			wmove(options->enemy_map, 1 + idx + (options->y * 2), 1 + jdx + (options->x * 4));
-			if (idx != 0 && jdx != 1) {
-
-			}
-*/
 	wmove(options->enemy_map, 1 + (options->y * 2), 2 + (options->x * 4));
 	wrefresh(options->enemy_map);
 }
@@ -72,13 +55,46 @@ void gui_key_processing_input_nick(struct gui *options, long ch)
 
 void gui_key_processing_chat(struct gui *options, long ch)
 {
+	int idx;
+
 	pthread_mutex_lock(&(options->mutex));
 	switch(ch) {
 		case ENTER:
+			if(options->size_of_msg != 0) {
+				wmove(options->chat, getmaxy(options->chat) - 2, 6);
+				for(idx = 5; idx < MAX_BUFF; idx++) {
+					wprintw(options->chat, " ");
+					options->msg[idx] = '\0';
+				}
+				options->size_of_msg = 0;
+				wrefresh(options->chat);
+			}
+
+			wmove(options->enemy_map, 1 + (options->y * 2), 2 + (options->x * 4));
+			wrefresh(options->enemy_map);
+
 			options->state = STATE_YOU_TURN;
 			break;
 
+		case KEY_BACKSPACE:
+			if(options->size_of_msg > 0) {
+				options->size_of_msg--;
+				wmove(options->chat, getmaxy(options->chat) - 2, 6 + options->size_of_msg);
+				wprintw(options->chat, " ");
+				wmove(options->chat, getmaxy(options->chat) - 2, 6 + options->size_of_msg);
+				options->msg[options->size_of_msg] = '\0';
+				wrefresh(options->chat);
+			}
+			break;
+
 		default:
+			if (options->size_of_msg < MAX_BUFF - 1) {
+				options->msg[options->size_of_msg] = ch;
+				wmove(options->chat, getmaxy(options->chat) - 2, 6 + options->size_of_msg);
+				wprintw(options->chat, "%c", ch);
+				options->size_of_msg++;
+				wrefresh(options->chat);
+			}
 			break;
 	}
 	pthread_mutex_unlock(&(options->mutex));
@@ -92,8 +108,7 @@ void gui_key_processing_battleground(struct gui *options, long ch)
 	switch(ch) {
 		case ENTER:
 			options->state = STATE_CHAT;
-			wmove(options->chat, getmaxy(options->chat) - 1, 1);
-//			curs_set(TRUE);
+			wmove(options->chat, getmaxy(options->chat) - 2, 6);
 			wrefresh(options->chat);
 			break;
 		
@@ -427,6 +442,17 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 	options->chat = newwin(getmaxy(stdscr) - 27, 89, 26, 4);
 	wbkgd(options->chat, COLOR_PAIR(CUR_COLOR));
 	box(options->chat, ACS_VLINE, ACS_HLINE);
+
+	wmove(options->chat, getmaxy(options->chat) - 3, 1);
+	
+	wattron(options->chat, A_UNDERLINE);
+	for(idx = 1; idx < getmaxx(options->chat) - 1; idx++) {
+		wprintw(options->chat, " ");
+	}
+	wattroff(options->chat, A_UNDERLINE);
+	wmove(options->chat, getmaxy(options->chat) - 2, 1);
+	wprintw(options->chat, "Msg: ");
+
 	wrefresh(options->chat);
 
 	options->line_stat = newwin(1, 89, getmaxy(stdscr) - 1, 4);
@@ -507,6 +533,10 @@ void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn)
 			break;
 
 	}
+
+	wmove(options->enemy_map, 1 + (options->y * 2), 2 + (options->x * 4));
+	wrefresh(options->enemy_map);
+
 	pthread_mutex_unlock(&(options->mutex));
 }
 
