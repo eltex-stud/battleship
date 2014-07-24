@@ -290,6 +290,41 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 	pthread_mutex_lock(&(options->mutex));
 	refresh();
 
+	move(0, 5);
+	
+	attron(A_BOLD);
+	
+	printw("Move: ");
+
+	attron(A_ALTCHARSET);
+	printw("%c%c%c%c%c%c%c", ACS_UARROW, ACS_VLINE, ACS_DARROW, ACS_VLINE, 
+							 ACS_LARROW, ACS_VLINE, ACS_RARROW);
+	attroff(A_ALTCHARSET);
+	printw("; Shot: space; Enter chat/battlefield: ENTER;");
+	
+	move(1, 5);
+	attron(COLOR_PAIR(CLR_BLK_GRN));
+	printw("#");
+	attroff(COLOR_PAIR(CLR_BLK_GRN));
+	printw(" - ship;");
+
+	attron(COLOR_PAIR(CLR_BLK_YLLW));
+	printw("X");
+	attroff(COLOR_PAIR(CLR_BLK_YLLW));
+	printw(" - wounded;");
+
+	attron(COLOR_PAIR(CLR_BLK_RED));
+	printw("X");
+	attroff(COLOR_PAIR(CLR_BLK_RED));
+	printw(" - dead;");
+
+	attron(COLOR_PAIR(CLR_BLK_WHT));
+	printw("*");
+	attroff(COLOR_PAIR(CLR_BLK_WHT));
+	printw(" - miss;");
+
+	attroff(A_BOLD);
+
 	for(idx = 0; idx < 10; idx++) {
 		move(poz, 2);
 		poz = poz + 2;
@@ -419,49 +454,35 @@ void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn)
 	switch(turn) {
 		case YOU_TURN:
 			wattron(options->line_stat, COLOR_PAIR(CLR_GRN_WHT));
-			wattron(options->line_stat, A_UNDERLINE);
+			wmove(options->line_stat, 0, 0);
 
-			wmove(options->line_stat, 0, 1);
-			
-			for(idx = 1; idx < getmaxx(options->line_stat) - 1; idx++) {
+			for(idx = 0; idx < getmaxx(options->line_stat); idx++) {
 				wprintw(options->line_stat, " ");
 			}
-			
-			wattron(options->line_stat, A_ALTCHARSET);
-			wprintw(options->line_stat, "%c", ACS_VLINE);
-			
-			wmove(options->line_stat, 0, 0);
-			wprintw(options->line_stat, "%c", ACS_VLINE);
-			
-			wattroff(options->line_stat, A_ALTCHARSET);
+
+			wmove(options->line_stat, 0, 1);
+
 			wprintw(options->line_stat, "STATUS: YOUR TURN");
 			wattroff(options->line_stat, COLOR_PAIR(CLR_GRN_WHT));
-			
 			wrefresh(options->line_stat);
-			
+
 			options->state = STATE_YOU_TURN;
 			break;
 
 		case NOT_YOU_TURN:
 			wattron(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
-			wattron(options->line_stat, A_UNDERLINE);
-
-			wmove(options->line_stat, 0, 1);
+			wmove(options->line_stat, 0, 0);
 			
-			for(idx = 1; idx < getmaxx(options->line_stat) - 1; idx++) {
+			for(idx = 0; idx < getmaxx(options->line_stat); idx++) {
 				wprintw(options->line_stat, " ");
 			}
-			
-			wattron(options->line_stat, A_ALTCHARSET);
-			wprintw(options->line_stat, "%c", ACS_VLINE);
-			
-			wmove(options->line_stat, 0, 0);
-			wprintw(options->line_stat, "%c", ACS_VLINE);
-			
-			wattroff(options->line_stat, A_ALTCHARSET);
+
+			wmove(options->line_stat, 0, 1);
+
 			wprintw(options->line_stat, "STATUS: ENEMY_TURN");
 			wattroff(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
 			wrefresh(options->line_stat);
+
 			options->state = STATE_ENEMY_TURN;
 			break;
 	}
