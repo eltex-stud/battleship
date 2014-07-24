@@ -240,7 +240,7 @@ void cl_main_check_net_shot(void * event_data,
 	char x = *(char *)(event_data ); /**< x coordinate*/
 	char y = *(char *)(event_data + sizeof(char)); /**< y coordinate*/
 	char result = *(char *)(event_data + sizeof(char) * 2); /**< shot result*/
-	printf("%d %d %d\n", x, y, result);
+	// printf("%d %d %d\n", x, y, result);
 	/* if playershoting and whating answer from server*/
 	if(*turn == WAITING_TURN) {
 		cl_logic_shot(x, y, result, enemy_map, turn);
@@ -276,6 +276,17 @@ void cl_main_start_game(void * event_data, map my_map, enum player_state *turn,
                         struct gui *cl_gui)
 {
 	*turn = *((char *)event_data);
+	switch(*turn) {
+	case SRV_NET_ENEMY_TURN:
+		*turn = ENEMY_TURN;
+		break;
+	case SRV_NET_YOUR_TURN:
+		*turn = MY_TURN;
+		break;
+	default:
+		printf("Wrong turn data\n");
+		exit(EXIT_FAILURE);
+	}
 	printf("Turn: %d\n", *turn);
 	cl_gui_main_window(cl_gui, my_map);
 }
