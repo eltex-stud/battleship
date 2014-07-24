@@ -459,32 +459,32 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 	 * @begin the test sequence coordinates are recived
 	 */
 
-	if (c_t_m->ship1_1[0][0] == shot->x 
-			&& c_t_m->ship1_1[1][0] == shot->y
+	if (c_t_m->ship1_1[0][0] == shot->y 
+			&& c_t_m->ship1_1[1][0] == shot->x
 			&& c_t_m->ship1_1[2][0] == 1) {
 		result_shot = SRV_LOGIC_RESULT_KILL;
 		c_t_m->ship1_1[2][0] = 3;
 		c_t_m->count = c_t_m->count + 1;
 	}
 
-	if (c_t_m->ship1_2[0][0] == shot->x 
-			&& c_t_m->ship1_2[1][0] == shot->y
+	if (c_t_m->ship1_2[0][0] == shot->y 
+			&& c_t_m->ship1_2[1][0] == shot->x
 			&& c_t_m->ship1_2[2][0] == 1) {
 		result_shot = SRV_LOGIC_RESULT_KILL;
 		c_t_m->ship1_2[2][0] = 3;
 		c_t_m->count = c_t_m->count + 1;
 	}
 
-	if (c_t_m->ship1_3[0][0] == shot->x 
-			&& c_t_m->ship1_3[1][0] == shot->y
+	if (c_t_m->ship1_3[0][0] == shot->y 
+			&& c_t_m->ship1_3[1][0] == shot->x
 			&& c_t_m->ship1_3[2][0] == 1) {
 		result_shot = SRV_LOGIC_RESULT_KILL;
 		c_t_m->ship1_3[2][0] = 3;
 		c_t_m->count = c_t_m->count + 1;
 	}
  
-	if (c_t_m->ship1_4[0][0] == shot->x 
-			&& c_t_m->ship1_4[1][0] == shot->y
+	if (c_t_m->ship1_4[0][0] == shot->y 
+			&& c_t_m->ship1_4[1][0] == shot->x
 			&& c_t_m->ship1_4[2][0] == 1) {
 		result_shot = SRV_LOGIC_RESULT_KILL;
 		c_t_m->ship1_4[2][0] = 3;
@@ -494,8 +494,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 
 
 
-	if (c_t_m->ship2_1[0][0] == shot->x
-			&& c_t_m->ship2_1[1][0] == shot->y
+	if (c_t_m->ship2_1[0][0] == shot->y
+			&& c_t_m->ship2_1[1][0] == shot->x
 			&& c_t_m->ship2_1[2][0] == 1) {
 		if (c_t_m->ship2_1[2][1] == 2) {
 			c_t_m->ship2_1[2][0] = 3;
@@ -508,8 +508,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
-	if (c_t_m->ship2_1[0][1] == shot->x
-			&& c_t_m->ship2_1[1][1] == shot->y
+	if (c_t_m->ship2_1[0][1] == shot->y
+			&& c_t_m->ship2_1[1][1] == shot->x
 			&& c_t_m->ship2_1[2][1] == 1) {
 		if (c_t_m->ship2_1[2][0] == 2) {
 			c_t_m->ship2_1[2][1] = 3;
@@ -522,8 +522,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
-	if (c_t_m->ship2_2[0][0] == shot->x
-			&& c_t_m->ship2_2[1][0] == shot->y
+	if (c_t_m->ship2_2[0][0] == shot->y
+			&& c_t_m->ship2_2[1][0] == shot->x
 			&& c_t_m->ship2_2[2][0] == 1) {
 		if (c_t_m->ship2_2[2][1] == 2) {
 			c_t_m->ship2_2[2][0] = 3;
@@ -536,8 +536,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 			c_t_m->count = c_t_m->count + 1;
 		}
 	} 
-	if (c_t_m->ship2_2[0][1] == shot->x
-			&& c_t_m->ship2_2[1][1] == shot->y
+	if (c_t_m->ship2_2[0][1] == shot->y
+			&& c_t_m->ship2_2[1][1] == shot->x
 			&& c_t_m->ship2_2[2][1] == 1) {
 		if (c_t_m->ship2_2[2][0] == 2) {
 			c_t_m->ship2_2[2][1] = 3;
@@ -550,8 +550,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
-	if (c_t_m->ship2_3[0][0] == shot->x
-			&& c_t_m->ship2_3[1][0] == shot->y
+	if (c_t_m->ship2_3[0][0] == shot->y
+			&& c_t_m->ship2_3[1][0] == shot->x
 			&& c_t_m->ship2_3[2][0] == 1) {
 		if (c_t_m->ship2_3[2][1] == 2) {
 			c_t_m->ship2_3[2][0] = 3;
@@ -564,8 +564,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 			c_t_m->count = c_t_m->count + 1;
 		}
 	} 
-	if (c_t_m->ship2_3[0][1] == shot->x
-			&& c_t_m->ship2_3[1][1] == shot->y
+	if (c_t_m->ship2_3[0][1] == shot->y
+			&& c_t_m->ship2_3[1][1] == shot->x
 			&& c_t_m->ship2_3[2][1] == 1) {
 		if (c_t_m->ship2_3[2][0] == 2) {
 			c_t_m->ship2_3[2][1] = 3;
@@ -580,8 +580,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 	}
 
 
-	if (c_t_m->ship3_1[0][0] == shot->x
-			&& c_t_m->ship3_1[1][0] == shot->y
+	if (c_t_m->ship3_1[0][0] == shot->y
+			&& c_t_m->ship3_1[1][0] == shot->x
 			&& c_t_m->ship3_1[2][0] == 1) {
 		if (c_t_m->ship3_1[2][1] == 2
 				&& c_t_m->ship3_1[2][2] == 2) {
@@ -596,8 +596,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 			c_t_m->count = c_t_m->count + 1;
 		}
 	} 
-	if (c_t_m->ship3_1[0][1] == shot->x
-			&& c_t_m->ship3_1[1][1] == shot->y
+	if (c_t_m->ship3_1[0][1] == shot->y
+			&& c_t_m->ship3_1[1][1] == shot->x
 			&& c_t_m->ship3_1[2][1] == 1) {
 		if (c_t_m->ship3_1[2][0] == 2
 				&& c_t_m->ship3_1[2][2] == 2) {
@@ -612,8 +612,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
-	if (c_t_m->ship3_1[0][2] == shot->x
-			&& c_t_m->ship3_1[1][2] == shot->y
+	if (c_t_m->ship3_1[0][2] == shot->y
+			&& c_t_m->ship3_1[1][2] == shot->x
 			&& c_t_m->ship3_1[2][2] == 1) {
 		if (c_t_m->ship3_1[2][0] == 2
 				&& c_t_m->ship3_1[2][1] == 2) {
@@ -629,8 +629,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 		}
 	}
 
-	if (c_t_m->ship3_2[0][0] == shot->x
-			&& c_t_m->ship3_2[1][0] == shot->y
+	if (c_t_m->ship3_2[0][0] == shot->y
+			&& c_t_m->ship3_2[1][0] == shot->x
 			&& c_t_m->ship3_2[2][0] == 1) {
 		if (c_t_m->ship3_2[2][1] == 2
 				&& c_t_m->ship3_2[2][2] == 2) {
@@ -645,8 +645,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 			c_t_m->count = c_t_m->count + 1;
 		}
 	} 
-	if (c_t_m->ship3_2[0][1] == shot->x
-			&& c_t_m->ship3_2[1][1] == shot->y
+	if (c_t_m->ship3_2[0][1] == shot->y
+			&& c_t_m->ship3_2[1][1] == shot->x
 			&& c_t_m->ship3_2[2][1] == 1) {
 		if (c_t_m->ship3_2[2][0] == 2
 				&& c_t_m->ship3_2[2][2] == 2) {
@@ -661,8 +661,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
-	if (c_t_m->ship3_2[0][2] == shot->x
-			&& c_t_m->ship3_2[1][2] == shot->y
+	if (c_t_m->ship3_2[0][2] == shot->y
+			&& c_t_m->ship3_2[1][2] == shot->x
 			&& c_t_m->ship3_2[2][2] == 1) {
 		if (c_t_m->ship3_2[2][0] == 2
 				&& c_t_m->ship3_2[2][1] == 2) {
@@ -679,8 +679,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 	}
 
 
-	if (c_t_m->ship4_1[0][0] == shot->x
-			&& c_t_m->ship4_1[1][0] == shot->y
+	if (c_t_m->ship4_1[0][0] == shot->y
+			&& c_t_m->ship4_1[1][0] == shot->x
 			&& c_t_m->ship4_1[2][0] == 1) {
 		if (c_t_m->ship4_1[2][1] == 2
 				&& c_t_m->ship4_1[2][2] == 2
@@ -697,8 +697,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
-	if (c_t_m->ship4_1[0][1] == shot->x
-			&& c_t_m->ship4_1[1][1] == shot->y
+	if (c_t_m->ship4_1[0][1] == shot->y
+			&& c_t_m->ship4_1[1][1] == shot->x
 			&& c_t_m->ship4_1[2][1] == 1) {
 		if (c_t_m->ship4_1[2][0] == 2
 				&& c_t_m->ship4_1[2][2] == 2
@@ -715,8 +715,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
-	if (c_t_m->ship4_1[0][2] == shot->x
-			&& c_t_m->ship4_1[1][2] == shot->y
+	if (c_t_m->ship4_1[0][2] == shot->y
+			&& c_t_m->ship4_1[1][2] == shot->x
 			&& c_t_m->ship4_1[2][2] == 1) {
 		if (c_t_m->ship4_1[2][0] == 2
 				&& c_t_m->ship4_1[2][1] == 2
@@ -733,8 +733,8 @@ enum srv_logic_shot_result srv_logic_make_shot(struct srv_logic_map *c_t_m,
 			c_t_m->count = c_t_m->count + 1;
 		}
 	}
-	if (c_t_m->ship4_1[0][3] == shot->x
-			&& c_t_m->ship4_1[1][3] == shot->y
+	if (c_t_m->ship4_1[0][3] == shot->y
+			&& c_t_m->ship4_1[1][3] == shot->x
 			&& c_t_m->ship4_1[2][3] == 1) {
 		if (c_t_m->ship4_1[2][0] == 2
 				&& c_t_m->ship4_1[2][1] == 2
