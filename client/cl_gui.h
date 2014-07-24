@@ -17,6 +17,11 @@
 
 #define CUR_COLOR ((options->bg_color * 10) + options->font_color)
 
+#define CLR_BLK_WHT 18
+#define CLR_BLK_GRN 13
+#define CLR_BLK_YLLW 14
+#define CLR_BLK_RED 12
+
 struct gui
 {
 	WINDOW *nick_window;

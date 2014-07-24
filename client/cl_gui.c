@@ -105,7 +105,7 @@ void gui_key_processing_battleground(struct gui *options, long ch)
 			} else {
 				options->y--;
 			}
-			gui_distinguish_cell(options, 18);
+			gui_distinguish_cell(options, CUR_COLOR);
 			break;
 
 		case KEY_DOWN:
@@ -114,7 +114,7 @@ void gui_key_processing_battleground(struct gui *options, long ch)
 			} else {
 				options->y++;
 			}
-			gui_distinguish_cell(options, 18);
+			gui_distinguish_cell(options, CUR_COLOR);
 			break;
 
 		case KEY_LEFT:
@@ -123,7 +123,7 @@ void gui_key_processing_battleground(struct gui *options, long ch)
 			} else {
 				options->x--;
 			}
-			gui_distinguish_cell(options, 18);
+			gui_distinguish_cell(options, CUR_COLOR);
 			break;
 
 		case KEY_RIGHT:
@@ -132,7 +132,7 @@ void gui_key_processing_battleground(struct gui *options, long ch)
 			} else {
 				options->x++;
 			}
-			gui_distinguish_cell(options, 18);
+			gui_distinguish_cell(options, CUR_COLOR);
 			break;
 
 		case KEY_SPACE:
