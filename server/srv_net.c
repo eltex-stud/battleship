@@ -277,7 +277,6 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 
 int srv_net_del_client(struct srv_net_client *client)
 {
-	char buff[10];
 	struct srv_net_queue *queue;
 
 	queue = (struct srv_net_queue *)malloc(sizeof(struct srv_net_queue));
