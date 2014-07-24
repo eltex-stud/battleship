@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 	cl_logic_generate_placement(cl_placement);
 	// cl_map = cl_logic_convert_placement(cl_placement);
 	memcpy(cl_map, cl_placement, sizeof(map));
-	// cl_gui_input_nick(cl_gui);
+	cl_gui_input_nick(cl_gui);
 	cl_net_send_placement(cl_net, cl_placement);
 
 	/* Start to process all events */
