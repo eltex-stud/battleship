@@ -202,9 +202,9 @@ struct gui *cl_gui_start(struct main_queue *main_queue_h)
 	cbreak();
 	noecho();
 
-	if(getmaxx(stdscr) < 94 || getmaxy(stdscr) < 39) {
+	if(getmaxx(stdscr) < WIDTH || getmaxy(stdscr) < HEIGHT) {
 		endwin();
-		printf("ERROR::Low Resolution: Resolution at least must be 94x39\n");
+		printf("ERROR::Low Resolution: Resolution at least must be %dx%d (HxW)\n", WIDTH, HEIGHT);
 		return NULL;
 	}
 

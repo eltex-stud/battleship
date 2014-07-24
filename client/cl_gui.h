@@ -13,6 +13,9 @@
 
 #define MAX_BUFF 100
 
+#define HEIGHT 39
+#define WIDTH 134
+
 #define ENTER 10
 #define KEY_SPACE 32
 
