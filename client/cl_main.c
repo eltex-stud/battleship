@@ -167,6 +167,7 @@ void cl_main_control(struct main_queue *queue, map my_map, map enemy_map,
 			switch (tmp->event_type) {
 			case GUI_NICK: /* gui send player nick*/
 				cl_net_send_nick(network, tmp->event_data, tmp->data_length);
+				cl_gui_main_window(cl_gui, my_map);
 				break;
 			case GUI_SHOT: /* gui send player's shot*/
 				cl_main_check_shot(tmp->event_data, my_map, network, cl_gui, &turn);
@@ -287,8 +288,8 @@ void cl_main_start_game(void * event_data, map my_map, enum player_state *turn,
 		printf("Wrong turn data\n");
 		exit(EXIT_FAILURE);
 	}
-	printf("Turn: %d\n", *turn);
-	cl_gui_main_window(cl_gui, my_map);
+	// printf("Turn: %d\n", *turn);
+	cl_gui_refresh_status(cl_gui, *turn);
 }
 
 /** Copy main queue

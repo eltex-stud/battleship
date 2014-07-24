@@ -24,7 +24,7 @@
 #define CLR_GRN_WHT 38
 #define CLR_RED_WHT 28
 
-enum gui_status_line { YOU_TURN, ENEMY_TURN };
+enum gui_status_line { YOU_TURN, NOT_YOU_TURN };
 
 struct gui
 {

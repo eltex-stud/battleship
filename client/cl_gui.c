@@ -420,7 +420,7 @@ void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn)
 			options->state = 1;
 			break;
 
-		case ENEMY_TURN:
+		case NOT_YOU_TURN:
 			wattron(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
 			wclear(options->line_stat);
 			wmove(options->line_stat, 0, 1);
