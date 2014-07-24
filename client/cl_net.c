@@ -232,29 +232,6 @@ void cl_net_send_nick(struct net *configure, char *net_nick, int nick_len) {
 
 
 /*
- * NAME: cl_net_send_start
- *
- * IN:	 struct net *configure - configure which was filled by net_start and
- * 		main
- *
- * OUT:	 nothing
- *
- * WORK: takes configure to place flag START into the net queue
- */
-void cl_net_send_start(struct net *configure) {
-	struct net_queue *element = (struct net_queue *)malloc(
-						sizeof (struct net_queue));
-
-	element->net_next = NULL;
-	element->type_msg = START;
-	element->data = NULL;
-	element->data_len = -1;
-	cl_net_add_queue (configure, element);
-}
-
-
-
-/*
  * NAME: cl_net_send_error
  *
  * IN:	 struct net *configure - configure which was filled by net_start and
@@ -355,7 +332,7 @@ void cl_net_del_queue(struct net *configure) {
 
 
 /*
- * NAME: net_recv
+ * NAME: cl_net_recv
  *
  * IN:	 struct net *configure - configure which was filled by net_start and
  * 		main
@@ -404,7 +381,7 @@ void cl_net_recv(struct net *configure) {
 				break;
 		}
 		
-		cl_main_make_event(configure->m_queue, code,	(void *)buff,
-					SIZE_BUF);
+		cl_main_make_event(configure->m_queue, code,	(void *)(buff+1),
+					SIZE_BUF-1);
 	}
 }

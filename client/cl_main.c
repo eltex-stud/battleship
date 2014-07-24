@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 	cl_logic_generate_placement(cl_placement);
 	// cl_map = cl_logic_convert_placement(cl_placement);
 	memcpy(cl_map, cl_placement, sizeof(map));
-	cl_gui_input_nick(cl_gui);
+	// cl_gui_input_nick(cl_gui);
 	cl_net_send_placement(cl_net, cl_placement);
 
 	/* Start to process all events */
@@ -216,6 +216,7 @@ void cl_main_check_shot(void * event_data, map my_map, struct net *network,
 
 	/* if shot not valid */
 	if(cl_logic_valid_shot(x, y, my_map, turn) == 0) {
+		printf("Invalid shot\n");
 		// cl_gui_error(cl_gui);
 	} else {
 		cl_net_send_shot(network, x, y);
@@ -236,9 +237,10 @@ void cl_main_check_net_shot(void * event_data,
                             map enemy_map,
                             struct gui *cl_gui)
 {
-	char x = *(char *)(event_data + sizeof(char)); /**< x coordinate*/
-	char y = *(char *)(event_data + sizeof(char) * 2); /**< y coordinate*/
-	char result = *(char *)(event_data + sizeof(char) * 3); /**< shot result*/
+	char x = *(char *)(event_data ); /**< x coordinate*/
+	char y = *(char *)(event_data + sizeof(char)); /**< y coordinate*/
+	char result = *(char *)(event_data + sizeof(char) * 2); /**< shot result*/
+	printf("%d %d %d\n", x, y, result);
 	/* if playershoting and whating answer from server*/
 	if(*turn == WAITING_TURN) {
 		cl_logic_shot(x, y, result, enemy_map, turn);
@@ -273,7 +275,8 @@ void cl_main_send_placement(void *event_data, map enemy_map, struct gui *cl_gui)
 void cl_main_start_game(void * event_data, map my_map, enum player_state *turn,
                         struct gui *cl_gui)
 {
-	turn = (enum player_state *) event_data;
+	*turn = *((char *)event_data);
+	printf("Turn: %d\n", *turn);
 	cl_gui_main_window(cl_gui, my_map);
 }
 

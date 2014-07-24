@@ -43,7 +43,7 @@ void gui_key_processing_input_nick(struct gui *options, long ch)
 			clear();
 			refresh();
 
-			options->state = 1;
+			// options->state = 1;
 			break;
 
 		case KEY_BACKSPACE:
@@ -388,6 +388,7 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 	wmove(options->line_stat, 0, 0);
 	wprintw(options->line_stat, "Status: ");
 	wrefresh(options->line_stat);
+	options->state = 1;
 
 	pthread_mutex_unlock(&(options->mutex));
 
