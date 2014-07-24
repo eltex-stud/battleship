@@ -258,21 +258,48 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 						temp = temp2;
 					}
 				}
+				if ((strcmp((temp->data), "del_client")) == 0) {
+					close(temp->fd);
+					for(jdx=0; jdx<32; jdx++) {
+						if(client_list[jdx].fd == temp->fd) {
+							main_client_ops.del_client(&(client_list[jdx]),
+									client_list[jdx].client_data,
+									client_list[jdx].network->main_data);
+							client_list[jdx].fd=0;
+							client_list[jdx].network=0;
+						}
+					}
+				}
 			}
 		}
-
 	}
 }
 
 int srv_net_del_client(struct srv_net_client *client)
 {
-	close(client->fd);
+	char buff[10];
+	struct srv_net_queue *queue;
 
-	main_client_ops.del_client(client, client->client_data,
-			client->network->main_data);
+	queue = (struct srv_net_queue *)malloc(sizeof(struct srv_net_queue));
 
-	client->fd=0;
-	client->network=0;
+	strcpy(queue->data, "del_client");
+	queue->size = 10;
+	queue->fd = client->fd;
+	queue->index = 0;
+	queue->next = NULL;
+
+	if(client->network->queue == NULL) {
+		client->network->queue = (struct srv_net_queue *)malloc(sizeof(struct srv_net_queue));
+		head = client->network->queue;
+		tail = head;
+
+		tail->next = queue;
+		tail = queue;
+	}
+	else {
+		tail->next = queue;
+		tail = queue;
+	}
 	return 0;
 }
 
