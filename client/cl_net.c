@@ -5,6 +5,7 @@
  */
 
 #include "cl_net.h"
+#include "cl_main.h" // DELETE ME
 #include <signal.h>
 #include <pthread.h>
 #include <strings.h>
@@ -80,6 +81,7 @@ struct net *cl_net_start(char *address, int port, struct main_queue *m_queue)
 	
 	configure->mutex = mutex;
 	configure->m_queue = m_queue;
+
 	configure->socket = cl_sock;
 	configure->net_queue_head = NULL;
 
@@ -359,15 +361,16 @@ void cl_net_recv(struct net *configure) {
 	int code; /* buffer for contain code of MAIN_EVENT_TYPES */
 
 	recv_bytes = recv(configure->socket, buff, SIZE_BUF, 0);
+	//fprintf(stderr, "net: %d", (int)configure->m_queue->main_id);
 	if (recv_bytes < 0) {
 	// receive error
 		err = errno;
-		cl_main_make_event(configure->m_queue, ERROR,
+		cl_main_make_event(configure->m_queue, NET_ERROR,
 					(void *)&err, sizeof(err));
 	} else if(!recv_bytes) {
 		// server has closed a connection
-		err = 1;
-		cl_main_make_event(configure->m_queue, ERROR,
+		err = -1;
+		cl_main_make_event(configure->m_queue, NET_ERROR,
 					(void *)&err, sizeof (err));
 	} else {
 		// it's ok
@@ -388,7 +391,7 @@ void cl_net_recv(struct net *configure) {
 				code = NET_PLACEMENT;
 				break;
 		}
-		
+
 		cl_main_make_event(configure->m_queue, code,	(void *)(buff+1),
 					SIZE_BUF-1);
 	}
