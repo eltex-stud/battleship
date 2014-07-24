@@ -147,9 +147,11 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 	while(1) {
 		fd_set readset;
 		fd_set writeset;
+		fd_set exceptset;
 
 		FD_ZERO(&readset);
 		FD_ZERO(&writeset);
+		FD_ZERO(&exceptset);
 
 		FD_SET(net->fd, &readset);
 
@@ -157,6 +159,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 		for(idx=0; idx<32; idx++) {
 			if(client_list[idx].fd!=0) {
 				FD_SET(client_list[idx].fd, &readset);
+				FD_SET(client_list[idx].fd, &exceptset);
 				if (client_list[idx].fd > max_fd) {
 					max_fd = client_list[idx].fd;
 				}
@@ -175,6 +178,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 			perror("Error select");
 		}
 
+
 		if(FD_ISSET(net->fd, &readset)) {
 			client_list[client_cnt].fd = accept(net->fd, NULL, NULL);
 			fcntl(client_list[client_cnt].fd, F_SETFL, O_NONBLOCK);
@@ -187,6 +191,28 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 
 		for(jdx=0; jdx<32; jdx++) {
 			if(client_list[jdx].fd!=0) {
+				if(FD_ISSET(client_list[jdx].fd, &exceptset)) {
+					close(client_list[jdx].fd);
+					main_client_ops.del_client(&(client_list[jdx]),
+							client_list[jdx].client_data,
+							client_list[jdx].network->main_data);
+					client_list[jdx].fd=0;
+					client_list[jdx].network=0;
+					if(head != NULL && head->next != NULL) {
+						temp2=head;
+						for(temp = head->next; temp!=NULL; temp=temp->next) {
+							if (temp->fd == client_list[jdx].fd) {
+								temp2->next = temp->next;
+								if(temp == tail) {
+									tail = temp2;
+								}
+								free(temp);
+								temp = temp2;
+							}
+						temp2=temp;
+						}
+					}
+				}
 				if(FD_ISSET(client_list[jdx].fd, &readset)) {
 					size = recv(client_list[jdx].fd, buff, SIZE_BUF, 0);
 					if (size == 0) {
