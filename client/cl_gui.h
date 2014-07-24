@@ -26,6 +26,9 @@
 
 enum gui_status_line { YOU_TURN, ENEMY_TURN };
 
+enum gui_state { STATE_NICK, STATE_YOU_TURN, STATE_ENEMY_TURN, STATE_CHAT, 
+				 STATE_WAIT};
+
 struct gui
 {
 	WINDOW *nick_window;
@@ -35,12 +38,12 @@ struct gui
 	WINDOW *line_stat;
 	unsigned short bg_color;
 	unsigned short font_color;
-	unsigned short state;
 	unsigned short size_of_msg;
 	unsigned short x;
 	unsigned short y;
 	char msg[MAX_BUFF];
 	struct main_queue *main_queue_head;
+	gui_state state;
 	pthread_t gui_id;
 	pthread_mutex_t mutex;
 };
