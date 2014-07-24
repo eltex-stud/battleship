@@ -202,9 +202,9 @@ struct gui *cl_gui_start(struct main_queue *main_queue_h)
 	cbreak();
 	noecho();
 
-	if(getmaxx(stdscr) < 94 || getmaxy(stdscr) < 39) {
+	if(getmaxx(stdscr) < WIDTH || getmaxy(stdscr) < HEIGHT) {
 		endwin();
-		printf("ERROR::Low Resolution: Resolution at least must be 94x39\n");
+		printf("ERROR::Low Resolution: Resolution at least must be %dx%d (HxW)\n", WIDTH, HEIGHT);
 		return NULL;
 	}
 
@@ -413,22 +413,52 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 
 void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn)
 {
+	int idx;
+
 	pthread_mutex_lock(&(options->mutex));
 	switch(turn) {
 		case YOU_TURN:
 			wattron(options->line_stat, COLOR_PAIR(CLR_GRN_WHT));
-			wclear(options->line_stat);
+			wattron(options->line_stat, A_UNDERLINE);
+
 			wmove(options->line_stat, 0, 1);
+			
+			for(idx = 1; idx < getmaxx(options->line_stat) - 1; idx++) {
+				wprintw(options->line_stat, " ");
+			}
+			
+			wattron(options->line_stat, A_ALTCHARSET);
+			wprintw(options->line_stat, "%c", ACS_VLINE);
+			
+			wmove(options->line_stat, 0, 0);
+			wprintw(options->line_stat, "%c", ACS_VLINE);
+			
+			wattroff(options->line_stat, A_ALTCHARSET);
 			wprintw(options->line_stat, "STATUS: YOUR TURN");
 			wattroff(options->line_stat, COLOR_PAIR(CLR_GRN_WHT));
+			
 			wrefresh(options->line_stat);
+			
 			options->state = STATE_YOU_TURN;
 			break;
 
 		case NOT_YOU_TURN:
 			wattron(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
-			wclear(options->line_stat);
+			wattron(options->line_stat, A_UNDERLINE);
+
 			wmove(options->line_stat, 0, 1);
+			
+			for(idx = 1; idx < getmaxx(options->line_stat) - 1; idx++) {
+				wprintw(options->line_stat, " ");
+			}
+			
+			wattron(options->line_stat, A_ALTCHARSET);
+			wprintw(options->line_stat, "%c", ACS_VLINE);
+			
+			wmove(options->line_stat, 0, 0);
+			wprintw(options->line_stat, "%c", ACS_VLINE);
+			
+			wattroff(options->line_stat, A_ALTCHARSET);
 			wprintw(options->line_stat, "STATUS: ENEMY_TURN");
 			wattroff(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
 			wrefresh(options->line_stat);
