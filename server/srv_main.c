@@ -15,7 +15,8 @@ enum client_connect_status {
 	PLACEMENT_RECEIVED = 2,
 	HAS_ENEMY = 4,
 	READY_TO_START = 7,
-	GAME_STARTED = 8
+	GAME_STARTED = 8,
+	GAME_ENDED = 9
 };
 
 struct client_data {
@@ -111,6 +112,7 @@ static void send_game_start(struct client_data *cl_data)
 	}
 	cl_data->client_status = GAME_STARTED;
 	cl_data->enemy->client_status = GAME_STARTED;
+	printf("game started\n");
 }
 
 static enum srv_net_shot_result logic_to_net_shot_result(enum srv_logic_shot_result r)
@@ -182,6 +184,9 @@ static void shot_received(struct srv_net_client *client,
 		srv_net_send_placement(client, enemy_placement);
 		srv_net_send_placement(enemy_data->client, my_placement);
 
+		client_data->client_status = GAME_ENDED;
+		enemy_data->client_status = GAME_ENDED;
+
 		/* Disconnect clients */
 		srv_net_del_client(client);
 		srv_net_del_client(enemy_data->client);
@@ -198,7 +203,7 @@ static void nick_received(struct srv_net_client *client __attribute__((unused)),
 {
 	struct client_data *cl_data = client_data;
 
-	cl_data->client_status &= NICK_RECEIVED;
+	cl_data->client_status |= NICK_RECEIVED;
 
 	if(cl_data->client_status == READY_TO_START
 			&& cl_data->enemy->client_status == READY_TO_START) {
@@ -225,6 +230,7 @@ static void *new_client(struct srv_net_client *client, void *main_data)
 	cl_data->client = client;
 	cl_data->map = NULL;
 	cl_data->enemy = NULL;
+	cl_data->client_status = 0;
 	
 	cl_list->client_data = cl_data;
 	cl_list->next = NULL;
@@ -246,8 +252,8 @@ static void *new_client(struct srv_net_client *client, void *main_data)
 			temp->client_data->turn = ENEMY;
 			cl_data->enemy = temp->client_data;
 			cl_data->turn = MY;
-			cl_data->client_status &= HAS_ENEMY;
-			cl_data->enemy->client_status &= HAS_ENEMY;
+			cl_data->client_status |= HAS_ENEMY;
+			cl_data->enemy->client_status |= HAS_ENEMY;
 			break;
 		}
 		temp = temp->next;
@@ -261,31 +267,36 @@ static void del_client(struct srv_net_client *client __attribute__((unused)),
 {
 	struct client_list *temp, *prev;
 	struct main_data *m_data;
+	struct client_data *enemy_data;
+
+	printf("del client\n");
 	
 	m_data = main_data;
 	temp = m_data->clients_data;
 	prev = NULL;
 
 	if(temp->client_data == (struct client_data*)client_data){
+		enemy_data = temp->client_data->enemy;
 		free(temp->client_data);
 		m_data->clients_data = temp->next;
-		if(temp->next == NULL){
-			m_data->clients_data = NULL;
-		}
 		free(temp);
 	} else {
 		while(temp->client_data != (struct client_data*)client_data){
 			prev = temp;
 			temp = temp->next;
 		}
+		enemy_data = temp->client_data->enemy;
 		free(temp->client_data);
-		if(temp->next != NULL){
-			prev->next = temp->next;
-		} else {
-			prev->next = NULL;
-		}
+		prev->next = temp->next;
 		free(temp);
 	}
+
+	if (enemy_data != NULL) {
+		enemy_data->enemy = NULL;
+		srv_net_del_client(enemy_data->client);
+	}
+
+	printf("return from del client\n");
 }
 
 
@@ -310,7 +321,7 @@ static void placement_received(struct srv_net_client *client __attribute__((unus
 	}
 	cl_data->map = srv_logic_placement_to_map(map);
 
-	cl_data->client_status &= PLACEMENT_RECEIVED;
+	cl_data->client_status |= PLACEMENT_RECEIVED;
 
 	if(cl_data->client_status == READY_TO_START
 			&& cl_data->enemy->client_status == READY_TO_START) {
