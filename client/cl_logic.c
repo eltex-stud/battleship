@@ -183,28 +183,30 @@ void cl_logic_merge_placement_map(placement server_map, map cl_map)
     
     for(index1 = 0; index1 < 10; index1++) {
 	for(index2 = 0; index2 < 10; index2++) {
+	    if(server_map[index1][index2] == 1)
+		continue;
 	    cl_map[index1][index2] = server_map[index1][index2] + cl_map[index1][index2];
 	}
     }
 }
 
-void cl_logic_shot(int x, int y, char result, placement map, enum player_state *state)
+void cl_logic_shot(int x, int y, enum map_states *result, placement map, enum player_state *state)
 {
     if(*state == ENEMY_TURN) {
 	switch(result) {
-	    case 2: {
+	    case MAP_WOUNDED: {
 		map[y][x] = result;
 		
 		break;
 	    }
 	    
-	    case 3: {
-		cl_logic_kill_ship(x, y, result, map);
+	    case MAP_KILLED: {
+		cl_logic_kill_ship(x, y, 3, map);
 		
 		break;
 	    }
 	    
-	    case 4: {
+	    case MAP_MISS: {
 		map[y][x] = result;
 		state = MY_TURN;
 		
@@ -214,19 +216,19 @@ void cl_logic_shot(int x, int y, char result, placement map, enum player_state *
     } else {
 	if(*state == WAITING_TURN) {
 	    switch(result) {
-		case 2: {
+		case MAP_WOUNDED: {
 		    map[y][x] = result;
 		    
 		    break;
 		}
 		
-		case 3: {
-		    cl_logic_kill_ship(x, y, result, map);
+		case MAP_KILLED: {
+		    cl_logic_kill_ship(x, y, 3, map);
 		    
 		    break;
 		}
 		
-		case 4: {
+		case MAP_MISS: {
 		    map[y][x] = result;
 		    *state = ENEMY_TURN;
 		    
@@ -237,7 +239,7 @@ void cl_logic_shot(int x, int y, char result, placement map, enum player_state *
     }
 }
 
-void cl_logic_kill_ship(int x, int y, char result, placement map)
+void cl_logic_kill_ship(int x, int y, int result, placement map)
 {
     int index1, index2;
     int x1 = x, y1 = y;
