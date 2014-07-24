@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 	placement cl_placement; /**< Player's placement to server */
 	struct sigaction sigact;
 	sigact.sa_handler = usr1_handler;
-	int i, j;
+	// int i, j;
 
 	bzero(cl_enemy_map, sizeof(map));
 
@@ -56,11 +56,11 @@ int main(int argc, char *argv[])
 	cl_logic_generate_placement(cl_placement);
 	// cl_map = cl_logic_convert_placement(cl_placement);
 	memcpy(cl_map, cl_placement, sizeof(map));
-	for(i = 0; i < 10; ++i) {
+	/* for(i = 0; i < 10; ++i) {
 			for (j = 0; j < 10; ++j)
 				fprintf(stderr, "%d ", cl_enemy_map[i][j]);
 			fprintf(stderr, "\n");
-		}
+		} */
 	cl_gui_input_nick(cl_gui);
 	cl_net_send_placement(cl_net, cl_placement);
 
@@ -249,16 +249,16 @@ void cl_main_check_net_shot(void * event_data,
 	char x = *(char *)(event_data ); /**< x coordinate*/
 	char y = *(char *)(event_data + sizeof(char)); /**< y coordinate*/
 	char result = *(char *)(event_data + sizeof(char) * 2); /**< shot result*/
-	int i, j;
+	// int i, j;
 	// printf("%d %d %d\n", x, y, result);
 	/* if playershoting and whating answer from server*/
 	if(*turn == WAITING_TURN) {
 		cl_logic_shot(x, y, result, enemy_map, turn);
-		for(i = 0; i < 10; ++i) {
+		/* for(i = 0; i < 10; ++i) {
 			for (j = 0; j < 10; ++j)
 				fprintf(stderr, "%d ", enemy_map[i][j]);
 			fprintf(stderr, "\n");
-		}
+		} */
 		cl_gui_refresh_map(cl_gui, enemy_map, ENEMY);
 	} else {
 		cl_logic_shot(x, y, result, my_map, turn);
