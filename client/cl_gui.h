@@ -65,6 +65,8 @@ int cl_gui_input_nick(struct gui *options);
 
 int cl_gui_main_window(struct gui *options, map cl_map);
 
+void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn);
+
 int cl_gui_refresh_map(struct gui *options, map came_map, enum player pl);
 
 #endif // BATTLESHIP_CLIENT_GUI_H_
