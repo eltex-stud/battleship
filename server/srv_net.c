@@ -206,9 +206,11 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 							break;
 
 						case PLACEMENT:
-							for(kdx = 1; kdx <= 101; kdx++) {
+							for(kdx = 1; kdx < 101; kdx++) {
 								placement[kdx-1] = buff[kdx];
+
 							}
+
 							client = srv_net_find_client(client_list[jdx].fd);
 							main_client_ops.placement_received(client, placement,
 									client_list[jdx].client_data, net->main_data);
