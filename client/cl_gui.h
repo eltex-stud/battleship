@@ -21,6 +21,10 @@
 #define CLR_BLK_GRN 13
 #define CLR_BLK_YLLW 14
 #define CLR_BLK_RED 12
+#define CLR_GRN_WHT 38
+#define CLR_RED_WHT 28
+
+enum gui_status_line { YOU_TURN, ENEMY_TURN };
 
 struct gui
 {
@@ -60,6 +64,8 @@ void cl_gui_wait(struct gui *options);
 int cl_gui_input_nick(struct gui *options);
 
 int cl_gui_main_window(struct gui *options, map cl_map);
+
+void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn);
 
 int cl_gui_refresh_map(struct gui *options, map came_map, enum player pl);
 
