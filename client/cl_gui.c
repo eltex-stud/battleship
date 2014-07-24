@@ -8,11 +8,11 @@ void gui_distinguish_cell(struct gui *options, unsigned short bgcolor)
 	int jdx;
 */
 
-	wclear(options->line_stat);
+/*	wclear(options->line_stat);
 	wmove(options->line_stat, 0, 0);
 	wprintw(options->line_stat, "%c%d", 'A' + options->x, 1 + options->y);
 	wrefresh(options->line_stat);
-/*
+
 	for (idx = 0; idx < 2; idx++) {
 		for(jdx = 0; jdx < 3; jdx++) {
 			wmove(options->enemy_map, 1 + idx + (options->y * 2), 1 + jdx + (options->x * 4));
@@ -43,7 +43,7 @@ void gui_key_processing_input_nick(struct gui *options, long ch)
 			clear();
 			refresh();
 
-			// options->state = 1;
+			 options->state = -1;
 			break;
 
 		case KEY_BACKSPACE:
@@ -136,9 +136,11 @@ void gui_key_processing_battleground(struct gui *options, long ch)
 			break;
 
 		case KEY_SPACE:
-			data[0] = options->x;
-			data[1] = options->y;
-			cl_main_make_event(options->main_queue_head, GUI_SHOT, (void *)data, 2);
+			if (options->state == 3) {
+				data[0] = options->x;
+				data[1] = options->y;
+				cl_main_make_event(options->main_queue_head, GUI_SHOT, (void *)data, 2);
+			}
 			break;
 	}
 	pthread_mutex_unlock(&(options->mutex));
@@ -171,6 +173,10 @@ void *gui_key_processing(void *arg)
 				break;
 
 			case 2:
+				gui_key_processing_chat(options, ch);
+				break;
+
+			case 3:
 				gui_key_processing_chat(options, ch);
 				break;
 		}
@@ -210,7 +216,7 @@ struct gui *cl_gui_start(struct main_queue *main_queue_h)
 
 	options->bg_color = 1;
 	options->font_color = 8;
-	options->state = 0;
+	options->state = -1;
 	options->main_queue_head = main_queue_h;
 	options->size_of_msg = 0;
 	options->x = 0;
@@ -265,6 +271,7 @@ int cl_gui_input_nick(struct gui *options)
 	curs_set(TRUE);
 	wmove(options->nick_window, 2, 23);
 	wrefresh(options->nick_window);
+	options->state = 0;
 
 	pthread_mutex_unlock(&(options->mutex));
 
@@ -384,14 +391,45 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 
 	options->line_stat = newwin(1, 89, getmaxy(stdscr) - 1, 4);
 	wbkgd(options->line_stat, COLOR_PAIR(CUR_COLOR));
-	wmove(options->line_stat, 0, 0);
-	wprintw(options->line_stat, "Status: ");
+	wattron(options->line_stat, A_BOLD);
+	wattron(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
+	
+	wclear(options->line_stat);
+
+	wmove(options->line_stat, 0, 1);
+	wprintw(options->line_stat, "STATUS: WAIT YOUR ENEMY");
+	
+	wattroff(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
 	wrefresh(options->line_stat);
-	options->state = 1;
 
 	pthread_mutex_unlock(&(options->mutex));
 
 	return 0;
+}
+
+void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn)
+{
+	switch(turn) {
+		case YOU_TURN:
+			wattron(options->line_stat, COLOR_PAIR(CLR_GRN_WHT));
+			wclear(options->line_stat);
+			wmove(options->line_stat, 0, 1);
+			wprintw(options->line_stat, "STATUS: YOUR TURN");
+			wattroff(options->line_stat, COLOR_PAIR(CLR_GRN_WHT));
+			wrefresh(options->line_stat);
+			options->state = 1;
+			break;
+
+		case ENEMY_TURN:
+			wattron(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
+			wclear(options->line_stat);
+			wmove(options->line_stat, 0, 1);
+			wprintw(options->line_stat, "STATUS: ENEMY_TURN");
+			wattroff(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
+			wrefresh(options->line_stat);
+			options->state = 3;
+			break;
+	}
 }
 
 int cl_gui_refresh_map(struct gui *options, map came_map, enum player pl)
