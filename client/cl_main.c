@@ -26,6 +26,9 @@ int main(int argc, char *argv[])
 	placement cl_placement; /**< Player's placement to server */
 	struct sigaction sigact;
 	sigact.sa_handler = usr1_handler;
+	// int i, j;
+
+	bzero(cl_enemy_map, sizeof(map));
 
 	if (sigaction(SIGUSR1, &sigact, NULL)) {
 		perror("sigaction");
@@ -53,6 +56,11 @@ int main(int argc, char *argv[])
 	cl_logic_generate_placement(cl_placement);
 	// cl_map = cl_logic_convert_placement(cl_placement);
 	memcpy(cl_map, cl_placement, sizeof(map));
+	/* for(i = 0; i < 10; ++i) {
+			for (j = 0; j < 10; ++j)
+				fprintf(stderr, "%d ", cl_enemy_map[i][j]);
+			fprintf(stderr, "\n");
+		} */
 	cl_gui_input_nick(cl_gui);
 	cl_net_send_placement(cl_net, cl_placement);
 
@@ -167,6 +175,7 @@ void cl_main_control(struct main_queue *queue, map my_map, map enemy_map,
 			switch (tmp->event_type) {
 			case GUI_NICK: /* gui send player nick*/
 				cl_net_send_nick(network, tmp->event_data, tmp->data_length);
+				cl_gui_main_window(cl_gui, my_map);
 				break;
 			case GUI_SHOT: /* gui send player's shot*/
 				cl_main_check_shot(tmp->event_data, my_map, network, cl_gui, &turn);
@@ -240,15 +249,25 @@ void cl_main_check_net_shot(void * event_data,
 	char x = *(char *)(event_data ); /**< x coordinate*/
 	char y = *(char *)(event_data + sizeof(char)); /**< y coordinate*/
 	char result = *(char *)(event_data + sizeof(char) * 2); /**< shot result*/
+	// int i, j;
 	// printf("%d %d %d\n", x, y, result);
 	/* if playershoting and whating answer from server*/
 	if(*turn == WAITING_TURN) {
 		cl_logic_shot(x, y, result, enemy_map, turn);
+		/* for(i = 0; i < 10; ++i) {
+			for (j = 0; j < 10; ++j)
+				fprintf(stderr, "%d ", enemy_map[i][j]);
+			fprintf(stderr, "\n");
+		} */
 		cl_gui_refresh_map(cl_gui, enemy_map, ENEMY);
 	} else {
 		cl_logic_shot(x, y, result, my_map, turn);
 		cl_gui_refresh_map(cl_gui, my_map, ME);
 	}
+	if (*turn == MY_TURN)
+		cl_gui_refresh_status(cl_gui, YOU_TURN);
+	else
+		cl_gui_refresh_status(cl_gui, NOT_YOU_TURN);
 }
 
 /** Take enemy placement when game end
@@ -287,8 +306,10 @@ void cl_main_start_game(void * event_data, map my_map, enum player_state *turn,
 		printf("Wrong turn data\n");
 		exit(EXIT_FAILURE);
 	}
-	printf("Turn: %d\n", *turn);
-	cl_gui_main_window(cl_gui, my_map);
+	if (*turn == MY_TURN)
+		cl_gui_refresh_status(cl_gui, YOU_TURN);
+	else
+		cl_gui_refresh_status(cl_gui, NOT_YOU_TURN);
 }
 
 /** Copy main queue

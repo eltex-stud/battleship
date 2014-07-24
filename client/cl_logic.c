@@ -190,7 +190,7 @@ void cl_logic_merge_placement_map(placement server_map, map cl_map)
     }
 }
 
-int cl_logic_shot(int x, int y, enum srv_net_shot_result *result, map cl_map, enum player_state *state)
+int cl_logic_shot(int x, int y, enum srv_net_shot_result result, map cl_map, enum player_state *state)
 {
     if(*state == ENEMY_TURN) {
 	switch(result) {
@@ -230,7 +230,7 @@ int cl_logic_shot(int x, int y, enum srv_net_shot_result *result, map cl_map, en
 		    break;
 		}
 		
-		case SRV_NET__KIL: {
+		case SRV_NET_KILL: {
 		    cl_logic_kill_ship(x, y, MAP_KILLED, cl_map);
 		    *state = MY_TURN;
 		    

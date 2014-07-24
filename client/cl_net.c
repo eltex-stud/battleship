@@ -114,6 +114,14 @@ void *net_work(void *arg)
 	fd_set readfd;
 	fd_set writefd;
 	fd_set errorfd;
+	struct sigaction sigact;
+
+	sigact.sa_handler = net_usr1_handler;
+
+	if (sigaction(SIGUSR1, &sigact, NULL)) {
+		perror("sigaction");
+		exit(EXIT_FAILURE);
+	}
 
 	while(1) {
 		FD_ZERO(&readfd);
@@ -384,4 +392,8 @@ void cl_net_recv(struct net *configure) {
 		cl_main_make_event(configure->m_queue, code,	(void *)(buff+1),
 					SIZE_BUF-1);
 	}
+}
+
+void net_usr1_handler(int a)
+{
 }

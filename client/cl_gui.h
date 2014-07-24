@@ -9,6 +9,7 @@
 #include <string.h>
 #include <curses.h>
 #include <pthread.h>
+#include <signal.h>
 
 #define MAX_BUFF 100
 
@@ -24,7 +25,7 @@
 #define CLR_GRN_WHT 38
 #define CLR_RED_WHT 28
 
-enum gui_status_line { YOU_TURN, ENEMY_TURN };
+enum gui_status_line { YOU_TURN, NOT_YOU_TURN };
 
 enum gui_state { STATE_NICK, STATE_YOU_TURN, STATE_ENEMY_TURN, STATE_CHAT, 
 				 STATE_WAIT};
@@ -43,7 +44,7 @@ struct gui
 	unsigned short y;
 	char msg[MAX_BUFF];
 	struct main_queue *main_queue_head;
-	gui_state state;
+	enum gui_state state;
 	pthread_t gui_id;
 	pthread_mutex_t mutex;
 };
@@ -71,5 +72,7 @@ int cl_gui_main_window(struct gui *options, map cl_map);
 void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn);
 
 int cl_gui_refresh_map(struct gui *options, map came_map, enum player pl);
+
+void gui_usr1_handler(int a);
 
 #endif // BATTLESHIP_CLIENT_GUI_H_
