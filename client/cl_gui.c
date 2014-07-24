@@ -253,9 +253,6 @@ void cl_gui_stop(struct gui *options)
 	delwin(options->chat);
 	delwin(options->line_stat);
 
-	clear();
-	refresh();
-
 	endwin();
 
 	pthread_mutex_destroy (&options->mutex);
@@ -306,8 +303,9 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 	printw("; Shot: space; Enter chat/battlefield: ENTER;");
 	
 	move(1, 5);
+	printw("| ");
 	attron(COLOR_PAIR(CLR_BLK_GRN));
-	printw("| #");
+	printw("#");
 	attroff(COLOR_PAIR(CLR_BLK_GRN));
 	printw(" - ship; ");
 
@@ -492,6 +490,22 @@ void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn)
 
 			options->state = STATE_ENEMY_TURN;
 			break;
+
+		case INVALID_SHOT:
+			wattron(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
+			wmove(options->line_stat, 0, 0);
+			
+			for(idx = 0; idx < getmaxx(options->line_stat); idx++) {
+				wprintw(options->line_stat, " ");
+			}
+
+			wmove(options->line_stat, 0, 1);
+
+			wprintw(options->line_stat, "STATUS: INVALID_SHOT");
+			wattroff(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
+			wrefresh(options->line_stat);
+			break;
+
 	}
 	pthread_mutex_unlock(&(options->mutex));
 }

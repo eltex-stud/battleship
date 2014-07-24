@@ -28,7 +28,7 @@
 #define CLR_GRN_WHT 38
 #define CLR_RED_WHT 28
 
-enum gui_status_line { YOU_TURN, NOT_YOU_TURN };
+enum gui_status_line { YOU_TURN, NOT_YOU_TURN, INVALID_SHOT};
 
 enum gui_state { STATE_NICK, STATE_YOU_TURN, STATE_ENEMY_TURN, STATE_CHAT, 
 				 STATE_WAIT};
