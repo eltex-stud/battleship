@@ -187,7 +187,7 @@ void *gui_key_processing(void *arg)
 	}
 
 	keypad(stdscr, FALSE);
-	cl_main_make_event(options->main_queue_head, GUI_EXIT, NULL, -1);
+	cl_main_make_event(options->main_queue_head, GUI_EXIT, NULL, 0);
 
 	return NULL;
 }
