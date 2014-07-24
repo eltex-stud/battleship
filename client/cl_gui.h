@@ -70,6 +70,14 @@ void cl_gui_wait(struct gui *options);
 
 int cl_gui_input_nick(struct gui *options);
 
+void gui_my_window(struct gui *options, map cl_map);
+
+void gui_enemy_window(struct gui *options);
+
+void gui_chat(struct gui *options);
+
+void gui_status_line(struct gui *options);
+
 int cl_gui_main_window(struct gui *options, map cl_map);
 
 void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn);
