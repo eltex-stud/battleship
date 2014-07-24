@@ -10,12 +10,21 @@
 
 enum turn { MY, ENEMY };
 
+enum client_connect_status {
+	NICK_RECEIVED = 1,
+	PLACEMENT_RECEIVED = 2,
+	HAS_ENEMY = 4,
+	READY_TO_START = 7,
+	GAME_STARTED = 8
+};
+
 struct client_data {
 	struct srv_net_client *client;
 	struct srv_logic_map *map;
 	struct client_data *enemy;
 	enum turn turn;
 	char plcmnt[10][10];
+	int client_status;
 };
 
 struct client_list {
@@ -89,6 +98,19 @@ int main(int argc, char *argv[])
 	srv_net_stop(net);
 
 	return 0;
+}
+
+static void send_game_start(struct client_data *cl_data)
+{
+	if(cl_data->turn == MY){
+		srv_net_send_game_start(cl_data->client, SRV_NET_YOUR_TURN);
+		srv_net_send_game_start(cl_data->enemy->client, SRV_NET_ENEMY_TURN);
+	} else {
+		srv_net_send_game_start(cl_data->client, SRV_NET_ENEMY_TURN);
+		srv_net_send_game_start(cl_data->enemy->client, SRV_NET_YOUR_TURN);
+	}
+	cl_data->client_status = GAME_STARTED;
+	cl_data->enemy->client_status = GAME_STARTED;
 }
 
 static enum srv_net_shot_result logic_to_net_shot_result(enum srv_logic_shot_result r)
@@ -170,12 +192,21 @@ static void shot_received(struct srv_net_client *client,
 
 
 static void nick_received(struct srv_net_client *client __attribute__((unused)),
-		char *nick __attribute__((unused)),
+		char *nick /*__attribute__((unused))*/,
 		void *client_data __attribute__((unused)),
 		void *main_data __attribute__((unused)))
 {
+	struct client_data *cl_data = client_data;
+
+	cl_data->client_status &= NICK_RECEIVED;
+
+	if(cl_data->client_status == READY_TO_START
+			&& cl_data->enemy->client_status == READY_TO_START) {
+		send_game_start(cl_data);
+	}
+
 	printf("nick received %s\n", nick);
-	/* Do nothing for now */
+	printf("%s\n", nick);
 }
 
 
@@ -214,7 +245,9 @@ static void *new_client(struct srv_net_client *client, void *main_data)
 			temp->client_data->enemy = cl_data;
 			temp->client_data->turn = ENEMY;
 			cl_data->enemy = temp->client_data;
-			cl_data->enemy->turn = MY;
+			cl_data->turn = MY;
+			cl_data->client_status &= HAS_ENEMY;
+			cl_data->enemy->client_status &= HAS_ENEMY;
 			break;
 		}
 		temp = temp->next;
@@ -256,8 +289,8 @@ static void del_client(struct srv_net_client *client __attribute__((unused)),
 }
 
 
-static void placement_received(struct srv_net_client *client, char *plcmnt,
-		void *client_data, void *main_data __attribute__((unused)))
+static void placement_received(struct srv_net_client *client __attribute__((unused)),
+		char *plcmnt, void *client_data, void *main_data __attribute__((unused)))
 {
 	printf("start placement_received\n");
 	struct client_data *cl_data;
@@ -277,17 +310,12 @@ static void placement_received(struct srv_net_client *client, char *plcmnt,
 	}
 	cl_data->map = srv_logic_placement_to_map(map);
 
-	if(cl_data->enemy == NULL) {
-		printf("placement_received\n");
-		return;
+	cl_data->client_status &= PLACEMENT_RECEIVED;
+
+	if(cl_data->client_status == READY_TO_START
+			&& cl_data->enemy->client_status == READY_TO_START) {
+		send_game_start(cl_data);
 	}
 
-	if(cl_data->turn == MY){
-		srv_net_send_game_start(client, SRV_NET_YOUR_TURN);
-		srv_net_send_game_start(cl_data->enemy->client, SRV_NET_ENEMY_TURN);
-	} else {
-		srv_net_send_game_start(client, SRV_NET_ENEMY_TURN);
-		srv_net_send_game_start(cl_data->enemy->client, SRV_NET_YOUR_TURN);
-	}
 	printf("placement_received\n");
 }
