@@ -172,8 +172,10 @@ static void shot_received(struct srv_net_client *client,
 	srv_net_send_shot_result(enemy_data->client, shot, net_shot_result);
 
 	/* Switch turn */
-	client_data->turn = ENEMY;
-	enemy_data->turn = MY;
+	if (shot_result == SRV_LOGIC_RESULT_MISS) {
+		client_data->turn = ENEMY;
+		enemy_data->turn = MY;
+	}
 
 	/* If game finished */
 	if(shot_result == SRV_LOGIC_RESULT_END_GAME) {

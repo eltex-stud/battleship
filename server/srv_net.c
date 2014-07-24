@@ -105,28 +105,6 @@ int srv_net_stop(struct srv_net_network *net)
   return 0;
 }
 
-void del_queue_client(int fd)
-{
-	struct srv_net_queue *temp2;
-	struct srv_net_queue *temp;
-
-	temp2=head;
-
-	if(head != NULL && head->next != NULL) {
-		for(temp = head->next; temp->next!=NULL; temp=temp->next) {
-			if(temp->fd == fd) {
-				temp2->next = temp->next;
-				if(temp == tail) {
-					tail = temp2;
-				}
-				free(temp);
-				temp=temp2;
-			}
-			temp2=temp;
-		}
-	}
-}
-
 void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute__((unused)),
 		struct srv_net_client_ops client_ops, void *main_data)
 {
@@ -271,6 +249,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 						break;
 					}
 					if((size_send+(temp->index)) == temp->size) {
+						/* Remove element from queue */
 						for(temp2 = head; temp2->next!=temp; temp2=temp2->next);
 						temp2->next = temp->next;
 						if(temp == tail) {
@@ -280,16 +259,26 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 						temp = temp2;
 					}
 				}
-				if ((strcmp((temp->data), "del_client")) == 0) {
+				else if ((strcmp((temp->data), "del_client")) == 0) {
 					close(temp->fd);
 					for(jdx=0; jdx<32; jdx++) {
 						if(client_list[jdx].fd == temp->fd) {
 							main_client_ops.del_client(&(client_list[jdx]),
 									client_list[jdx].client_data,
 									client_list[jdx].network->main_data);
-							del_queue_client(client_list[jdx].fd);
+
+							/* Remove element from queue */
+							for(temp2 = head; temp2->next!=temp; temp2=temp2->next);
+							temp2->next = temp->next;
+							if(temp == tail) {
+								tail = temp2;
+							}
+							free(temp);
+							temp = temp2;
+
 							client_list[jdx].fd=0;
 							client_list[jdx].network=0;
+							break;
 						}
 					}
 				}
