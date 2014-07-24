@@ -177,7 +177,7 @@ void *gui_key_processing(void *arg)
 				break;
 
 			case 3:
-				gui_key_processing_chat(options, ch);
+				gui_key_processing_battleground(options, ch);
 				break;
 		}
 	}
@@ -409,6 +409,7 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 
 void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn)
 {
+	pthread_mutex_lock(&(options->mutex));
 	switch(turn) {
 		case YOU_TURN:
 			wattron(options->line_stat, COLOR_PAIR(CLR_GRN_WHT));
@@ -430,6 +431,7 @@ void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn)
 			options->state = 3;
 			break;
 	}
+	pthread_mutex_unlock(&(options->mutex));
 }
 
 int cl_gui_refresh_map(struct gui *options, map came_map, enum player pl)
