@@ -43,7 +43,7 @@ void gui_key_processing_input_nick(struct gui *options, long ch)
 			clear();
 			refresh();
 
-			 options->state = -1;
+			 options->state =  STATE_WAIT;
 			break;
 
 		case KEY_BACKSPACE:
@@ -75,8 +75,7 @@ void gui_key_processing_chat(struct gui *options, long ch)
 	pthread_mutex_lock(&(options->mutex));
 	switch(ch) {
 		case ENTER:
-			options->state = 1;
-//			curs_set(FALSE);
+			options->state = STATE_YOU_TURN;
 			break;
 
 		default:
@@ -92,7 +91,7 @@ void gui_key_processing_battleground(struct gui *options, long ch)
 	pthread_mutex_lock(&(options->mutex));
 	switch(ch) {
 		case ENTER:
-			options->state = 2;
+			options->state = STATE_CHAT;
 			wmove(options->chat, getmaxy(options->chat) - 1, 1);
 //			curs_set(TRUE);
 			wrefresh(options->chat);
@@ -136,7 +135,7 @@ void gui_key_processing_battleground(struct gui *options, long ch)
 			break;
 
 		case KEY_SPACE:
-			if (options->state == 3) {
+			if (options->state == STATE_YOU_TURN) {
 				data[0] = options->x;
 				data[1] = options->y;
 				cl_main_make_event(options->main_queue_head, GUI_SHOT, (void *)data, 2);
@@ -158,26 +157,21 @@ void *gui_key_processing(void *arg)
 	keypad(stdscr, TRUE);
 
 	while((ch = getch()) != KEY_END) {
-	/*
-	 * options->state = 0 - enter_nickname;
-	 * options->state = 1 - work with battleground;
-	 * options->state = 2 - work with chat;
-	 */
 		switch(options->state) {
-			case 0:
+			case STATE_NICK:
 				gui_key_processing_input_nick(options, ch);
 				break;
 
-			case 1:
+			case STATE_YOU_TURN:
 				gui_key_processing_battleground(options, ch);
 				break;
 
-			case 2:
+			case STATE_ENEMY_TURN:
+				gui_key_processing_battleground(options, ch);
+				break;
+
+			case STATE_CHAT:
 				gui_key_processing_chat(options, ch);
-				break;
-
-			case 3:
-				gui_key_processing_battleground(options, ch);
 				break;
 		}
 	}
@@ -216,7 +210,7 @@ struct gui *cl_gui_start(struct main_queue *main_queue_h)
 
 	options->bg_color = 1;
 	options->font_color = 8;
-	options->state = -1;
+	options->state = STATE_WAIT;
 	options->main_queue_head = main_queue_h;
 	options->size_of_msg = 0;
 	options->x = 0;
@@ -271,7 +265,7 @@ int cl_gui_input_nick(struct gui *options)
 	curs_set(TRUE);
 	wmove(options->nick_window, 2, 23);
 	wrefresh(options->nick_window);
-	options->state = 0;
+	options->state = STATE_NICK;
 
 	pthread_mutex_unlock(&(options->mutex));
 
@@ -418,7 +412,7 @@ void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn)
 			wprintw(options->line_stat, "STATUS: YOUR TURN");
 			wattroff(options->line_stat, COLOR_PAIR(CLR_GRN_WHT));
 			wrefresh(options->line_stat);
-			options->state = 1;
+			options->state = STATE_YOU_TURN;
 			break;
 
 		case NOT_YOU_TURN:
@@ -428,7 +422,7 @@ void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn)
 			wprintw(options->line_stat, "STATUS: ENEMY_TURN");
 			wattroff(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
 			wrefresh(options->line_stat);
-			options->state = 3;
+			options->state = STATE_ENEMY_TURN;
 			break;
 	}
 	pthread_mutex_unlock(&(options->mutex));
