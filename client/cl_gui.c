@@ -253,6 +253,9 @@ void cl_gui_stop(struct gui *options)
 	delwin(options->chat);
 	delwin(options->line_stat);
 
+	clear();
+	refresh();
+
 	endwin();
 
 	pthread_mutex_destroy (&options->mutex);
@@ -294,7 +297,7 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 	
 	attron(A_BOLD);
 	
-	printw("Move: ");
+	printw("| Move: ");
 
 	attron(A_ALTCHARSET);
 	printw("%c%c%c%c%c%c%c", ACS_UARROW, ACS_VLINE, ACS_DARROW, ACS_VLINE, 
@@ -304,24 +307,24 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 	
 	move(1, 5);
 	attron(COLOR_PAIR(CLR_BLK_GRN));
-	printw("#");
+	printw("| #");
 	attroff(COLOR_PAIR(CLR_BLK_GRN));
-	printw(" - ship;");
+	printw(" - ship; ");
 
 	attron(COLOR_PAIR(CLR_BLK_YLLW));
 	printw("X");
 	attroff(COLOR_PAIR(CLR_BLK_YLLW));
-	printw(" - wounded;");
+	printw(" - wounded; ");
 
 	attron(COLOR_PAIR(CLR_BLK_RED));
 	printw("X");
 	attroff(COLOR_PAIR(CLR_BLK_RED));
-	printw(" - dead;");
+	printw(" - dead; ");
 
 	attron(COLOR_PAIR(CLR_BLK_WHT));
 	printw("*");
 	attroff(COLOR_PAIR(CLR_BLK_WHT));
-	printw(" - miss;");
+	printw(" - miss; ");
 
 	attroff(A_BOLD);
 
@@ -435,7 +438,11 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 	
 	wclear(options->line_stat);
 
-	wmove(options->line_stat, 0, 1);
+	wmove(options->line_stat, 0, 0);
+	for(idx = 0; idx < getmaxx(options->line_stat); idx++) {
+		wprintw(options->line_stat, " ");
+	}
+	wmove(options->line_stat, 0, 0);
 	wprintw(options->line_stat, "STATUS: WAIT YOUR ENEMY");
 	
 	wattroff(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
