@@ -623,6 +623,7 @@ void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn)
 			wrefresh(options->line_stat);
 
 			options->state = STATE_GAME_OVER;
+			fprintf(stderr, "game end");
 			break;
 	}
 
@@ -678,6 +679,12 @@ int cl_gui_refresh_map(struct gui *options, map came_map, enum player pl)
 		case ENEMY:
 			for(idx = 0; idx < 10; idx++) {
 				for(jdx = 0; jdx < 10; jdx++) {
+					if(came_map[idx][jdx] == MAP_SHIP) {
+						wmove(options->enemy_map, 1 + (idx * 2), 2 + (jdx * 4));
+						wattron(options->enemy_map, COLOR_PAIR(CLR_BLK_GRN));
+						wprintw(options->enemy_map, "#");
+						wattroff(options->enemy_map, COLOR_PAIR(CLR_BLK_GRN));
+					}
 					if(came_map[idx][jdx] == MAP_WOUNDED) {
 						wmove(options->enemy_map, 1 + (idx * 2), 2 + (jdx * 4));
 						wattron(options->enemy_map, A_BOLD);
