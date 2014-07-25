@@ -1,6 +1,7 @@
 /* vim: set noexpandtab tabstop=4 shiftwidth=4 smartindent: */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <server/srv_logic.h>
 
@@ -42,6 +43,7 @@ struct srv_logic_map *srv_logic_placement_to_map(char placement[10][10]) {
 
 	struct srv_logic_map *c_t_m;
 	c_t_m = (struct srv_logic_map *)malloc(sizeof(struct srv_logic_map));
+	memset(c_t_m, 0, sizeof(struct srv_logic_map));
 
 /*
  * @create a test array and fill it with zeros
