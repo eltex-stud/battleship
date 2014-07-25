@@ -5,7 +5,7 @@
  */
 
 #include "cl_net.h"
-#include "cl_main.h" // DELETE ME
+//#include "cl_main.h" // DELETE ME
 #include <signal.h>
 #include <pthread.h>
 #include <strings.h>
@@ -357,43 +357,62 @@ void cl_net_del_queue(struct net *configure) {
 void cl_net_recv(struct net *configure) {
 	char buff[SIZE_BUF]; /* buffer for contain net information in recv */
 	int recv_bytes; /* receive bytes */
-	int err; /* buffer for contain error */
+	int err = 0; /* buffer for contain error. 0 = no error */
 	int code; /* buffer for contain code of MAIN_EVENT_TYPES */
+	int size; /* size of received data which we need to send in main */
 
 	recv_bytes = recv(configure->socket, buff, SIZE_BUF, 0);
 	//fprintf(stderr, "net: %d", (int)configure->m_queue->main_id);
 	if (recv_bytes < 0) {
 	// receive error
+		//fprintf (stderr, "net recv < 0\n");
 		err = errno;
 		cl_main_make_event(configure->m_queue, NET_ERROR,
 					(void *)&err, sizeof(err));
 	} else if(!recv_bytes) {
 		// server has closed a connection
+		//fprintf (stderr, "net recv == 0\n");
 		err = -1;
 		cl_main_make_event(configure->m_queue, NET_ERROR,
-					(void *)&err, sizeof (err));
+					(void *)&err, sizeof(err));
 	} else {
 		// it's ok
 		switch(buff[0]) {
 			case START:
+				if(recv_bytes != sizeof(char) * 2)
+					err = -2;
 				code = NET_START_GAME;
+				size = sizeof(char);
 				break;
 
 			case SHOT:
+				if(recv_bytes != sizeof(char) * 4)
+					err = -2;
 				code = NET_SHOT_RESULT;
+				size = sizeof(char) * 3;
 				break;
 
 			case ERROR:
+				if(recv_bytes != sizeof(char))
+					err = -2;
 				code = NET_ERROR;
+				size = sizeof(int);
 				break;
 
 			case PLACEMENT:
+				if(recv_bytes != (sizeof(char) + sizeof(placement)))
+					err = -2;
 				code = NET_PLACEMENT;
+				size = sizeof(placement);
 				break;
 		}
-
-		cl_main_make_event(configure->m_queue, code,	(void *)(buff+1),
-					SIZE_BUF-1);
+		//fprintf(stderr, "err = %d\nsize = %d\nrecv_bytes = %d\n\n", err, size, recv_bytes);
+		if(!err)
+			cl_main_make_event(configure->m_queue, code,	(void *)(buff+1),
+					size);
+		else
+			cl_main_make_event(configure->m_queue, NET_ERROR,
+					(void *)&err, sizeof(err));
 	}
 }
 

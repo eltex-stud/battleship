@@ -198,6 +198,7 @@ void cl_main_control(struct main_queue *queue, map my_map, map enemy_map,
 				cl_main_send_placement(tmp->event_data, enemy_map, cl_gui);
 				break;
 			case NET_ERROR: /* server send some error*/
+				cl_net_stop(network);
 				cl_gui_stop(cl_gui);
 				printf("Server close connection\n");
 			case NET_START_GAME: /* server send that the game start*/
@@ -308,7 +309,7 @@ void cl_main_start_game(void * event_data, map my_map, enum player_state *turn,
 		*turn = MY_TURN;
 		break;
 	default:
-		printf("Wrong turn data\n");
+		//printf("Wrong turn data\n");
 		exit(EXIT_FAILURE);
 	}
 	if (*turn == MY_TURN)
