@@ -283,6 +283,7 @@ static void del_client(struct srv_net_client *client __attribute__((unused)),
 
 	if(temp->client_data == (struct client_data*)client_data){
 		enemy_data = temp->client_data->enemy;
+		srv_logic_delmap(temp->client_data->map);
 		free(temp->client_data);
 		m_data->clients_data = temp->next;
 		free(temp);
@@ -292,6 +293,7 @@ static void del_client(struct srv_net_client *client __attribute__((unused)),
 			temp = temp->next;
 		}
 		enemy_data = temp->client_data->enemy;
+		srv_logic_delmap(temp->client_data->map);
 		free(temp->client_data);
 		prev->next = temp->next;
 		free(temp);
