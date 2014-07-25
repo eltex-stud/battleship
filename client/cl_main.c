@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 	struct main_event cap = { NULL }, /**< Cap for easy queue processing */
 	       *head = &cap; /**< Pointer on head of queue */
 	struct main_queue queue /**< All information about queue */
-	                        = { pthread_self(), PTHREAD_MUTEX_INITIALIZER,
+	                        = { pthread_self(), PTHREAD_MUTEX_INITIALIZER, 0,
 	                            head };
 	//fprintf(stderr, "main: %d ", (int)pthread_self());
 	struct net *cl_net = NULL; /**< Net information */
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 		printf("Can't initialize ncurses interface\n");
 		exit(EXIT_FAILURE);
 	}
-
+	queue.net_working = 1;
 	cl_logic_generate_placement(cl_placement);
 	// cl_map = cl_logic_convert_placement(cl_placement);
 	memcpy(cl_map, cl_placement, sizeof(map));
@@ -70,7 +70,8 @@ int main(int argc, char *argv[])
 
 	/* After main work wait for all threads to end */
 	cl_gui_wait(cl_gui);
-	cl_net_wait(cl_net);
+	//cl_net_wait(cl_net);
+	cl_gui_stop(cl_gui);
 	return 0;
 }
 
@@ -136,9 +137,12 @@ void cl_main_make_event(struct main_queue *queue, enum main_event_types type,
 	tmp->next = NULL;
 	tmp->data_length = data_length;
 	tmp->event_type = type;
-	tmp->event_data = malloc(data_length);
-	memcpy(tmp->event_data, data, data_length);
-
+	if(data_length == 0)
+		tmp->event_data = NULL;
+	else {
+		tmp->event_data = malloc(data_length);
+		memcpy(tmp->event_data, data, data_length);
+	}
 	pthread_mutex_unlock(&(queue->mutex));
 	//fprintf(stderr, "event: %d", (int)queue->main_id);
 	pthread_kill(queue->main_id, SIGUSR1);
@@ -183,8 +187,11 @@ void cl_main_control(struct main_queue *queue, map my_map, map enemy_map,
 				cl_main_check_shot(tmp->event_data, enemy_map, network, cl_gui, &turn);
 				break;
 			case GUI_EXIT: /* gui send player's whant exit*/
-				cl_net_stop(network);
+				//fprintf(stderr, "blabla %d", queue->net_working);
+				if(queue->net_working)
+					cl_net_stop(network);
 				cl_gui_stop(cl_gui);
+				//fprintf(stderr, "we was here!!!\n");
 				goto out;
 				break;
 			case NET_SHOT_RESULT: /* server send shot result*/
@@ -195,12 +202,18 @@ void cl_main_control(struct main_queue *queue, map my_map, map enemy_map,
 				                       cl_gui);
 				break;
 			case NET_PLACEMENT: /* server send enemy placement*/
-				cl_main_send_placement(tmp->event_data, enemy_map, cl_gui);
+				cl_main_send_placement(tmp->event_data, queue, enemy_map,
+                                                       cl_gui, turn, network);
 				break;
 			case NET_ERROR: /* server send some error*/
-				cl_net_stop(network);
-				cl_gui_stop(cl_gui);
-				printf("Server close connection\n");
+				//fprintf(stderr, "net_working(NET_ERROR%d)\n", queue->net_working);
+				if(queue->net_working) {
+					cl_gui_stop(cl_gui);
+					cl_net_stop(network);
+					printf("Server close connection\n");
+				}
+				goto out;
+				break;
 			case NET_START_GAME: /* server send that the game start*/
 				cl_main_start_game(tmp->event_data, my_map, &turn, cl_gui);
 				break;
@@ -258,18 +271,13 @@ void cl_main_check_net_shot(void * event_data,
 	// printf("%d %d %d\n", x, y, result);
 	/* if playershoting and whating answer from server*/
 	if(*turn == WAITING_TURN) {
-		
 		cl_logic_shot(x, y, result, enemy_map, turn);
-		/* for(i = 0; i < 10; ++i) {
-			for (j = 0; j < 10; ++j)
-				fprintf(stderr, "%d ", enemy_map[i][j]);
-			fprintf(stderr, "\n");
-		} */
 		cl_gui_refresh_map(cl_gui, enemy_map, ENEMY);
 	} else {
 		cl_logic_shot(x, y, result, my_map, turn);
 		cl_gui_refresh_map(cl_gui, my_map, ME);
 	}
+
 	if (*turn == MY_TURN)
 		cl_gui_refresh_status(cl_gui, YOU_TURN);
 	else
@@ -282,12 +290,25 @@ void cl_main_check_net_shot(void * event_data,
  * \param cl_gui - gui information
  */
 
-void cl_main_send_placement(void *event_data, map enemy_map, struct gui *cl_gui)
+void cl_main_send_placement(void *event_data, struct main_queue *queue, map enemy_map,
+                            struct gui *cl_gui, enum player_state turn, struct net *cl_net)
 {
 	placement place;
 	memcpy(place, event_data, sizeof(placement));  // FIX ME!!!!!!
+
+	if(queue->net_working) {
+		cl_net_stop(cl_net);
+		queue->net_working = 0;
+	}
+
 	cl_logic_merge_placement_map(place, enemy_map);
 	cl_gui_refresh_map(cl_gui, enemy_map, ENEMY);
+
+	if(turn == MY_TURN || turn == WAITING_TURN)
+		cl_gui_refresh_status(cl_gui, YOU_WIN);
+	else
+		cl_gui_refresh_status(cl_gui, YOU_LOSE);
+
 }
 
 /** Start game

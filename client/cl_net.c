@@ -25,7 +25,7 @@
  *       and send to server,
  *       else waiting for unlock and do the same things
  */
-void cl_net_processing_event(struct net *configure)
+int cl_net_processing_event(struct net *configure)
 {
 	struct net_queue *idx; /* iterator struct net_queue */
 	char buf[SIZE_BUF];
@@ -35,9 +35,9 @@ void cl_net_processing_event(struct net *configure)
 		if(idx->type_msg == END) {
 			pthread_mutex_unlock(&configure->mutex);
 			close(configure->socket);
-			pthread_kill(configure->pthreadfd, SIGKILL);
+			//pthread_kill(configure->pthreadfd, SIGKILL);
 			free(configure);
-			return ;
+			return -1;
 		}
 		memcpy(buf, (char*)&(idx->type_msg), 1);
 		memcpy(buf + 1, idx->data, idx->data_len);
@@ -45,6 +45,7 @@ void cl_net_processing_event(struct net *configure)
 		cl_net_del_queue(configure);
 	}
 	pthread_mutex_unlock(&configure->mutex);
+	return 0;
 }
 
 
@@ -145,12 +146,13 @@ void *net_work(void *arg)
 		if(FD_ISSET(configure->socket, &readfd))
 			cl_net_recv(configure);
 		if(FD_ISSET(configure->socket, &writefd))
-			cl_net_processing_event(configure);
+			if(cl_net_processing_event(configure) == -1)
+				return NULL;
 		if(FD_ISSET(configure->socket, &errorfd)) {
 			msg_error = errno;
 			cl_main_make_event(configure->m_queue, NET_ERROR,
 			                   (void *)&msg_error, sizeof(msg_error));
-
+			//return NULL;
 		}
 	}
 	return NULL;

@@ -285,6 +285,7 @@ void cl_gui_stop(struct gui *options)
 	pthread_mutex_destroy (&options->mutex);
 
 	free(options);
+	//fprintf(stderr, "we was in gui_stop\n");
 }
 
 

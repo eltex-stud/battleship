@@ -183,9 +183,10 @@ void cl_logic_merge_placement_map(placement server_map, map cl_map)
     
     for(index1 = 0; index1 < 10; index1++) {
 	for(index2 = 0; index2 < 10; index2++) {
-	    if(server_map[index1][index2] == 1)
-		continue;
-	    cl_map[index1][index2] = server_map[index1][index2] + cl_map[index1][index2];
+		if(server_map[index1][index2] == 1){
+			if(!cl_map[index1][index2])
+				cl_map[index1][index2] = MAP_SHIP;
+		}
 	}
     }
 }
@@ -215,7 +216,7 @@ int cl_logic_shot(int x, int y, enum srv_net_shot_result result, map cl_map, enu
 	    
 	    case SRV_NET_END: {
 		cl_logic_kill_ship(x, y, MAP_KILLED, cl_map);
-		return 1;
+		//return 1;
 		
 		break;
 	    }
@@ -247,7 +248,7 @@ int cl_logic_shot(int x, int y, enum srv_net_shot_result result, map cl_map, enu
 		case SRV_NET_END: {
 		    cl_logic_kill_ship(x, y, MAP_KILLED, cl_map);
 		    *state = MY_TURN;
-		    return 1;
+		    //return 1;
 		    
 		    break;
 		}
