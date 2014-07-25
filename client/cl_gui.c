@@ -198,10 +198,14 @@ void *gui_key_processing(void *arg)
 
 			case STATE_WAIT:
 				break;
+
+			case STATE_GAME_OVER:
+				cl_main_make_event(options->main_queue_head, GUI_EXIT, NULL, 0);
+				return NULL;
+				break;
 		}
 	}
 
-	keypad(stdscr, FALSE);
 	cl_main_make_event(options->main_queue_head, GUI_EXIT, NULL, 0);
 
 	return NULL;
@@ -263,6 +267,8 @@ void cl_gui_wait(struct gui *options)
 
 void cl_gui_stop(struct gui *options)
 {
+	keypad(stdscr, FALSE);
+
 	delwin(options->my_map);
 	delwin(options->enemy_map);
 	delwin(options->chat);
@@ -578,6 +584,39 @@ void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn)
 			wrefresh(options->line_stat);
 			break;
 
+		case YOU_WIN:
+			wattron(options->line_stat, COLOR_PAIR(CLR_GRN_WHT));
+			wmove(options->line_stat, 0, 0);
+			
+			for(idx = 0; idx < getmaxx(options->line_stat); idx++) {
+				wprintw(options->line_stat, " ");
+			}
+
+			wmove(options->line_stat, 0, 1);
+
+			wprintw(options->line_stat, "CONGRATULATIONS! YOU WIN! YOUR ENEMY - LOOOOSER!  PRESS ANY KEY TO END GAME...");
+			wattroff(options->line_stat, COLOR_PAIR(CLR_GRN_WHT));
+			wrefresh(options->line_stat);
+
+			options->state = STATE_GAME_OVER;
+			break;
+
+		case YOU_LOSE:
+			wattron(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
+			wmove(options->line_stat, 0, 0);
+			
+			for(idx = 0; idx < getmaxx(options->line_stat); idx++) {
+				wprintw(options->line_stat, " ");
+			}
+
+			wmove(options->line_stat, 0, 1);
+
+			wprintw(options->line_stat, "SORRY, YOU LOSE. BUT YOU'LL STILL BE ABLE TO TAKE REVENGE! PRESS ANY KEY TO END GAME...");
+			wattroff(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
+			wrefresh(options->line_stat);
+
+			options->state = STATE_GAME_OVER;
+			break;
 	}
 
 	wmove(options->enemy_map, 1 + (options->y * 2), 2 + (options->x * 4));
