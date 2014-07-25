@@ -241,7 +241,8 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 
 		if(head != NULL && head->next != NULL) {
 			for(temp = head->next; temp!=NULL; temp=temp->next) {
-				if(FD_ISSET (temp->fd, &writeset)) {
+				if(FD_ISSET (temp->fd, &writeset)
+						&& strcmp(temp->data, "del_client") != 0) {
 					size_send = send(temp->fd, (temp->data)+(temp->index), temp->size, 0);
 					printf("send %d of %d (index %d)\n", size_send, temp->size, temp->index);
 					if((size_send+(temp->index)) < temp->size) {
@@ -257,9 +258,23 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 						}
 						free(temp);
 						temp = temp2;
+						break;
 					}
 				}
 				else if ((strcmp((temp->data), "del_client")) == 0) {
+					/* if there are messages in queue do not delete */
+					struct srv_net_queue *temp3 = head->next;
+					int new_iter_flag = 0;
+					while (temp3 != NULL) {
+						if (temp3->fd == temp->fd
+								&& strcmp(temp3->data, "del_client") != 0) {
+							new_iter_flag = 1;
+							break;
+						}
+						temp3 = temp3->next;
+					}
+					if (new_iter_flag) { break; }
+
 					close(temp->fd);
 					for(jdx=0; jdx<32; jdx++) {
 						if(client_list[jdx].fd == temp->fd) {
