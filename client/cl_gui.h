@@ -11,7 +11,7 @@
 #include <pthread.h>
 #include <signal.h>
 
-#define MAX_BUFF 100
+#define MAX_BUFF 86
 
 #define HEIGHT 33
 #define WIDTH 94
@@ -28,7 +28,7 @@
 #define CLR_GRN_WHT 38
 #define CLR_RED_WHT 28
 
-enum gui_status_line { YOU_TURN, NOT_YOU_TURN };
+enum gui_status_line { YOU_TURN, NOT_YOU_TURN, INVALID_SHOT};
 
 enum gui_state { STATE_NICK, STATE_YOU_TURN, STATE_ENEMY_TURN, STATE_CHAT, 
 				 STATE_WAIT};
@@ -69,6 +69,14 @@ void cl_gui_stop(struct gui *options);
 void cl_gui_wait(struct gui *options);
 
 int cl_gui_input_nick(struct gui *options);
+
+void gui_my_window(struct gui *options, map cl_map);
+
+void gui_enemy_window(struct gui *options);
+
+void gui_chat(struct gui *options);
+
+void gui_status_line(struct gui *options);
 
 int cl_gui_main_window(struct gui *options, map cl_map);
 

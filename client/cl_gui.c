@@ -3,23 +3,6 @@
 
 void gui_distinguish_cell(struct gui *options, unsigned short bgcolor)
 {
-/*	chtype symb;
-	int idx;
-	int jdx;
-*/
-
-/*	wclear(options->line_stat);
-	wmove(options->line_stat, 0, 0);
-	wprintw(options->line_stat, "%c%d", 'A' + options->x, 1 + options->y);
-	wrefresh(options->line_stat);
-
-	for (idx = 0; idx < 2; idx++) {
-		for(jdx = 0; jdx < 3; jdx++) {
-			wmove(options->enemy_map, 1 + idx + (options->y * 2), 1 + jdx + (options->x * 4));
-			if (idx != 0 && jdx != 1) {
-
-			}
-*/
 	wmove(options->enemy_map, 1 + (options->y * 2), 2 + (options->x * 4));
 	wrefresh(options->enemy_map);
 }
@@ -72,13 +55,46 @@ void gui_key_processing_input_nick(struct gui *options, long ch)
 
 void gui_key_processing_chat(struct gui *options, long ch)
 {
+	int idx;
+
 	pthread_mutex_lock(&(options->mutex));
 	switch(ch) {
 		case ENTER:
+			if(options->size_of_msg != 0) {
+				wmove(options->chat, getmaxy(options->chat) - 2, 6);
+				for(idx = 5; idx < MAX_BUFF; idx++) {
+					wprintw(options->chat, " ");
+					options->msg[idx] = '\0';
+				}
+				options->size_of_msg = 0;
+				wrefresh(options->chat);
+			}
+
+			wmove(options->enemy_map, 1 + (options->y * 2), 2 + (options->x * 4));
+			wrefresh(options->enemy_map);
+
 			options->state = STATE_YOU_TURN;
 			break;
 
+		case KEY_BACKSPACE:
+			if(options->size_of_msg > 0) {
+				options->size_of_msg--;
+				wmove(options->chat, getmaxy(options->chat) - 2, 6 + options->size_of_msg);
+				wprintw(options->chat, " ");
+				wmove(options->chat, getmaxy(options->chat) - 2, 6 + options->size_of_msg);
+				options->msg[options->size_of_msg] = '\0';
+				wrefresh(options->chat);
+			}
+			break;
+
 		default:
+			if (options->size_of_msg < MAX_BUFF - 1) {
+				options->msg[options->size_of_msg] = ch;
+				wmove(options->chat, getmaxy(options->chat) - 2, 6 + options->size_of_msg);
+				wprintw(options->chat, "%c", ch);
+				options->size_of_msg++;
+				wrefresh(options->chat);
+			}
 			break;
 	}
 	pthread_mutex_unlock(&(options->mutex));
@@ -92,8 +108,7 @@ void gui_key_processing_battleground(struct gui *options, long ch)
 	switch(ch) {
 		case ENTER:
 			options->state = STATE_CHAT;
-			wmove(options->chat, getmaxy(options->chat) - 1, 1);
-//			curs_set(TRUE);
+			wmove(options->chat, getmaxy(options->chat) - 2, 6);
 			wrefresh(options->chat);
 			break;
 		
@@ -253,9 +268,6 @@ void cl_gui_stop(struct gui *options)
 	delwin(options->chat);
 	delwin(options->line_stat);
 
-	clear();
-	refresh();
-
 	endwin();
 
 	pthread_mutex_destroy (&options->mutex);
@@ -269,7 +281,7 @@ int cl_gui_input_nick(struct gui *options)
 	pthread_mutex_lock(&(options->mutex));
 
 	refresh();
-	options->nick_window = newwin(5, 50, 10, 20);
+	options->nick_window = newwin(5, 50, getmaxy(stdscr) / 2 - 2, getmaxx(stdscr) / 2 - 25);
 	wbkgd(options->nick_window, COLOR_PAIR(CUR_COLOR));
 	box(options->nick_window, ACS_VLINE, ACS_HLINE);
 
@@ -285,57 +297,23 @@ int cl_gui_input_nick(struct gui *options)
 	return 0;
 }
 
-int cl_gui_main_window(struct gui *options, map cl_map)
+void gui_my_window(struct gui *options, map cl_map)
 {
-	int idx, jdx;
+	int idx;
+	int jdx;
 	int poz = 4;
 
 	pthread_mutex_lock(&(options->mutex));
 	refresh();
 
-	move(0, 5);
-	
-	attron(A_BOLD);
-	
-	printw("| Move: ");
-
-	attron(A_ALTCHARSET);
-	printw("%c%c%c%c%c%c%c", ACS_UARROW, ACS_VLINE, ACS_DARROW, ACS_VLINE, 
-							 ACS_LARROW, ACS_VLINE, ACS_RARROW);
-	attroff(A_ALTCHARSET);
-	printw("; Shot: space; Enter chat/battlefield: ENTER;");
-	
-	move(1, 5);
-	attron(COLOR_PAIR(CLR_BLK_GRN));
-	printw("| #");
-	attroff(COLOR_PAIR(CLR_BLK_GRN));
-	printw(" - ship; ");
-
-	attron(COLOR_PAIR(CLR_BLK_YLLW));
-	printw("X");
-	attroff(COLOR_PAIR(CLR_BLK_YLLW));
-	printw(" - wounded; ");
-
-	attron(COLOR_PAIR(CLR_BLK_RED));
-	printw("X");
-	attroff(COLOR_PAIR(CLR_BLK_RED));
-	printw(" - dead; ");
-
-	attron(COLOR_PAIR(CLR_BLK_WHT));
-	printw("*");
-	attroff(COLOR_PAIR(CLR_BLK_WHT));
-	printw(" - miss; ");
-
-	attroff(A_BOLD);
-
 	for(idx = 0; idx < 10; idx++) {
-		move(poz, 2);
+		move(poz, 0 + getmaxx(stdscr) / 2 - 45);
 		poz = poz + 2;
 		printw("%d\n", idx+1);
 		refresh();
 	}
 
-	poz = 5;
+	poz = 2 + getmaxx(stdscr) / 2 - 43;
 	for(idx = 0; idx < 10; idx++) {
 		move(2, poz);
 		poz += 4;
@@ -343,7 +321,7 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 	}
 	refresh();
 
-	options->my_map = newwin(22, 41, 3, 4);
+	options->my_map = newwin(22, 41, 3, 2 + getmaxx(stdscr) / 2 - 45);
 	wbkgd(options->my_map, COLOR_PAIR(CUR_COLOR));
 
 	for(idx = 2; idx < 20; idx += 2) {
@@ -364,7 +342,7 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 
 	box(options->my_map, ACS_VLINE, ACS_HLINE);
 
-	move(25, 4);
+	move(25, 2 + getmaxx(stdscr) / 2 - 43);
 	attrset(COLOR_PAIR(CLR_BLK_GRN));
 	printw("You");
 	attroff(COLOR_PAIR(CLR_BLK_GRN));
@@ -382,19 +360,28 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 	wattroff(options->my_map, COLOR_PAIR(CLR_BLK_GRN));
 	wrefresh(options->my_map);
 
+	pthread_mutex_unlock(&(options->mutex));
+}
 
-	options->enemy_map = newwin(22, 41, 3, 52);
+void gui_enemy_window(struct gui *options)
+{
+	int idx;
+	int jdx;
+	int poz = 4;
+
+	pthread_mutex_lock(&(options->mutex));
+	options->enemy_map = newwin(22, 41, 3, getmaxx(stdscr) / 2  + 4);
 	wbkgd(options->enemy_map, COLOR_PAIR(CUR_COLOR));
 
 	poz = 4;
 	for(idx = 0; idx < 10; idx++) {
-		move(poz, 50);
+		move(poz, getmaxx(stdscr) / 2 + 2);
 		poz = poz + 2;
 		printw("%d\n", idx+1);
 		refresh();
 	}
 
-	poz = 53;
+	poz = getmaxx(stdscr) / 2  + 6;
 	for(idx = 0; idx < 10; idx++) {
 		move(2, poz);
 		poz += 4;
@@ -420,22 +407,49 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 	box(options->enemy_map, ACS_VLINE, ACS_HLINE);
 	wrefresh(options->enemy_map);
 
-	move(25, 53);
-	attrset(COLOR_PAIR(2));
+	move(25, getmaxx(stdscr) / 2 + 6);
+	attrset(COLOR_PAIR(CLR_BLK_RED));
 	printw("Enemy: hair monster");
-	attroff(COLOR_PAIR(2));
+	attroff(COLOR_PAIR(CLR_BLK_RED));
 	refresh();
+	pthread_mutex_unlock(&(options->mutex));
+}
 
-	options->chat = newwin(getmaxy(stdscr) - 27, 89, 26, 4);
+void gui_chat(struct gui *options)
+{
+	int idx;
+
+	pthread_mutex_lock(&(options->mutex));
+	options->chat = newwin(getmaxy(stdscr) - 27, 89, 26, getmaxx(stdscr) / 2 - 43);
 	wbkgd(options->chat, COLOR_PAIR(CUR_COLOR));
 	box(options->chat, ACS_VLINE, ACS_HLINE);
+
+	wmove(options->chat, getmaxy(options->chat) - 3, 1);
+
+	wattron(options->chat, A_UNDERLINE);
+	for(idx = 1; idx < getmaxx(options->chat) - 1; idx++) {
+		wprintw(options->chat, " ");
+	}
+	wattroff(options->chat, A_UNDERLINE);
+	wmove(options->chat, getmaxy(options->chat) - 2, 1);
+	wprintw(options->chat, "Msg: ");
+
 	wrefresh(options->chat);
 
-	options->line_stat = newwin(1, 89, getmaxy(stdscr) - 1, 4);
+	pthread_mutex_unlock(&(options->mutex));
+}
+
+void gui_status_line(struct gui *options)
+{
+	int idx;
+
+	pthread_mutex_lock(&(options->mutex));
+
+	options->line_stat = newwin(1, 89, getmaxy(stdscr) - 1,  getmaxx(stdscr) / 2 - 43);
 	wbkgd(options->line_stat, COLOR_PAIR(CUR_COLOR));
 	wattron(options->line_stat, A_BOLD);
 	wattron(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
-	
+
 	wclear(options->line_stat);
 
 	wmove(options->line_stat, 0, 0);
@@ -444,11 +458,67 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 	}
 	wmove(options->line_stat, 0, 0);
 	wprintw(options->line_stat, "STATUS: WAIT YOUR ENEMY");
-	
+
 	wattroff(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
 	wrefresh(options->line_stat);
 
+	wmove(options->enemy_map, 1 + (options->y * 2), 2 + (options->x * 4));
+	wrefresh(options->enemy_map);
+
 	pthread_mutex_unlock(&(options->mutex));
+
+}
+
+int cl_gui_main_window(struct gui *options, map cl_map)
+{
+	pthread_mutex_lock(&(options->mutex));
+	refresh();
+
+	move(0, getmaxx(stdscr) / 2 - 43);
+
+	attron(A_BOLD);
+
+	printw("| Move: ");
+
+	attron(A_ALTCHARSET);
+	printw("%c%c", ACS_UARROW, ACS_VLINE);
+	attroff(A_ALTCHARSET);
+	printw("v");
+	attron(A_ALTCHARSET);
+	printw("%c%c%c%c", ACS_VLINE, ACS_LARROW, ACS_VLINE, ACS_RARROW);
+	printw("; Shot - SPACE; Enter chat/battlefield - ENTER; End game - END;");
+	attroff(A_ALTCHARSET);
+
+	move(1, getmaxx(stdscr) / 2 - 43);
+	printw("| ");
+	attron(COLOR_PAIR(CLR_BLK_GRN));
+	printw("#");
+	attroff(COLOR_PAIR(CLR_BLK_GRN));
+	printw(" - ship; ");
+
+	attron(COLOR_PAIR(CLR_BLK_YLLW));
+	printw("X");
+	attroff(COLOR_PAIR(CLR_BLK_YLLW));
+	printw(" - wounded; ");
+
+	attron(COLOR_PAIR(CLR_BLK_RED));
+	printw("X");
+	attroff(COLOR_PAIR(CLR_BLK_RED));
+	printw(" - dead; ");
+
+	attron(COLOR_PAIR(CLR_BLK_WHT));
+	printw("*");
+	attroff(COLOR_PAIR(CLR_BLK_WHT));
+	printw(" - miss; ");
+
+	attroff(A_BOLD);
+
+	pthread_mutex_unlock(&(options->mutex));
+
+	gui_my_window(options, cl_map);
+	gui_enemy_window(options);
+	gui_chat(options);
+	gui_status_line(options);
 
 	return 0;
 }
@@ -492,7 +562,27 @@ void cl_gui_refresh_status(struct gui *options, enum gui_status_line turn)
 
 			options->state = STATE_ENEMY_TURN;
 			break;
+
+		case INVALID_SHOT:
+			wattron(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
+			wmove(options->line_stat, 0, 0);
+			
+			for(idx = 0; idx < getmaxx(options->line_stat); idx++) {
+				wprintw(options->line_stat, " ");
+			}
+
+			wmove(options->line_stat, 0, 1);
+
+			wprintw(options->line_stat, "STATUS: INVALID_SHOT");
+			wattroff(options->line_stat, COLOR_PAIR(CLR_RED_WHT));
+			wrefresh(options->line_stat);
+			break;
+
 	}
+
+	wmove(options->enemy_map, 1 + (options->y * 2), 2 + (options->x * 4));
+	wrefresh(options->enemy_map);
+
 	pthread_mutex_unlock(&(options->mutex));
 }
 

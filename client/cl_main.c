@@ -17,8 +17,9 @@ int main(int argc, char *argv[])
 	struct main_event cap = { NULL }, /**< Cap for easy queue processing */
 	       *head = &cap; /**< Pointer on head of queue */
 	struct main_queue queue /**< All information about queue */
-	                        = { pthread_self(), PTHREAD_MUTEX_INITIALIZER, 
+	                        = { pthread_self(), PTHREAD_MUTEX_INITIALIZER,
 	                            head };
+	//fprintf(stderr, "main: %d ", (int)pthread_self());
 	struct net *cl_net = NULL; /**< Net information */
 	struct gui *cl_gui = NULL; /**< GUI information */
 	map cl_map, /**< Player's map */
@@ -34,7 +35,7 @@ int main(int argc, char *argv[])
 		perror("sigaction");
 		exit(EXIT_FAILURE);
 	}
-	
+
 	/* Process all command line options */
 	if (cl_main_get_options(argc, argv, &srv_port, srv_address)) {
 		printf("Illegal command line options.\n");
@@ -58,8 +59,8 @@ int main(int argc, char *argv[])
 	memcpy(cl_map, cl_placement, sizeof(map));
 	/* for(i = 0; i < 10; ++i) {
 			for (j = 0; j < 10; ++j)
-				fprintf(stderr, "%d ", cl_enemy_map[i][j]);
-			fprintf(stderr, "\n");
+				//fprintf(stderr, "%d ", cl_enemy_map[i][j]);
+			//fprintf(stderr, "\n");
 		} */
 	cl_gui_input_nick(cl_gui);
 	cl_net_send_placement(cl_net, cl_placement);
@@ -139,6 +140,7 @@ void cl_main_make_event(struct main_queue *queue, enum main_event_types type,
 	memcpy(tmp->event_data, data, data_length);
 
 	pthread_mutex_unlock(&(queue->mutex));
+	//fprintf(stderr, "event: %d", (int)queue->main_id);
 	pthread_kill(queue->main_id, SIGUSR1);
 }
 
@@ -178,10 +180,11 @@ void cl_main_control(struct main_queue *queue, map my_map, map enemy_map,
 				cl_gui_main_window(cl_gui, my_map);
 				break;
 			case GUI_SHOT: /* gui send player's shot*/
-				cl_main_check_shot(tmp->event_data, my_map, network, cl_gui, &turn);
+				cl_main_check_shot(tmp->event_data, enemy_map, network, cl_gui, &turn);
 				break;
 			case GUI_EXIT: /* gui send player's whant exit*/
 				cl_net_stop(network);
+				cl_gui_stop(cl_gui);
 				goto out;
 				break;
 			case NET_SHOT_RESULT: /* server send shot result*/
@@ -195,8 +198,9 @@ void cl_main_control(struct main_queue *queue, map my_map, map enemy_map,
 				cl_main_send_placement(tmp->event_data, enemy_map, cl_gui);
 				break;
 			case NET_ERROR: /* server send some error*/
-				// cl_gui_error(cl_gui);//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-				break;
+				cl_net_stop(network);
+				cl_gui_stop(cl_gui);
+				printf("Server close connection\n");
 			case NET_START_GAME: /* server send that the game start*/
 				cl_main_start_game(tmp->event_data, my_map, &turn, cl_gui);
 				break;
@@ -224,8 +228,9 @@ void cl_main_check_shot(void * event_data, map my_map, struct net *network,
 	char y = *(char *)(event_data + sizeof(char)) /**< y coordinate*/;
 
 	/* if shot not valid */
+	//fprintf(stderr, "%d\n", my_map[(int)y][(int)x]);
 	if(cl_logic_valid_shot(x, y, my_map, turn) == 0) {
-		printf("Invalid shot\n");
+		cl_gui_refresh_status(cl_gui, INVALID_SHOT);
 		// cl_gui_error(cl_gui);
 	} else {
 		cl_net_send_shot(network, x, y);
@@ -253,6 +258,7 @@ void cl_main_check_net_shot(void * event_data,
 	// printf("%d %d %d\n", x, y, result);
 	/* if playershoting and whating answer from server*/
 	if(*turn == WAITING_TURN) {
+		
 		cl_logic_shot(x, y, result, enemy_map, turn);
 		/* for(i = 0; i < 10; ++i) {
 			for (j = 0; j < 10; ++j)
@@ -303,7 +309,7 @@ void cl_main_start_game(void * event_data, map my_map, enum player_state *turn,
 		*turn = MY_TURN;
 		break;
 	default:
-		printf("Wrong turn data\n");
+		//printf("Wrong turn data\n");
 		exit(EXIT_FAILURE);
 	}
 	if (*turn == MY_TURN)
