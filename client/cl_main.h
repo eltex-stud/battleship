@@ -27,6 +27,7 @@ struct main_queue {
 	pthread_t main_id;
 	pthread_mutex_t mutex;
 	int net_working;
+	int gui_working;
 	struct main_event *head;
 };
 

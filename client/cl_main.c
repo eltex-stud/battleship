@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 	struct main_event cap = { NULL }, /**< Cap for easy queue processing */
 	       *head = &cap; /**< Pointer on head of queue */
 	struct main_queue queue /**< All information about queue */
-	                        = { pthread_self(), PTHREAD_MUTEX_INITIALIZER, 0,
+	                        = { pthread_self(), PTHREAD_MUTEX_INITIALIZER, 0, 1,
 	                            head };
 	//fprintf(stderr, "main: %d ", (int)pthread_self());
 	struct net *cl_net = NULL; /**< Net information */
@@ -71,7 +71,8 @@ int main(int argc, char *argv[])
 	/* After main work wait for all threads to end */
 	cl_gui_wait(cl_gui);
 	//cl_net_wait(cl_net);
-	cl_gui_stop(cl_gui);
+	if(queue.gui_working)
+		cl_gui_stop(cl_gui);
 	return 0;
 }
 
@@ -191,6 +192,7 @@ void cl_main_control(struct main_queue *queue, map my_map, map enemy_map,
 				if(queue->net_working)
 					cl_net_stop(network);
 				cl_gui_stop(cl_gui);
+				queue->gui_working = 0;;
 				//fprintf(stderr, "we was here!!!\n");
 				goto out;
 				break;
@@ -210,6 +212,7 @@ void cl_main_control(struct main_queue *queue, map my_map, map enemy_map,
 				if(queue->net_working) {
 					cl_gui_stop(cl_gui);
 					cl_net_stop(network);
+					queue->gui_working = 0;
 					printf("Server close connection\n");
 				}
 				goto out;
