@@ -41,6 +41,9 @@ void gui_key_processing_input_nick(struct gui *options, long ch)
 			break;
 
 		default:
+			if(ch <= 32 || ch >= 127) {
+				break;
+			}
 			if (options->size_of_msg < 26 - 1) {
 				options->msg[options->size_of_msg] = ch;
 				wmove(options->nick_window, 2, 23 + options->size_of_msg);
@@ -88,6 +91,9 @@ void gui_key_processing_chat(struct gui *options, long ch)
 			break;
 
 		default:
+			if(ch <= 32 || ch >= 127) {
+				break;
+			}
 			if (options->size_of_msg < MAX_BUFF - 1) {
 				options->msg[options->size_of_msg] = ch;
 				wmove(options->chat, getmaxy(options->chat) - 2, 6 + options->size_of_msg);
