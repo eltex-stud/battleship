@@ -49,12 +49,11 @@ static struct srv_net_client *srv_net_find_client(int fd)
 
 struct srv_net_queue *head = NULL;
 struct srv_net_queue *tail = NULL;
+int sock_opt_reuseaddr = 1;
 
 struct srv_net_network *srv_net_start(char *ip, short int port)
 {
 	int server_sock;
-	int *sock_opt_reuseaddr = malloc(sizeof(int)); /* TODO: fix memory leak */
-	*sock_opt_reuseaddr = 1;
 
 	struct sockaddr_in server_addr;
 	struct srv_net_network *network;
@@ -223,6 +222,7 @@ void srv_net_wait_events(struct srv_net_network *net, int *clients[] __attribute
 							client = srv_net_find_client(client_list[jdx].fd);
 							main_client_ops.shot_received(client, cl_shot,
 									client_list[jdx].client_data, net->main_data);
+							free(cl_shot);
 							break;
 
 						case END:
