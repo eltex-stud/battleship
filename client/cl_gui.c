@@ -481,10 +481,12 @@ int cl_gui_main_window(struct gui *options, map cl_map)
 	printw("| Move: ");
 
 	attron(A_ALTCHARSET);
-	printw("%c%c%c%c%c%c%c", ACS_UARROW, ACS_VLINE, ACS_DARROW, ACS_VLINE, 
-							 ACS_LARROW, ACS_VLINE, ACS_RARROW);
+	printw("%c%c", ACS_UARROW, ACS_VLINE);
 	attroff(A_ALTCHARSET);
-	printw("; Shot: space; Enter chat/battlefield: ENTER;");
+	printw("v");
+	attron(A_ALTCHARSET);
+	printw("%c%c%c%c", ACS_VLINE, ACS_LARROW, ACS_VLINE, ACS_RARROW);
+	printw("; Shot - SPACE; Enter chat/battlefield - ENTER; End game - END;");
 
 	move(1, getmaxx(stdscr) / 2 - 43);
 	printw("| ");
